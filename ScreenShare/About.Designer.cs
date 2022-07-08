@@ -28,105 +28,106 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
-            this.linkLabel2 = new System.Windows.Forms.LinkLabel();
-            this.linkLabel3 = new System.Windows.Forms.LinkLabel();
-            this.label4 = new System.Windows.Forms.Label();
+            this.name = new System.Windows.Forms.Label();
+            this.version = new System.Windows.Forms.Label();
+            this.authorLabel = new System.Windows.Forms.Label();
+            this.authorLink = new System.Windows.Forms.LinkLabel();
+            this.thankLabel = new System.Windows.Forms.Label();
+            this.thankLink = new System.Windows.Forms.LinkLabel();
+            this.thankLink2 = new System.Windows.Forms.LinkLabel();
             this.SuspendLayout();
             // 
-            // label1
+            // name
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(50, 40);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(88, 16);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "版本：V1.0";
+            this.name.AutoSize = true;
+            this.name.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.name.Location = new System.Drawing.Point(55, 10);
+            this.name.Name = "name";
+            this.name.Size = new System.Drawing.Size(71, 16);
+            this.name.TabIndex = 0;
+            this.name.Text = "屏幕共享";
             // 
-            // label2
+            // version
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(10, 70);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(41, 12);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "作者：";
+            this.version.AutoSize = true;
+            this.version.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.version.Location = new System.Drawing.Point(50, 40);
+            this.version.Name = "version";
+            this.version.Size = new System.Drawing.Size(87, 16);
+            this.version.TabIndex = 1;
+            this.version.Text = "版本：V2.0";
             // 
-            // label3
+            // authorLabel
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(10, 100);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(41, 12);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "感谢：";
+            this.authorLabel.AutoSize = true;
+            this.authorLabel.Location = new System.Drawing.Point(10, 70);
+            this.authorLabel.Name = "authorLabel";
+            this.authorLabel.Size = new System.Drawing.Size(41, 12);
+            this.authorLabel.TabIndex = 2;
+            this.authorLabel.Text = "作者：";
             // 
-            // linkLabel1
+            // authorLink
             // 
-            this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(50, 70);
-            this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(47, 12);
-            this.linkLabel1.TabIndex = 3;
-            this.linkLabel1.TabStop = true;
-            this.linkLabel1.Text = "ALI1416";
-            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabel1_LinkClicked);
+            this.authorLink.AutoSize = true;
+            this.authorLink.Location = new System.Drawing.Point(50, 70);
+            this.authorLink.Name = "authorLink";
+            this.authorLink.Size = new System.Drawing.Size(47, 12);
+            this.authorLink.TabIndex = 3;
+            this.authorLink.TabStop = true;
+            this.authorLink.Text = "ALI1416";
+            this.authorLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.AuthorLink_LinkClicked);
             // 
-            // linkLabel2
+            // thankLabel
             // 
-            this.linkLabel2.AutoSize = true;
-            this.linkLabel2.Location = new System.Drawing.Point(50, 100);
-            this.linkLabel2.Name = "linkLabel2";
-            this.linkLabel2.Size = new System.Drawing.Size(47, 12);
-            this.linkLabel2.TabIndex = 4;
-            this.linkLabel2.TabStop = true;
-            this.linkLabel2.Text = "EslaMx7";
-            this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabel2_LinkClicked);
+            this.thankLabel.AutoSize = true;
+            this.thankLabel.Location = new System.Drawing.Point(10, 100);
+            this.thankLabel.Name = "thankLabel";
+            this.thankLabel.Size = new System.Drawing.Size(41, 12);
+            this.thankLabel.TabIndex = 4;
+            this.thankLabel.Text = "感谢：";
             // 
-            // linkLabel3
+            // thankLink
             // 
-            this.linkLabel3.AutoSize = true;
-            this.linkLabel3.Location = new System.Drawing.Point(50, 120);
-            this.linkLabel3.Name = "linkLabel3";
-            this.linkLabel3.Size = new System.Drawing.Size(77, 12);
-            this.linkLabel3.TabIndex = 5;
-            this.linkLabel3.TabStop = true;
-            this.linkLabel3.Text = "xChivalrouSx";
-            this.linkLabel3.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabel3_LinkClicked);
+            this.thankLink.AutoSize = true;
+            this.thankLink.Location = new System.Drawing.Point(50, 100);
+            this.thankLink.Name = "thankLink";
+            this.thankLink.Size = new System.Drawing.Size(47, 12);
+            this.thankLink.TabIndex = 5;
+            this.thankLink.TabStop = true;
+            this.thankLink.Text = "EslaMx7";
+            this.thankLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ThankLink_LinkClicked);
             // 
-            // label4
+            // thankLink2
             // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label4.Location = new System.Drawing.Point(55, 10);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(72, 16);
-            this.label4.TabIndex = 6;
-            this.label4.Text = "屏幕共享";
+            this.thankLink2.AutoSize = true;
+            this.thankLink2.Location = new System.Drawing.Point(50, 120);
+            this.thankLink2.Name = "thankLink2";
+            this.thankLink2.Size = new System.Drawing.Size(77, 12);
+            this.thankLink2.TabIndex = 6;
+            this.thankLink2.TabStop = true;
+            this.thankLink2.Text = "xChivalrouSx";
+            this.thankLink2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ThankLink2_LinkClicked);
             // 
             // About
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(184, 161);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.linkLabel3);
-            this.Controls.Add(this.linkLabel2);
-            this.Controls.Add(this.linkLabel1);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.name);
+            this.Controls.Add(this.version);
+            this.Controls.Add(this.authorLabel);
+            this.Controls.Add(this.authorLink);
+            this.Controls.Add(this.thankLabel);
+            this.Controls.Add(this.thankLink);
+            this.Controls.Add(this.thankLink2);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "About";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "About";
+            this.Text = "关于";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -134,12 +135,12 @@
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.LinkLabel linkLabel1;
-        private System.Windows.Forms.LinkLabel linkLabel2;
-        private System.Windows.Forms.LinkLabel linkLabel3;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label name;
+        private System.Windows.Forms.Label version;
+        private System.Windows.Forms.Label authorLabel;
+        private System.Windows.Forms.LinkLabel authorLink;
+        private System.Windows.Forms.Label thankLabel;
+        private System.Windows.Forms.LinkLabel thankLink;
+        private System.Windows.Forms.LinkLabel thankLink2;
     }
 }

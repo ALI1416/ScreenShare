@@ -380,4 +380,3 @@ namespace ScreenShare
         }
     }
 }
-
