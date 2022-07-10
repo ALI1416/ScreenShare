@@ -42,6 +42,8 @@
             this.MinimizeBox = false;
             this.Name = "DrawScreen";
             this.Opacity = 0.25D;
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.TopMost = true;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DrawScreen_KeyDown);
@@ -49,7 +51,6 @@
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.DrawScreen_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DrawScreen_MouseUp);
             this.ResumeLayout(false);
-
         }
 
         #endregion

@@ -1,16 +1,14 @@
 ﻿using ScreenShare.Properties;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -18,13 +16,19 @@ namespace ScreenShare
 {
     public partial class ScreenShare : Form
     {
-        public int realScreenW;
-        public int realScreenH;
+        // 获取到所有的屏幕信息
+        private Screen[] screens = Screen.AllScreens;
+        private int screenW;
+        private int screenH;
         private bool isWorking = false;
-        private List<Tuple<string, string>> ips;
-        private HttpListener server = new HttpListener();
-        private MemoryStream imageStream = new MemoryStream();
-        private MemoryStream ico16 = new MemoryStream();
+        private readonly List<Tuple<string, string>> ips;
+        // 服务器
+        private readonly HttpListener server = new HttpListener();
+        // 图标
+        private readonly MemoryStream faviconStream = new MemoryStream();
+        // 图片
+        private readonly MemoryStream imageStream = new MemoryStream();
+        // 返回结果
         private byte[] responseData;
 
         /// <summary>
@@ -34,18 +38,20 @@ namespace ScreenShare
         {
             InitializeComponent();
             ScreenRealSize.Init();
-            Resources.Ico16.Save(ico16, ImageFormat.Png);
+            // 读取图标
+            Resources.favicon.Save(faviconStream);
             Size screenRealSize = ScreenRealSize.DESKTOP;
-            realScreenW = screenRealSize.Width;
-            realScreenH = screenRealSize.Height;
-            screenWNud.Value = videoWNud.Value = screenWNud.Maximum = realScreenW;
-            screenHNud.Value = videoHNud.Value = screenHNud.Maximum = realScreenH;
-            ips = Util.GetAllIPv4Addresses();
+            screenW = screenRealSize.Width;
+            screenH = screenRealSize.Height;
+            screenWNud.Value = videoWNud.Value = screenWNud.Maximum = screenW;
+            screenHNud.Value = videoHNud.Value = screenHNud.Maximum = screenH;
+            // 获取IP地址
+            ips = GetAllIPv4Addresses();
             foreach (var ip in ips)
             {
                 ipAddressComboBox.Items.Add(ip.Item2 + " - " + ip.Item1);
             }
-            ipAddressComboBox.SelectedIndex = ipAddressComboBox.Items.Count - 1;
+            ipAddressComboBox.SelectedIndex = 0;
             Log("屏幕共享初始化完成！");
         }
 
@@ -84,7 +90,6 @@ namespace ScreenShare
             string encryptionPwd = encryptionPwdText.Text;
             int videoFrame = (int)videoFrameNud.Value;
             string html = Resources.Html1 + (1000 / videoFrame) + Resources.Html2;
-
             server.Prefixes.Clear();
             server.Prefixes.Add("http://" + ipAddress + ":" + ipPort + "/");
             server.Start();
@@ -136,10 +141,10 @@ namespace ScreenShare
                     ctx.Response.ContentType = "image/jpeg";
                     responseData = imageStream.ToArray();
                 }
-                else
+                else if (localPath == "/favicon.ico")
                 {
-                    ctx.Response.ContentType = "image/png";
-                    responseData = ico16.ToArray();
+                    ctx.Response.ContentType = "image/x-icon";
+                    responseData = faviconStream.ToArray();
                 }
                 try
                 {
@@ -274,8 +279,8 @@ namespace ScreenShare
             if (isChecked)
             {
                 screenXNud.Value = screenYNud.Value = 0;
-                screenWNud.Value = realScreenW;
-                screenHNud.Value = realScreenH;
+                screenWNud.Value = screenW;
+                screenHNud.Value = screenH;
             }
         }
 
@@ -372,11 +377,29 @@ namespace ScreenShare
             else
             {
                 previewImg.Dock = DockStyle.None;
-                Size clientSize = ClientSize;
-                Point previewImgLocation = previewImg.Location;
-                previewImg.Size = new Size(clientSize.Width - previewImgLocation.X - 9, clientSize.Height - previewImgLocation.Y - 11);
                 previewImg.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             }
         }
+
+        /// <summary>
+        /// 获取所有的IP地址
+        /// </summary>
+        /// <returns></returns>
+        public static List<Tuple<string, string>> GetAllIPv4Addresses()
+        {
+            List<Tuple<string, string>> ipList = new List<Tuple<string, string>>();
+            foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                foreach (var ua in ni.GetIPProperties().UnicastAddresses)
+                {
+                    if (ua.Address.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        ipList.Add(Tuple.Create(ni.Name, ua.Address.ToString()));
+                    }
+                }
+            }
+            return ipList;
+        }
+
     }
 }

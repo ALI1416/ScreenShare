@@ -31,7 +31,6 @@ namespace ScreenShare
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ScreenShare));
             this.ShareScreenLabel = new System.Windows.Forms.Label();
             this.ipAddressLabel = new System.Windows.Forms.Label();
             this.shareLinkLabel = new System.Windows.Forms.Label();
@@ -95,10 +94,9 @@ namespace ScreenShare
             // 
             // ShareScreenLabel
             // 
-            this.ShareScreenLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ShareScreenLabel.AutoSize = true;
             this.ShareScreenLabel.Font = new System.Drawing.Font("宋体", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.ShareScreenLabel.Location = new System.Drawing.Point(290, 10);
+            this.ShareScreenLabel.Location = new System.Drawing.Point(322, 10);
             this.ShareScreenLabel.Name = "ShareScreenLabel";
             this.ShareScreenLabel.Size = new System.Drawing.Size(124, 27);
             this.ShareScreenLabel.TabIndex = 0;
@@ -124,9 +122,8 @@ namespace ScreenShare
             // 
             // ipPortLabel
             // 
-            this.ipPortLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.ipPortLabel.AutoSize = true;
-            this.ipPortLabel.Location = new System.Drawing.Point(360, 54);
+            this.ipPortLabel.Location = new System.Drawing.Point(424, 54);
             this.ipPortLabel.Name = "ipPortLabel";
             this.ipPortLabel.Size = new System.Drawing.Size(53, 12);
             this.ipPortLabel.TabIndex = 3;
@@ -155,20 +152,17 @@ namespace ScreenShare
             // 
             // ipAddressComboBox
             // 
-            this.ipAddressComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.ipAddressComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ipAddressComboBox.FormattingEnabled = true;
             this.ipAddressComboBox.Location = new System.Drawing.Point(70, 50);
             this.ipAddressComboBox.Name = "ipAddressComboBox";
-            this.ipAddressComboBox.Size = new System.Drawing.Size(280, 20);
+            this.ipAddressComboBox.Size = new System.Drawing.Size(344, 20);
             this.ipAddressComboBox.TabIndex = 1;
             this.ipAddressComboBox.SelectedValueChanged += new System.EventHandler(this.IpAddressComboBox_SelectedValueChanged);
             // 
             // ipPortNud
             // 
-            this.ipPortNud.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ipPortNud.Location = new System.Drawing.Point(410, 50);
+            this.ipPortNud.Location = new System.Drawing.Point(474, 50);
             this.ipPortNud.Maximum = new decimal(new int[] {
             65535,
             0,
@@ -186,19 +180,16 @@ namespace ScreenShare
             // 
             // shareLinkText
             // 
-            this.shareLinkText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.shareLinkText.BackColor = System.Drawing.SystemColors.Window;
             this.shareLinkText.Location = new System.Drawing.Point(70, 80);
             this.shareLinkText.Name = "shareLinkText";
             this.shareLinkText.ReadOnly = true;
-            this.shareLinkText.Size = new System.Drawing.Size(420, 21);
+            this.shareLinkText.Size = new System.Drawing.Size(484, 21);
             this.shareLinkText.TabIndex = 3;
             // 
             // aboutBtn
             // 
-            this.aboutBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.aboutBtn.Location = new System.Drawing.Point(650, 50);
+            this.aboutBtn.Location = new System.Drawing.Point(714, 50);
             this.aboutBtn.Name = "aboutBtn";
             this.aboutBtn.Size = new System.Drawing.Size(45, 23);
             this.aboutBtn.TabIndex = 4;
@@ -208,8 +199,7 @@ namespace ScreenShare
             // 
             // copyBtn
             // 
-            this.copyBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.copyBtn.Location = new System.Drawing.Point(500, 80);
+            this.copyBtn.Location = new System.Drawing.Point(564, 80);
             this.copyBtn.Name = "copyBtn";
             this.copyBtn.Size = new System.Drawing.Size(45, 23);
             this.copyBtn.TabIndex = 3;
@@ -587,15 +577,13 @@ namespace ScreenShare
             // 
             // logText
             // 
-            this.logText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)));
             this.logText.BackColor = System.Drawing.SystemColors.Window;
             this.logText.Location = new System.Drawing.Point(10, 280);
             this.logText.Multiline = true;
             this.logText.Name = "logText";
             this.logText.ReadOnly = true;
             this.logText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.logText.Size = new System.Drawing.Size(350, 150);
+            this.logText.Size = new System.Drawing.Size(350, 141);
             this.logText.TabIndex = 21;
             this.logText.TabStop = false;
             // 
@@ -669,7 +657,7 @@ namespace ScreenShare
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(704, 441);
+            this.ClientSize = new System.Drawing.Size(768, 432);
             this.Controls.Add(this.previewImg);
             this.Controls.Add(this.logText);
             this.Controls.Add(this.videoBox);
@@ -686,8 +674,9 @@ namespace ScreenShare
             this.Controls.Add(this.shareLinkLabel);
             this.Controls.Add(this.ipAddressLabel);
             this.Controls.Add(this.ShareScreenLabel);
-            this.Icon = Resources.Ico;
-            this.MinimumSize = new System.Drawing.Size(720, 480);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = global::ScreenShare.Properties.Resources.icon;
+            this.MaximizeBox = false;
             this.Name = "ScreenShare";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "屏幕共享";
