@@ -48,8 +48,8 @@
             this.pwdText = new System.Windows.Forms.TextBox();
             this.coordinatesBox = new System.Windows.Forms.GroupBox();
             this.isFullScreenCb = new System.Windows.Forms.CheckBox();
-            this.displayLabel = new System.Windows.Forms.Label();
-            this.displayComboBox = new System.Windows.Forms.ComboBox();
+            this.screenLabel = new System.Windows.Forms.Label();
+            this.screenComboBox = new System.Windows.Forms.ComboBox();
             this.screenXLabel = new System.Windows.Forms.Label();
             this.screenXNud = new System.Windows.Forms.NumericUpDown();
             this.screenYLabel = new System.Windows.Forms.Label();
@@ -120,14 +120,14 @@
             this.ipAddressComboBox.FormattingEnabled = true;
             this.ipAddressComboBox.Location = new System.Drawing.Point(70, 50);
             this.ipAddressComboBox.Name = "ipAddressComboBox";
-            this.ipAddressComboBox.Size = new System.Drawing.Size(345, 20);
+            this.ipAddressComboBox.Size = new System.Drawing.Size(350, 20);
             this.ipAddressComboBox.TabIndex = 2;
             this.ipAddressComboBox.SelectedValueChanged += new System.EventHandler(this.IpAddressComboBox_SelectedValueChanged);
             // 
             // ipPortLabel
             // 
             this.ipPortLabel.AutoSize = true;
-            this.ipPortLabel.Location = new System.Drawing.Point(419, 54);
+            this.ipPortLabel.Location = new System.Drawing.Point(424, 54);
             this.ipPortLabel.Name = "ipPortLabel";
             this.ipPortLabel.Size = new System.Drawing.Size(53, 12);
             this.ipPortLabel.TabIndex = 0;
@@ -135,7 +135,7 @@
             // 
             // ipPortNud
             // 
-            this.ipPortNud.Location = new System.Drawing.Point(475, 50);
+            this.ipPortNud.Location = new System.Drawing.Point(480, 50);
             this.ipPortNud.Maximum = new decimal(new int[] {
             65535,
             0,
@@ -153,7 +153,7 @@
             // 
             // reloadConfigBtn
             // 
-            this.reloadConfigBtn.Location = new System.Drawing.Point(560, 50);
+            this.reloadConfigBtn.Location = new System.Drawing.Point(565, 50);
             this.reloadConfigBtn.Name = "reloadConfigBtn";
             this.reloadConfigBtn.Size = new System.Drawing.Size(90, 23);
             this.reloadConfigBtn.TabIndex = 4;
@@ -162,9 +162,9 @@
             // 
             // aboutBtn
             // 
-            this.aboutBtn.Location = new System.Drawing.Point(710, 50);
+            this.aboutBtn.Location = new System.Drawing.Point(705, 50);
             this.aboutBtn.Name = "aboutBtn";
-            this.aboutBtn.Size = new System.Drawing.Size(50, 53);
+            this.aboutBtn.Size = new System.Drawing.Size(55, 53);
             this.aboutBtn.TabIndex = 5;
             this.aboutBtn.Text = "关于";
             this.aboutBtn.UseVisualStyleBackColor = true;
@@ -185,12 +185,12 @@
             this.shareLinkText.Location = new System.Drawing.Point(70, 80);
             this.shareLinkText.Name = "shareLinkText";
             this.shareLinkText.ReadOnly = true;
-            this.shareLinkText.Size = new System.Drawing.Size(485, 21);
+            this.shareLinkText.Size = new System.Drawing.Size(440, 21);
             this.shareLinkText.TabIndex = 6;
             // 
             // copyBtn
             // 
-            this.copyBtn.Location = new System.Drawing.Point(560, 80);
+            this.copyBtn.Location = new System.Drawing.Point(515, 80);
             this.copyBtn.Name = "copyBtn";
             this.copyBtn.Size = new System.Drawing.Size(45, 23);
             this.copyBtn.TabIndex = 7;
@@ -201,7 +201,7 @@
             // 
             // openBtn
             // 
-            this.openBtn.Location = new System.Drawing.Point(610, 80);
+            this.openBtn.Location = new System.Drawing.Point(565, 80);
             this.openBtn.Name = "openBtn";
             this.openBtn.Size = new System.Drawing.Size(90, 23);
             this.openBtn.TabIndex = 8;
@@ -227,9 +227,9 @@
             this.isEncryptionCb.AutoSize = true;
             this.isEncryptionCb.Location = new System.Drawing.Point(10, 20);
             this.isEncryptionCb.Name = "isEncryptionCb";
-            this.isEncryptionCb.Size = new System.Drawing.Size(48, 16);
+            this.isEncryptionCb.Size = new System.Drawing.Size(72, 16);
             this.isEncryptionCb.TabIndex = 1;
-            this.isEncryptionCb.Text = "开启";
+            this.isEncryptionCb.Text = "开启加密";
             this.toolTip.SetToolTip(this.isEncryptionCb, "开启后需要输入账号密码才能访问。");
             this.isEncryptionCb.UseVisualStyleBackColor = true;
             this.isEncryptionCb.CheckStateChanged += new System.EventHandler(this.IsEncryptionCb_CheckStateChanged);
@@ -271,8 +271,8 @@
             // coordinatesBox
             // 
             this.coordinatesBox.Controls.Add(this.isFullScreenCb);
-            this.coordinatesBox.Controls.Add(this.displayLabel);
-            this.coordinatesBox.Controls.Add(this.displayComboBox);
+            this.coordinatesBox.Controls.Add(this.screenLabel);
+            this.coordinatesBox.Controls.Add(this.screenComboBox);
             this.coordinatesBox.Controls.Add(this.screenXLabel);
             this.coordinatesBox.Controls.Add(this.screenXNud);
             this.coordinatesBox.Controls.Add(this.screenYLabel);
@@ -302,22 +302,23 @@
             this.isFullScreenCb.UseVisualStyleBackColor = true;
             this.isFullScreenCb.CheckStateChanged += new System.EventHandler(this.IsFullScreenCb_CheckStateChanged);
             // 
-            // displayLabel
+            // screenLabel
             // 
-            this.displayLabel.AutoSize = true;
-            this.displayLabel.Location = new System.Drawing.Point(69, 20);
-            this.displayLabel.Name = "displayLabel";
-            this.displayLabel.Size = new System.Drawing.Size(53, 12);
-            this.displayLabel.TabIndex = 0;
-            this.displayLabel.Text = "显示器：";
+            this.screenLabel.AutoSize = true;
+            this.screenLabel.Location = new System.Drawing.Point(69, 20);
+            this.screenLabel.Name = "screenLabel";
+            this.screenLabel.Size = new System.Drawing.Size(53, 12);
+            this.screenLabel.TabIndex = 0;
+            this.screenLabel.Text = "显示器：";
             // 
-            // displayComboBox
+            // screenComboBox
             // 
-            this.displayComboBox.FormattingEnabled = true;
-            this.displayComboBox.Location = new System.Drawing.Point(125, 16);
-            this.displayComboBox.Name = "displayComboBox";
-            this.displayComboBox.Size = new System.Drawing.Size(130, 20);
-            this.displayComboBox.TabIndex = 2;
+            this.screenComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.screenComboBox.FormattingEnabled = true;
+            this.screenComboBox.Location = new System.Drawing.Point(125, 16);
+            this.screenComboBox.Name = "screenComboBox";
+            this.screenComboBox.Size = new System.Drawing.Size(130, 20);
+            this.screenComboBox.TabIndex = 2;
             // 
             // screenXLabel
             // 
@@ -771,63 +772,218 @@
 
         #endregion
 
-        // 头部
+        /* 头部 */
+        /// <summary>
+        /// 屏幕共享Label
+        /// </summary>
         private System.Windows.Forms.Label shareScreenLabel;
+        /// <summary>
+        /// IP地址Label
+        /// </summary>
         private System.Windows.Forms.Label ipAddressLabel;
+        /// <summary>
+        /// IP地址ComboBox
+        /// </summary>
         private System.Windows.Forms.ComboBox ipAddressComboBox;
+        /// <summary>
+        /// 端口号Label
+        /// </summary>
         private System.Windows.Forms.Label ipPortLabel;
+        /// <summary>
+        /// IP地址NumericUpDown
+        /// </summary>
         private System.Windows.Forms.NumericUpDown ipPortNud;
+        /// <summary>
+        /// 重新加载配置Button
+        /// </summary>
         private System.Windows.Forms.Button reloadConfigBtn;
+        /// <summary>
+        /// 关于Button
+        /// </summary>
         private System.Windows.Forms.Button aboutBtn;
+        /// <summary>
+        /// 分享地址Label
+        /// </summary>
         private System.Windows.Forms.Label shareLinkLabel;
+        /// <summary>
+        /// 分享地址TextBox
+        /// </summary>
         private System.Windows.Forms.TextBox shareLinkText;
+        /// <summary>
+        /// 复制Button
+        /// </summary>
         private System.Windows.Forms.Button copyBtn;
+        /// <summary>
+        /// 用浏览器打开Button
+        /// </summary>
         private System.Windows.Forms.Button openBtn;
-        // 加密传输box
+
+        /* 加密传输GroupBox */
+        /// <summary>
+        /// 加密传输GroupBox
+        /// </summary>
         private System.Windows.Forms.GroupBox encryptionBox;
+        /// <summary>
+        /// 开启加密CheckBox
+        /// </summary>
         private System.Windows.Forms.CheckBox isEncryptionCb;
+        /// <summary>
+        /// 账号Label
+        /// </summary>
         private System.Windows.Forms.Label accountLabel;
+        /// <summary>
+        /// 账号TextBox
+        /// </summary>
         private System.Windows.Forms.TextBox accountText;
+        /// <summary>
+        /// 密码Label
+        /// </summary>
         private System.Windows.Forms.Label pwdLabel;
+        /// <summary>
+        /// 密码TextBox
+        /// </summary>
         private System.Windows.Forms.TextBox pwdText;
-        // 选取位置box
+
+        /* 选取位置GroupBox */
+        /// <summary>
+        /// 选取位置GroupBox
+        /// </summary>
         private System.Windows.Forms.GroupBox coordinatesBox;
+        /// <summary>
+        /// 全屏CheckBox
+        /// </summary>
         private System.Windows.Forms.CheckBox isFullScreenCb;
-        private System.Windows.Forms.Label displayLabel;
-        private System.Windows.Forms.ComboBox displayComboBox;
+        /// <summary>
+        /// 显示器Label
+        /// </summary>
+        private System.Windows.Forms.Label screenLabel;
+        /// <summary>
+        /// 显示器ComboBox
+        /// </summary>
+        private System.Windows.Forms.ComboBox screenComboBox;
+        /// <summary>
+        /// X Label
+        /// </summary>
         private System.Windows.Forms.Label screenXLabel;
+        /// <summary>
+        /// X NumericUpDown
+        /// </summary>
         private System.Windows.Forms.NumericUpDown screenXNud;
+        /// <summary>
+        /// Y Label
+        /// </summary>
         private System.Windows.Forms.Label screenYLabel;
+        /// <summary>
+        /// Y NumericUpDown
+        /// </summary>
         private System.Windows.Forms.NumericUpDown screenYNud;
+        /// <summary>
+        /// 宽Label
+        /// </summary>
         private System.Windows.Forms.Label screenWLabel;
+        /// <summary>
+        /// 宽NumericUpDown
+        /// </summary>
         private System.Windows.Forms.NumericUpDown screenWNud;
+        /// <summary>
+        /// 高Label
+        /// </summary>
         private System.Windows.Forms.Label screenHLabel;
+        /// <summary>
+        /// 高NumericUpDown
+        /// </summary>
         private System.Windows.Forms.NumericUpDown screenHNud;
+        /// <summary>
+        /// 选取屏幕坐标Button
+        /// </summary>
         private System.Windows.Forms.Button captureScreenCoordinatesBtn;
-        // 视频尺寸box
+
+        /* 视频尺寸GroupBox */
+        /// <summary>
+        /// 视频尺寸GroupBox
+        /// </summary>
         private System.Windows.Forms.GroupBox scalingBox;
+        /// <summary>
+        /// 锁定纵横比CheckBox
+        /// </summary>
         private System.Windows.Forms.CheckBox isLockAspectRatioCb;
+        /// <summary>
+        /// 缩放比例Label
+        /// </summary>
         private System.Windows.Forms.Label scalingLabel;
+        /// <summary>
+        /// 缩放比例NumericUpDown
+        /// </summary>
         private System.Windows.Forms.NumericUpDown scalingNud;
+        /// <summary>
+        /// 宽Label
+        /// </summary>
         private System.Windows.Forms.Label videoWLabel;
+        /// <summary>
+        /// 宽NumericUpDown
+        /// </summary>
         private System.Windows.Forms.NumericUpDown videoWNud;
+        /// <summary>
+        /// 高Label
+        /// </summary>
         private System.Windows.Forms.Label videoHLabel;
+        /// <summary>
+        /// 高NumericUpDown
+        /// </summary>
         private System.Windows.Forms.NumericUpDown videoHNud;
-        // 视频设置box
+
+        /* 视频设置GroupBox */
+        /// <summary>
+        /// 视频设置GroupBox
+        /// </summary>
         private System.Windows.Forms.GroupBox videoBox;
+        /// <summary>
+        /// 显示光标CheckBox
+        /// </summary>
         private System.Windows.Forms.CheckBox isDisplayCursorCb;
+        /// <summary>
+        /// 每秒帧数Label
+        /// </summary>
         private System.Windows.Forms.Label videoFrameLabel;
+        /// <summary>
+        /// 每秒帧数NumericUpDown
+        /// </summary>
         private System.Windows.Forms.NumericUpDown videoFrameNud;
+        /// <summary>
+        /// 视频质量Label
+        /// </summary>
         private System.Windows.Forms.Label videoQualityLabel;
+        /// <summary>
+        /// 视频质量NumericUpDown
+        /// </summary>
         private System.Windows.Forms.NumericUpDown videoQualityNud;
-        // 开始分享按钮
+
+        /* 开始分享按钮 */
+        /// <summary>
+        /// 开始分享Button
+        /// </summary>
         private System.Windows.Forms.Button startSharingScreenBtn;
-        // 日志
+
+        /* 日志 */
+        /// <summary>
+        /// 日志TextBox
+        /// </summary>
         private System.Windows.Forms.TextBox logText;
-        // 预览
+
+        /* 预览 */
+        /// <summary>
+        /// 预览Label
+        /// </summary>
         private System.Windows.Forms.Label previewLabel;
+        /// <summary>
+        /// 预览图像PictureBox
+        /// </summary>
         private System.Windows.Forms.PictureBox previewImg;
-        // 提示
+
+        /* 提示 */
+        /// <summary>
+        /// 提示ToolTip
+        /// </summary>
         private System.Windows.Forms.ToolTip toolTip;
     }
 }

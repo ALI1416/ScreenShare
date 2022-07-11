@@ -16,12 +16,99 @@ namespace ScreenShare
 {
     public partial class ScreenShare : Form
     {
-        // 获取到所有的屏幕信息
-        private Screen[] screens = Screen.AllScreens;
+        /* 初始化参数 */
+        /// <summary>
+        /// 已启动
+        /// </summary>
+        private bool isWorking = false;
+        /// <summary>
+        /// IP地址下标
+        /// </summary>
+        private int ipAddressIndex;
+        /// <summary>
+        /// 端口号
+        /// </summary>
+        private int port;
+        /// <summary>
+        /// 分享地址
+        /// </summary>
+        private String shareLink;
+        /// <summary>
+        /// 开启加密
+        /// </summary>
+        private bool isEncryption;
+        /// <summary>
+        /// 账号
+        /// </summary>
+        private String account;
+        /// <summary>
+        /// 密码
+        /// </summary>
+        private String pwd;
+        /// <summary>
+        /// 开启全屏
+        /// </summary>
+        private bool isFullScreen;
+        /// <summary>
+        /// 显示器下标
+        /// </summary>
+        private int screenIndex;
+        /// <summary>
+        /// 显示器X
+        /// </summary>
+        private int screenX;
+        /// <summary>
+        /// 显示器Y
+        /// </summary>
+        private int screenY;
+        /// <summary>
+        /// 显示器宽
+        /// </summary>
+        private int screenWidth;
+        /// <summary>
+        /// 显示器高
+        /// </summary>
+        private int screenHeight;
+        /// <summary>
+        /// 视频缩放比例
+        /// </summary>
+        private int scaling;
+        /// <summary>
+        /// 视频X
+        /// </summary>
+        private int videoX;
+        /// <summary>
+        /// 视频Y
+        /// </summary>
+        private int videoY;
+        /// <summary>
+        /// 视频宽
+        /// </summary>
+        private int videoWidth;
+        /// <summary>
+        /// 视频高
+        /// </summary>
+        private int videoHeight;
+        /// <summary>
+        /// 显示光标
+        /// </summary>
+        private bool isDisplayCursor;
+        /// <summary>
+        /// 每秒帧数
+        /// </summary>
+        private int videoFrame;
+        /// <summary>
+        /// 视频质量
+        /// </summary>
+        private int videoQuality;
+
+        /* 其他参数 */
+        // IP地址列表
+        private List<Tuple<string, string>> ipList;
+        // 屏幕信息列表
+        private Screen[] screenList;
         private int screenW;
         private int screenH;
-        private bool isWorking = false;
-        private readonly List<Tuple<string, string>> ips;
         // 服务器
         private readonly HttpListener server = new HttpListener();
         // 图标
@@ -37,20 +124,35 @@ namespace ScreenShare
         public ScreenShare()
         {
             InitializeComponent();
+            Init();
             // 读取图标
             Resources.favicon.Save(faviconStream);
-            screenW = screens[0].Bounds.Width;
-            screenH = screens[0].Bounds.Height;
+            screenW = screenList[0].Bounds.Width;
+            screenH = screenList[0].Bounds.Height;
             screenWNud.Value = videoWNud.Value = screenWNud.Maximum = screenW;
             screenHNud.Value = videoHNud.Value = screenHNud.Maximum = screenH;
+            Log("屏幕共享初始化完成！");
+        }
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        private void Init()
+        {
             // 获取IP地址
-            ips = GetAllIPv4Addresses();
-            foreach (var ip in ips)
+            ipList = GetAllIPv4Addresses();
+            foreach (var ip in ipList)
             {
                 ipAddressComboBox.Items.Add(ip.Item2 + " - " + ip.Item1);
             }
             ipAddressComboBox.SelectedIndex = 0;
-            Log("屏幕共享初始化完成！");
+            // 获取屏幕信息
+            screenList = Screen.AllScreens;
+            foreach(var screen in screenList)
+            {
+                screenComboBox.Items.Add(screen.DeviceName.Remove(0,11) + " [" + screen.Bounds.Width + "x" + screen.Bounds.Height + "]");
+            }
+            screenComboBox.SelectedIndex = 0;
         }
 
         /// <summary>
@@ -81,7 +183,7 @@ namespace ScreenShare
         /// </summary>
         private async void StartServerTask()
         {
-            string ipAddress = ips.ElementAt(ipAddressComboBox.SelectedIndex).Item2;
+            string ipAddress = ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2;
             int ipPort = (int)ipPortNud.Value;
             bool isEncryption = isEncryptionCb.Checked;
             string encryptionAccount = accountText.Text;
@@ -347,7 +449,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void IpPortNud_ValueChanged(object sender, EventArgs e)
         {
-            shareLinkText.Text = "http://" + ips.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value;
+            shareLinkText.Text = "http://" + ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value;
         }
 
         /// <summary>
@@ -357,7 +459,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void IpAddressComboBox_SelectedValueChanged(object sender, EventArgs e)
         {
-            shareLinkText.Text = "http://" + ips.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value;
+            shareLinkText.Text = "http://" + ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value;
         }
 
         /// <summary>
@@ -380,7 +482,7 @@ namespace ScreenShare
         /// <summary>
         /// 获取所有的IP地址
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List&lt;Tuple&lt;名称, IP地址&gt;&gt;</returns>
         public static List<Tuple<string, string>> GetAllIPv4Addresses()
         {
             List<Tuple<string, string>> ipList = new List<Tuple<string, string>>();
