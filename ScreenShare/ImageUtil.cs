@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Windows.Forms;
 
 namespace ScreenShare
 {
@@ -28,7 +29,7 @@ namespace ScreenShare
                 g.CopyFromScreen(r.X, r.Y, 0, 0, new Size(r.Width, r.Height), CopyPixelOperation.SourceCopy);
                 if (captureCursor)
                 {
-                    Point p = ScreenRealSize.GetCursor();
+                    Point p = Control.MousePosition;
                     g.DrawImage(Resources.cursor, new Point(p.X - r.X, p.Y - r.Y));
                 }
                 return bitmap;

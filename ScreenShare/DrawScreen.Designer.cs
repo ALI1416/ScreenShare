@@ -44,8 +44,8 @@
             this.Opacity = 0.25D;
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.TopMost = true;
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DrawScreen_KeyDown);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DrawScreen_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.DrawScreen_MouseMove);

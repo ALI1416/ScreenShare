@@ -10,7 +10,6 @@ namespace ScreenShare
             InitializeComponent();
         }
 
-
         private void AuthorLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             Process.Start("https://github.com/ALI1416/ScreenShare");

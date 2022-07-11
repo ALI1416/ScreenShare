@@ -9,8 +9,12 @@ namespace ScreenShare
         public DrawScreen()
         {
             InitializeComponent();
-        }
-        public Rectangle ResultRect { get; set; }
+            // 获取到所有的屏幕信息
+            Screen[] screens = Screen.AllScreens;
+        //this.Location = new Point(-500, 500);
+        //this.Size = new Size(1000,1000);
+    }
+    public Rectangle ResultRect { get; set; }
         private bool _canDraw;
         private int _startX, _startY;
         private Rectangle _rect;

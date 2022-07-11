@@ -54,7 +54,7 @@
             this.version.Location = new System.Drawing.Point(50, 40);
             this.version.Name = "version";
             this.version.Size = new System.Drawing.Size(87, 16);
-            this.version.TabIndex = 1;
+            this.version.TabIndex = 0;
             this.version.Text = "版本：V2.0";
             // 
             // authorLabel
@@ -63,7 +63,7 @@
             this.authorLabel.Location = new System.Drawing.Point(10, 70);
             this.authorLabel.Name = "authorLabel";
             this.authorLabel.Size = new System.Drawing.Size(41, 12);
-            this.authorLabel.TabIndex = 2;
+            this.authorLabel.TabIndex = 0;
             this.authorLabel.Text = "作者：";
             // 
             // authorLink
@@ -72,7 +72,7 @@
             this.authorLink.Location = new System.Drawing.Point(50, 70);
             this.authorLink.Name = "authorLink";
             this.authorLink.Size = new System.Drawing.Size(47, 12);
-            this.authorLink.TabIndex = 3;
+            this.authorLink.TabIndex = 1;
             this.authorLink.TabStop = true;
             this.authorLink.Text = "ALI1416";
             this.authorLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.AuthorLink_LinkClicked);
@@ -83,7 +83,7 @@
             this.thankLabel.Location = new System.Drawing.Point(10, 100);
             this.thankLabel.Name = "thankLabel";
             this.thankLabel.Size = new System.Drawing.Size(41, 12);
-            this.thankLabel.TabIndex = 4;
+            this.thankLabel.TabIndex = 0;
             this.thankLabel.Text = "感谢：";
             // 
             // thankLink
@@ -92,7 +92,7 @@
             this.thankLink.Location = new System.Drawing.Point(50, 100);
             this.thankLink.Name = "thankLink";
             this.thankLink.Size = new System.Drawing.Size(47, 12);
-            this.thankLink.TabIndex = 5;
+            this.thankLink.TabIndex = 2;
             this.thankLink.TabStop = true;
             this.thankLink.Text = "EslaMx7";
             this.thankLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ThankLink_LinkClicked);
@@ -103,7 +103,7 @@
             this.thankLink2.Location = new System.Drawing.Point(50, 120);
             this.thankLink2.Name = "thankLink2";
             this.thankLink2.Size = new System.Drawing.Size(77, 12);
-            this.thankLink2.TabIndex = 6;
+            this.thankLink2.TabIndex = 3;
             this.thankLink2.TabStop = true;
             this.thankLink2.Text = "xChivalrouSx";
             this.thankLink2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ThankLink2_LinkClicked);

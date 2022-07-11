@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("屏幕共享")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ALI1416")]
-[assembly: AssemblyProduct("ScreenShare")]
+[assembly: AssemblyProduct("https://github.com/ALI1416/ScreenShare")]
 [assembly: AssemblyCopyright("Copyright (c) 1998-present, Cheng Kai (ali-k@foxmail.com) All rights reserved.")]
 [assembly: AssemblyTrademark("404z.cn")]
 [assembly: AssemblyCulture("")]

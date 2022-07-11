@@ -37,12 +37,10 @@ namespace ScreenShare
         public ScreenShare()
         {
             InitializeComponent();
-            ScreenRealSize.Init();
             // 读取图标
             Resources.favicon.Save(faviconStream);
-            Size screenRealSize = ScreenRealSize.DESKTOP;
-            screenW = screenRealSize.Width;
-            screenH = screenRealSize.Height;
+            screenW = screens[0].Bounds.Width;
+            screenH = screens[0].Bounds.Height;
             screenWNud.Value = videoWNud.Value = screenWNud.Maximum = screenW;
             screenHNud.Value = videoHNud.Value = screenHNud.Maximum = screenH;
             // 获取IP地址
@@ -86,8 +84,8 @@ namespace ScreenShare
             string ipAddress = ips.ElementAt(ipAddressComboBox.SelectedIndex).Item2;
             int ipPort = (int)ipPortNud.Value;
             bool isEncryption = isEncryptionCb.Checked;
-            string encryptionAccount = encryptionAccountText.Text;
-            string encryptionPwd = encryptionPwdText.Text;
+            string encryptionAccount = accountText.Text;
+            string encryptionPwd = pwdText.Text;
             int videoFrame = (int)videoFrameNud.Value;
             string html = Resources.Html1 + (1000 / videoFrame) + Resources.Html2;
             server.Prefixes.Clear();
@@ -247,12 +245,11 @@ namespace ScreenShare
                 Rectangle rect = drawScreen.ResultRect;
                 if (rect.Width != 0 && rect.Height != 0)
                 {
-                    Rectangle r = ScreenRealSize.ConvertRectangle(rect);
                     isFullScreenCb.Checked = false;
-                    screenXNud.Value = r.X;
-                    screenYNud.Value = r.Y;
-                    screenWNud.Value = r.Width;
-                    screenHNud.Value = r.Height;
+                    screenXNud.Value = rect.X;
+                    screenYNud.Value = rect.Y;
+                    screenWNud.Value = rect.Width;
+                    screenHNud.Value = rect.Height;
                 }
             }
         }
@@ -264,7 +261,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void IsEncryptionCb_CheckStateChanged(object sender, EventArgs e)
         {
-            encryptionAccountText.Enabled = encryptionPwdText.Enabled = ((CheckBox)sender).Checked;
+            accountText.Enabled = pwdText.Enabled = ((CheckBox)sender).Checked;
         }
 
         /// <summary>
@@ -376,7 +373,6 @@ namespace ScreenShare
             }
             else
             {
-                previewImg.Dock = DockStyle.None;
                 previewImg.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             }
         }
