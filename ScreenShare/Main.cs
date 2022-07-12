@@ -16,7 +16,6 @@ namespace ScreenShare
 {
     public partial class ScreenShare : Form
     {
-
         /********** 初始化参数 **********/
         /// <summary>
         /// 已启动
@@ -38,10 +37,6 @@ namespace ScreenShare
         /// 密码
         /// </summary>
         private string pwd;
-        /// <summary>
-        /// 开启全屏
-        /// </summary>
-        private bool isFullScreen;
         /// <summary>
         /// 显示器
         /// </summary>
@@ -69,10 +64,6 @@ namespace ScreenShare
 
         /********** 其他参数 **********/
         /// <summary>
-        /// jpg图片的ImageCodecInfo
-        /// </summary>
-        private static readonly ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
-        /// <summary>
         /// IP地址列表
         /// </summary>
         private List<Tuple<string, string>> ipList;
@@ -80,8 +71,6 @@ namespace ScreenShare
         /// 屏幕信息列表
         /// </summary>
         private List<Tuple<string, Rectangle>> screenList;
-        private int screenW;
-        private int screenH;
         /// <summary>
         /// 服务器
         /// </summary>
@@ -110,10 +99,6 @@ namespace ScreenShare
             Init();
             // 读取图标
             Resources.favicon.Save(faviconStream);
-            screenW = screenList[0].Item2.Width;
-            screenH = screenList[0].Item2.Height;
-            screenWNud.Value = videoWNud.Value = screenWNud.Maximum = screenW;
-            screenHNud.Value = videoHNud.Value = screenHNud.Maximum = screenH;
             Log("屏幕共享初始化完成！");
         }
 
@@ -123,7 +108,8 @@ namespace ScreenShare
         /// </summary>
         private void Init()
         {
-            // 获取IP地址
+            /* 头部 */
+            // IP地址
             ipList = GetAllIPv4Address();
             ipAddressComboBox.Items.Clear();
             foreach (var ip in ipList)
@@ -131,7 +117,23 @@ namespace ScreenShare
                 ipAddressComboBox.Items.Add(ip.Item2 + " - " + ip.Item1);
             }
             ipAddressComboBox.SelectedIndex = 0;
-            // 获取屏幕信息
+            // 端口号
+            ipPortNud.Value = 7070;
+            // 分享地址
+            shareLinkText.Text = "http://" + ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + (int)ipPortNud.Value + "/";
+
+            /* 加密传输 */
+            // 开启加密
+            isEncryptionCb.Checked = false;
+            // 账号
+            accountText.Text = "";
+            // 密码
+            pwdText.Text = "";
+
+            /* 选取位置 */
+            // 全屏
+            isFullScreenCb.Checked = true;
+            // 显示器
             screenList = GetAllScreen();
             screenComboBox.Items.Clear();
             foreach (var screen in screenList)
@@ -146,8 +148,33 @@ namespace ScreenShare
             {
                 screenComboBox.SelectedIndex = 1;
             }
-            // 加载配置
-            LoadConfig();
+            Rectangle currentScreen = screenList.ElementAt(screenComboBox.SelectedIndex).Item2;
+            // X
+            screenXNud.Value = currentScreen.X;
+            // Y
+            screenYNud.Value = currentScreen.Y;
+            // 宽
+            screenWNud.Value = currentScreen.Width;
+            // 高
+            screenHNud.Value = currentScreen.Height;
+
+            /* 视频尺寸 */
+            // 锁定缩放比
+            isLockAspectRatioCb.Checked = true;
+            // 缩放比例
+            scalingNud.Value = 100;
+            // 宽
+            videoWNud.Value = currentScreen.Width;
+            // 高
+            videoHNud.Value = currentScreen.Height;
+
+            /* 视频设置 */
+            // 显示光标
+            isDisplayCursorCb.Checked = true;
+            // 每秒帧数
+            videoFrameNud.Value = 5;
+            // 视频质量
+            videoQualityNud.Value = 100;
         }
 
         /// <summary>
@@ -157,9 +184,8 @@ namespace ScreenShare
         {
             shareLink = shareLinkText.Text;
             isEncryption = isEncryptionCb.Checked;
-            account=accountText.Text;
-            pwd=pwdText.Text;
-            isFullScreen=isFullScreenCb.Checked;
+            account = accountText.Text;
+            pwd = pwdText.Text;
             screen = new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value);
             scaling = (int)scalingNud.Value;
             video = new Size((int)videoWNud.Value, (int)videoHNud.Value);
@@ -175,23 +201,21 @@ namespace ScreenShare
         {
             // 加载配置
             LoadConfig();
-            string ipAddress = ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2;
-            int ipPort = (int)ipPortNud.Value;
-            bool isEncryption = isEncryptionCb.Checked;
-            string encryptionAccount = accountText.Text;
-            string encryptionPwd = pwdText.Text;
-            int videoFrame = (int)videoFrameNud.Value;
+            // 构造网页
             string html = Resources.Html1 + (1000 / videoFrame) + Resources.Html2;
             server.Prefixes.Clear();
-            server.Prefixes.Add("http://" + ipAddress + ":" + ipPort + "/");
+            server.Prefixes.Add(shareLink);
             server.Start();
             while (isWorking)
             {
                 HttpListenerContext ctx = await server.GetContextAsync();
+                // 开启加密
                 if (isEncryption)
                 {
+                    // 判断请求头是否输入账号密码
                     if (!ctx.Request.Headers.AllKeys.Contains("Authorization"))
                     {
+                        // 没有输入账号密码
                         ctx.Response.StatusCode = 401;
                         ctx.Response.AddHeader("WWW-Authenticate", "Basic realm=ScreenShare Authentication : ");
                         ctx.Response.Close();
@@ -199,10 +223,15 @@ namespace ScreenShare
                     }
                     else
                     {
+                        // 已输入账号密码
+                        // 获取到输入的账号密码
                         string auth1 = ctx.Request.Headers["Authorization"];
-                        auth1 = auth1.Remove(0, 6); // Remove "Basic " From The Header Value
+                        // 移除头部"Basic "字符串
+                        auth1 = auth1.Remove(0, 6);
+                        // 解码账号密码
                         auth1 = Encoding.UTF8.GetString(Convert.FromBase64String(auth1));
-                        string auth2 = encryptionAccount + ":" + encryptionPwd;
+                        string auth2 = account + ":" + pwd;
+                        // 账号密码错误
                         if (auth1 != auth2)
                         {
                             responseData = Encoding.UTF8.GetBytes("<h1 style=\"color:red\">Not Authorized !!!");
@@ -221,20 +250,26 @@ namespace ScreenShare
                         }
                     }
                 }
+                // 请求成功
                 ctx.Response.StatusCode = 200;
+                // 获取请求地址
                 string localPath = ctx.Request.Url.LocalPath;
+                // 判断请求地址
                 if (localPath == "/favicon.ico")
                 {
+                    // 图标
                     ctx.Response.ContentType = "image/x-icon";
                     responseData = faviconStream.ToArray();
                 }
                 else if (localPath == "/image")
                 {
+                    // 图片
                     ctx.Response.ContentType = "image/jpeg";
                     responseData = imageStream.ToArray();
                 }
                 else
                 {
+                    // 网页
                     ctx.Response.ContentType = "text/html;charset=UTF-8";
                     responseData = Encoding.UTF8.GetBytes(html);
                 }
@@ -254,19 +289,10 @@ namespace ScreenShare
         /// </summary>
         private async void CaptureScreenTask()
         {
-            int screenX = (int)screenXNud.Value;
-            int screenY = (int)screenYNud.Value;
-            int screenW = (int)screenWNud.Value;
-            int screenH = (int)screenHNud.Value;
-            int videoW = (int)videoWNud.Value;
-            int videoH = (int)videoHNud.Value;
-            int videoQuality = (int)videoQualityNud.Value;
-            int videoFrame = (int)videoFrameNud.Value;
-            bool isDisplayCursor = isDisplayCursorCb.Checked;
-            Rectangle screen = new Rectangle(screenX, screenY, screenW, screenH);
-            Size video = new Size(videoW, videoH);
-            if (screen.Size == video && videoQuality == 100)//正常
+            // 判断捕获图片属性
+            if (screen.Size == video && videoQuality == 100)
             {
+                // 正常
                 while (isWorking)
                 {
                     imageStream.SetLength(0);
@@ -275,16 +301,20 @@ namespace ScreenShare
                     await Task.Delay(1000 / videoFrame);
                 }
             }
-            else if (screen.Size != video && videoQuality == 100)//缩放
+            else if (screen.Size != video && videoQuality == 100)
             {
+                // 缩放
                 while (isWorking)
                 {
-                    ZoomImage(CaptureScreenArea(screen, isDisplayCursor), video, 0).Save(imageStream, ImageFormat.Jpeg);
+                    imageStream.SetLength(0);
+                    ZoomImage(CaptureScreenArea(screen, isDisplayCursor), video, scaling).Save(imageStream, ImageFormat.Jpeg);
+                    previewImg.Image = new Bitmap(imageStream);
                     await Task.Delay(1000 / videoFrame);
                 }
             }
-            else if (screen.Size == video && videoQuality != 100)//压缩
+            else if (screen.Size == video && videoQuality != 100)
             {
+                // 压缩
                 while (isWorking)
                 {
                     imageStream.SetLength(0);
@@ -293,12 +323,13 @@ namespace ScreenShare
                     await Task.Delay(1000 / videoFrame);
                 }
             }
-            else//缩放+压缩
+            else
             {
+                // 缩放+压缩
                 while (isWorking)
                 {
                     imageStream.SetLength(0);
-                    QualitySave(ZoomImage(CaptureScreenArea(screen, isDisplayCursor), video, 0), videoQuality, imageStream);
+                    QualitySave(ZoomImage(CaptureScreenArea(screen, isDisplayCursor), video, scaling), videoQuality, imageStream);
                     previewImg.Image = new Bitmap(imageStream);
                     await Task.Delay(1000 / videoFrame);
                 }
@@ -405,8 +436,8 @@ namespace ScreenShare
             if (isChecked)
             {
                 screenXNud.Value = screenYNud.Value = 0;
-                screenWNud.Value = screenW;
-                screenHNud.Value = screenH;
+                screenWNud.Value = screen.Width;
+                screenHNud.Value = screen.Height;
             }
         }
 
@@ -525,6 +556,10 @@ namespace ScreenShare
         }
 
         /********** 图像工具类 **********/
+        /// <summary>
+        /// jpg图片的ImageCodecInfo
+        /// </summary>
+        private static readonly ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
 
         /// <summary>
         /// 捕获指定区域屏幕截图
@@ -538,11 +573,13 @@ namespace ScreenShare
             {
                 Bitmap bitmap = new Bitmap(r.Width, r.Height);
                 Graphics g = Graphics.FromImage(bitmap);
-                g.CopyFromScreen(r.X, r.Y, 0, 0, new Size(r.Width, r.Height), CopyPixelOperation.SourceCopy);
+                g.CopyFromScreen(r.X, r.Y, 0, 0, r.Size, CopyPixelOperation.SourceCopy);
                 if (captureCursor)
                 {
                     Point p = Control.MousePosition;
                     g.DrawImage(Resources.cursor, new Point(p.X - r.X, p.Y - r.Y));
+                    g.Dispose();
+                    g = null;
                 }
                 return bitmap;
             }
@@ -554,26 +591,34 @@ namespace ScreenShare
 
         /// <summary>
         /// 缩放图片
+        /// <para>scale大于0时，size无效</para>
+        /// <para>sourceBitmap会被释放掉</para>
         /// </summary>
-        /// <param name="bitmap">图片bitmap</param>
-        /// <param name="s">图片的尺寸</param>
-        /// <param name="scale">缩放比例(0-100)</param>
+        /// <param name="sourceBitmap">源图片bitmap</param>
+        /// <param name="size">指定目的图片的尺寸</param>
+        /// <param name="scale">指定目的图片相对于原图片的缩放比例(大于0，原尺寸数值为100)</param>
         /// <returns>Bitmap</returns>
-        private static Bitmap ZoomImage(Bitmap bitmap, Size s, int scale)
+        private static Bitmap ZoomImage(Bitmap sourceBitmap, Size size, int scale)
         {
+            if (scale <= 0 || scale == 100)
+            {
+                return sourceBitmap;
+            }
             try
             {
                 if (scale > 0)
                 {
-                    s.Width = bitmap.Width * scale / 100;
-                    s.Height = bitmap.Height * scale / 100;
+                    size.Width = sourceBitmap.Width * scale / 100;
+                    size.Height = sourceBitmap.Height * scale / 100;
                 }
-                Bitmap destBitmap = new Bitmap(s.Width, s.Height);
-                Graphics g = Graphics.FromImage(destBitmap);
-                g.DrawImage(bitmap, new Rectangle(0, 0, s.Width, s.Height), 0, 0, bitmap.Width, bitmap.Height, GraphicsUnit.Pixel);
+                Bitmap bitmap = new Bitmap(size.Width, size.Height);
+                Graphics g = Graphics.FromImage(bitmap);
+                g.DrawImage(sourceBitmap, new Rectangle(0, 0, size.Width, size.Height), 0, 0, sourceBitmap.Width, sourceBitmap.Height, GraphicsUnit.Pixel);
                 g.Dispose();
-                bitmap.Dispose();
-                return destBitmap;
+                g = null;
+                sourceBitmap.Dispose();
+                sourceBitmap = null;
+                return bitmap;
             }
             catch
             {
@@ -583,16 +628,25 @@ namespace ScreenShare
 
         /// <summary>
         /// 按质量保存图片到内存流
+        /// <para>bitmap会被释放掉</para>
         /// </summary>
         /// <param name="bitmap">图片bitmap</param>
-        /// <param name="quality">图片质量(0-100)</param>
+        /// <param name="quality">图片质量(0-100]</param>
         /// <param name="memoryStream">MemoryStream</param>
         private static void QualitySave(Bitmap bitmap, int quality, MemoryStream memoryStream)
         {
-            EncoderParameters encoderParameters = new EncoderParameters(1);
-            encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, quality);
-            bitmap.Save(memoryStream, jpgEncoder, encoderParameters);
+            if (quality < 0 || quality >= 100)
+            {
+                bitmap.Save(memoryStream, ImageFormat.Jpeg);
+            }
+            else
+            {
+                EncoderParameters encoderParameters = new EncoderParameters(1);
+                encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, quality);
+                bitmap.Save(memoryStream, jpgEncoder, encoderParameters);
+            }
             bitmap.Dispose();
+            bitmap = null;
         }
 
         /// <summary>
@@ -645,7 +699,7 @@ namespace ScreenShare
         /// </para>
         /// </summary>
         /// <returns>List&lt;Tuple&lt;名称, 屏幕Rectangle&gt;&gt;</returns>
-        private static List<Tuple<string,Rectangle>> GetAllScreen()
+        private static List<Tuple<string, Rectangle>> GetAllScreen()
         {
             var screenList = new List<Tuple<string, Rectangle>>();
             var screens = Screen.AllScreens;
@@ -664,15 +718,15 @@ namespace ScreenShare
                     }
                     else
                     {
-                        screenList.Add(Tuple.Create(screens[i].DeviceName.Remove(0, 11) , screens[i].Bounds));
+                        screenList.Add(Tuple.Create(screens[i].DeviceName.Remove(0, 11), screens[i].Bounds));
                     }
                 }
                 // 计算全部屏幕的叠加态
                 int xMin = screenList.Min(t => t.Item2.Left);
-                int yMin= screenList.Min(t => t.Item2.Top);
+                int yMin = screenList.Min(t => t.Item2.Top);
                 int xMax = screenList.Max(t => t.Item2.Right);
-                int yMax= screenList.Max(t => t.Item2.Bottom);
-                screenList.Insert(0, Tuple.Create("0(全)", new Rectangle(xMin,yMin,xMax-xMin,yMax-yMin)));
+                int yMax = screenList.Max(t => t.Item2.Bottom);
+                screenList.Insert(0, Tuple.Create("0(全)", new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin)));
             }
             return screenList;
         }
