@@ -86,7 +86,6 @@
     <Compile Include="About.Designer.cs">
       <DependentUpon>About.cs</DependentUpon>
     </Compile>
-    <Compile Include="ImageUtil.cs" />
     <Compile Include="DrawScreen.cs">
       <SubType>Form</SubType>
     </Compile>

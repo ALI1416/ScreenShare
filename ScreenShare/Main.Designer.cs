@@ -159,6 +159,7 @@
             this.reloadConfigBtn.TabIndex = 4;
             this.reloadConfigBtn.Text = "重新加载配置";
             this.reloadConfigBtn.UseVisualStyleBackColor = true;
+            this.reloadConfigBtn.Click += new System.EventHandler(this.ReloadConfigBtn_Click);
             // 
             // aboutBtn
             // 
@@ -207,6 +208,7 @@
             this.openBtn.TabIndex = 8;
             this.openBtn.Text = "用浏览器打开";
             this.openBtn.UseVisualStyleBackColor = true;
+            this.openBtn.Click += new System.EventHandler(this.OpenBtn_Click);
             // 
             // encryptionBox
             // 
@@ -319,6 +321,7 @@
             this.screenComboBox.Name = "screenComboBox";
             this.screenComboBox.Size = new System.Drawing.Size(130, 20);
             this.screenComboBox.TabIndex = 2;
+            this.screenComboBox.SelectedValueChanged += new System.EventHandler(this.ScreenComboBox_SelectedValueChanged);
             // 
             // screenXLabel
             // 
