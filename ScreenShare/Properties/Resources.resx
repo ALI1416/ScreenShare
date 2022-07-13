@@ -117,14 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="Html1" xml:space="preserve">
-    <value>&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset="utf-8"&gt;&lt;title&gt;ScreenShare&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;img src="image" style="max-width:100%;max-height:100%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"&gt;&lt;script&gt;setInterval(function (){document.getElementsByTagName("img")[0].src="image?r="+Math.random();},</value>
+    <value>&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset="utf-8"&gt;&lt;title&gt;ScreenShare&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;img src="image.jpg" style="max-width:100%;max-height:100%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"&gt;&lt;script&gt;setInterval(function (){document.getElementsByTagName("img")[0].src="image.jpg?r="+Math.random();},</value>
   </data>
   <data name="Html2" xml:space="preserve">
     <value>);&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;</value>
   </data>
-    <data name="cursor" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="cursor" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\cursor.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="icon" type="System.Resources.ResXFileRef, System.Windows.Forms">

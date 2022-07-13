@@ -59,9 +59,29 @@ namespace ScreenShare.Properties {
                 resourceCulture = value;
             }
         }
-
+        
         /// <summary>
-        ///   查找类似 &lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;title&gt;ScreenShare&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;img src=&quot;image&quot; style=&quot;max-width:100%;max-height:100%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);&quot;&gt;&lt;script&gt;setInterval(function (){document.getElementsByTagName(&quot;img&quot;)[0].src=&quot;image?r=&quot;+Math.random();}, 的本地化字符串。
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap cursor {
+            get {
+                object obj = ResourceManager.GetObject("cursor", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似于 (图标) 的 System.Drawing.Icon 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Icon favicon {
+            get {
+                object obj = ResourceManager.GetObject("favicon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 &lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;title&gt;ScreenShare&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;img src=&quot;image.jpg&quot; style=&quot;max-width:100%;max-height:100%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);&quot;&gt;&lt;script&gt;setInterval(function (){document.getElementsByTagName(&quot;img&quot;)[0].src=&quot;image.jpg?r=&quot;+Math.random();}, 的本地化字符串。
         /// </summary>
         internal static string Html1 {
             get {
@@ -77,19 +97,7 @@ namespace ScreenShare.Properties {
                 return ResourceManager.GetString("Html2", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap cursor
-        {
-            get
-            {
-                object obj = ResourceManager.GetObject("cursor", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-
+        
         /// <summary>
         ///   查找类似于 (图标) 的 System.Drawing.Icon 类型的本地化资源。
         /// </summary>
@@ -99,18 +107,5 @@ namespace ScreenShare.Properties {
                 return ((System.Drawing.Icon)(obj));
             }
         }
-
-        /// <summary>
-        ///   查找类似于 (图标) 的 System.Drawing.Icon 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Icon favicon
-        {
-            get
-            {
-                object obj = ResourceManager.GetObject("favicon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-
     }
 }

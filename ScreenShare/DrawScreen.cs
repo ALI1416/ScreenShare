@@ -6,58 +6,118 @@ namespace ScreenShare
 {
     public partial class DrawScreen : Form
     {
-        public DrawScreen()
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="rect">绘图的rect</param>
+        public DrawScreen(Rectangle rect)
         {
             InitializeComponent();
-            // 获取到所有的屏幕信息
-            Screen[] screens = Screen.AllScreens;
-        //this.Location = new Point(-500, 500);
-        //this.Size = new Size(1000,1000);
-    }
-    public Rectangle ResultRect { get; set; }
-        private bool _canDraw;
-        private int _startX, _startY;
-        private Rectangle _rect;
+            Location = rect.Location;
+            Size = rect.Size;
+        }
 
+        /// <summary>
+        /// 填充
+        /// </summary>
+        private Brush brush = new SolidBrush(Color.White);
+        /// <summary>
+        /// 正在绘画
+        /// </summary>
+        private bool isDraw;
+        /// <summary>
+        /// 起始点
+        /// </summary>
+        private Point start;
+        /// <summary>
+        /// 结果rect
+        /// </summary>
+        public Rectangle rect;
+
+        /// <summary>
+        /// 鼠标按下
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DrawScreen_MouseDown(object sender, MouseEventArgs e)
         {
-            _canDraw = true;
-            _startX = e.X;
-            _startY = e.Y;
+            isDraw = true;
+            start = e.Location;
         }
 
-        private void DrawScreen_MouseUp(object sender, MouseEventArgs e)
-        {
-            _canDraw = false;
-            ResultRect = _rect;
-            this.DialogResult = DialogResult.OK;
-            this.Close();
-        }
-
+        /// <summary>
+        /// 鼠标移动
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DrawScreen_MouseMove(object sender, MouseEventArgs e)
         {
-            if (!_canDraw) return;
-            int x = Math.Min(_startX, e.X);
-            int y = Math.Min(_startY, e.Y);
-            int width = Math.Max(_startX, e.X) - Math.Min(_startX, e.X);
-            int height = Math.Max(_startY, e.Y) - Math.Min(_startY, e.Y);
-            _rect = new Rectangle(x, y, width, height);
+            if (!isDraw) return;
+            int xMin = Math.Min(start.X, e.X);
+            int yMin = Math.Min(start.Y, e.Y);
+            int xMax = Math.Max(start.X, e.X);
+            int yMax = Math.Max(start.Y, e.Y);
+            rect = new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin);
             Refresh();
         }
 
-        protected override void OnPaint(PaintEventArgs e)
+        /// <summary>
+        /// 鼠标抬起
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DrawScreen_MouseUp(object sender, MouseEventArgs e)
         {
-            Brush brush = new SolidBrush(Color.White);
-            e.Graphics.FillRectangle(brush, _rect);
+            isDraw = false;
+            // 防止越界
+            if (rect.X < 0)
+            {
+                rect.X = 0;
+            }
+            if (rect.Y < 0)
+            {
+                rect.Y = 0;
+            }
+            if (rect.Width > Size.Width - rect.X)
+            {
+                rect.Width = Size.Width - rect.X;
+            }
+            if (rect.Height > Size.Height - rect.Y)
+            {
+                rect.Height = Size.Height - rect.Y;
+            }
+            // 返回父窗口对应的rect
+            rect = new Rectangle(rect.X + Location.X, rect.Y + Location.Y, rect.Width, rect.Height);
+            DialogResult = DialogResult.OK;
+            Close();
+            brush.Dispose();
+            Dispose();
         }
 
+        /// <summary>
+        /// 键盘按下
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DrawScreen_KeyDown(object sender, KeyEventArgs e)
         {
+            // ESC键
             if (e.KeyCode == Keys.Escape)
             {
-                this.Close();
-                this.Dispose();
+                Close();
+                brush.Dispose();
+                Dispose();
             }
+        }
+
+        /// <summary>
+        /// 绘图
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            e.Graphics.FillRectangle(brush, rect);
         }
 
     }

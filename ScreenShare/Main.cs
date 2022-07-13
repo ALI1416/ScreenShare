@@ -1,13 +1,12 @@
 ﻿using ScreenShare.Properties;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -16,7 +15,7 @@ namespace ScreenShare
 {
     public partial class ScreenShare : Form
     {
-        /********** 初始化参数 **********/
+        /********** 配置参数 **********/
         /// <summary>
         /// 已启动
         /// </summary>
@@ -42,10 +41,6 @@ namespace ScreenShare
         /// </summary>
         private Rectangle screen;
         /// <summary>
-        /// 视频缩放比例
-        /// </summary>
-        private int scaling;
-        /// <summary>
         /// 视频
         /// </summary>
         private Size video;
@@ -61,6 +56,14 @@ namespace ScreenShare
         /// 视频质量
         /// </summary>
         private int videoQuality;
+        /// <summary>
+        /// 网页内容
+        /// </summary>
+        private string html;
+        /// <summary>
+        /// 账号密码
+        /// </summary>
+        private string auth;
 
         /********** 其他参数 **********/
         /// <summary>
@@ -72,17 +75,21 @@ namespace ScreenShare
         /// </summary>
         private List<Tuple<string, Rectangle>> screenList;
         /// <summary>
-        /// 服务器
-        /// </summary>
-        private readonly HttpListener server = new HttpListener();
-        /// <summary>
-        /// 图标
+        /// 图标MemoryStream
         /// </summary>
         private readonly MemoryStream faviconStream = new MemoryStream();
         /// <summary>
-        /// 图片
+        /// 图片MemoryStream
         /// </summary>
         private readonly MemoryStream imageStream = new MemoryStream();
+        /// <summary>
+        /// 服务器
+        /// </summary>
+        private HttpListener server = new HttpListener();
+        /// <summary>
+        /// 接收和返回上下文
+        /// </summary>
+        private HttpListenerContext ctx;
         /// <summary>
         /// 返回结果
         /// </summary>
@@ -110,7 +117,7 @@ namespace ScreenShare
         {
             /* 头部 */
             // IP地址
-            ipList = GetAllIPv4Address();
+            ipList = Utils.GetAllIPv4Address();
             ipAddressComboBox.Items.Clear();
             foreach (var ip in ipList)
             {
@@ -120,7 +127,7 @@ namespace ScreenShare
             // 端口号
             ipPortNud.Value = 7070;
             // 分享地址
-            shareLinkText.Text = "http://" + ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + (int)ipPortNud.Value + "/";
+            shareLinkText.Text = "http://" + ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value + "/";
 
             /* 加密传输 */
             // 开启加密
@@ -134,7 +141,7 @@ namespace ScreenShare
             // 全屏
             isFullScreenCb.Checked = true;
             // 显示器
-            screenList = GetAllScreen();
+            screenList = Utils.GetAllScreen();
             screenComboBox.Items.Clear();
             foreach (var screen in screenList)
             {
@@ -148,15 +155,21 @@ namespace ScreenShare
             {
                 screenComboBox.SelectedIndex = 1;
             }
-            Rectangle currentScreen = screenList.ElementAt(screenComboBox.SelectedIndex).Item2;
+            Rectangle selectedScreen = screenList.ElementAt(screenComboBox.SelectedIndex).Item2;
             // X
-            screenXNud.Value = currentScreen.X;
+            screenXNud.Minimum = selectedScreen.Left;
+            screenXNud.Maximum = selectedScreen.Right - 2;
+            screenXNud.Value = selectedScreen.X;
             // Y
-            screenYNud.Value = currentScreen.Y;
+            screenYNud.Minimum = selectedScreen.Top;
+            screenYNud.Maximum = selectedScreen.Bottom - 2;
+            screenYNud.Value = selectedScreen.Y;
             // 宽
-            screenWNud.Value = currentScreen.Width;
+            screenWNud.Maximum = selectedScreen.Width;
+            screenWNud.Value = selectedScreen.Width;
             // 高
-            screenHNud.Value = currentScreen.Height;
+            screenHNud.Maximum = selectedScreen.Height;
+            screenHNud.Value = selectedScreen.Height;
 
             /* 视频尺寸 */
             // 锁定缩放比
@@ -164,9 +177,9 @@ namespace ScreenShare
             // 缩放比例
             scalingNud.Value = 100;
             // 宽
-            videoWNud.Value = currentScreen.Width;
+            videoWNud.Value = selectedScreen.Width;
             // 高
-            videoHNud.Value = currentScreen.Height;
+            screenHNud.Value = selectedScreen.Height;
 
             /* 视频设置 */
             // 显示光标
@@ -187,100 +200,90 @@ namespace ScreenShare
             account = accountText.Text;
             pwd = pwdText.Text;
             screen = new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value);
-            scaling = (int)scalingNud.Value;
             video = new Size((int)videoWNud.Value, (int)videoHNud.Value);
             isDisplayCursor = isDisplayCursorCb.Checked;
             videoFrame = (int)videoFrameNud.Value;
             videoQuality = (int)videoQualityNud.Value;
+            html = Resources.Html1 + (1000 / videoFrame) + Resources.Html2;
+            auth = account + ":" + pwd;
         }
 
         /// <summary>
-        /// 开启HTTP服务
+        /// 开启HTTP服务器
         /// </summary>
         private async void StartServerTask()
         {
-            // 加载配置
-            LoadConfig();
-            // 构造网页
-            string html = Resources.Html1 + (1000 / videoFrame) + Resources.Html2;
-            server.Prefixes.Clear();
-            server.Prefixes.Add(shareLink);
-            server.Start();
             while (isWorking)
             {
-                HttpListenerContext ctx = await server.GetContextAsync();
-                // 开启加密
-                if (isEncryption)
+                try
                 {
-                    // 判断请求头是否输入账号密码
-                    if (!ctx.Request.Headers.AllKeys.Contains("Authorization"))
+                    ctx = await server.GetContextAsync();
+                    // 开启加密
+                    if (isEncryption)
                     {
-                        // 没有输入账号密码
-                        ctx.Response.StatusCode = 401;
-                        ctx.Response.AddHeader("WWW-Authenticate", "Basic realm=ScreenShare Authentication : ");
-                        ctx.Response.Close();
-                        continue;
-                    }
-                    else
-                    {
-                        // 已输入账号密码
-                        // 获取到输入的账号密码
-                        string auth1 = ctx.Request.Headers["Authorization"];
-                        // 移除头部"Basic "字符串
-                        auth1 = auth1.Remove(0, 6);
-                        // 解码账号密码
-                        auth1 = Encoding.UTF8.GetString(Convert.FromBase64String(auth1));
-                        string auth2 = account + ":" + pwd;
-                        // 账号密码错误
-                        if (auth1 != auth2)
+                        // 未输入账号密码
+                        if (!ctx.Request.Headers.AllKeys.Contains("Authorization"))
                         {
-                            responseData = Encoding.UTF8.GetBytes("<h1 style=\"color:red\">Not Authorized !!!");
-                            ctx.Response.ContentType = "text/html";
                             ctx.Response.StatusCode = 401;
-                            ctx.Response.AddHeader("WWW-Authenticate", "Basic realm=ScreenShare Authentication : ");
-                            try
-                            {
-                                await ctx.Response.OutputStream.WriteAsync(responseData, 0, responseData.Length);
-                            }
-                            catch (Exception)
-                            {
-                            }
+                            ctx.Response.AddHeader("WWW-Authenticate", "Basic realm=ScreenShare Authentication");
                             ctx.Response.Close();
                             continue;
                         }
+                        // 已输入账号密码
+                        else
+                        {
+                            // 获取到输入的账号密码
+                            string auth = ctx.Request.Headers["Authorization"];
+                            // 移除头部"Basic "字符串
+                            auth = auth.Remove(0, 6);
+                            // 解码账号密码
+                            auth = Encoding.UTF8.GetString(Convert.FromBase64String(auth));
+                            // 账号密码错误
+                            if (auth != this.auth)
+                            {
+                                responseData = Encoding.UTF8.GetBytes("<h1 style=\"color:red\">Not Authorized !");
+                                ctx.Response.ContentType = "text/html";
+                                ctx.Response.StatusCode = 401;
+                                ctx.Response.AddHeader("WWW-Authenticate", "Basic realm=ScreenShare Authentication");
+                                await ctx.Response.OutputStream.WriteAsync(responseData, 0, responseData.Length);
+                                ctx.Response.Close();
+                                continue;
+                            }
+                        }
                     }
-                }
-                // 请求成功
-                ctx.Response.StatusCode = 200;
-                // 获取请求地址
-                string localPath = ctx.Request.Url.LocalPath;
-                // 判断请求地址
-                if (localPath == "/favicon.ico")
-                {
-                    // 图标
-                    ctx.Response.ContentType = "image/x-icon";
-                    responseData = faviconStream.ToArray();
-                }
-                else if (localPath == "/image")
-                {
-                    // 图片
-                    ctx.Response.ContentType = "image/jpeg";
-                    responseData = imageStream.ToArray();
-                }
-                else
-                {
-                    // 网页
-                    ctx.Response.ContentType = "text/html;charset=UTF-8";
-                    responseData = Encoding.UTF8.GetBytes(html);
-                }
-                try
-                {
+                    // 请求成功
+                    ctx.Response.StatusCode = 200;
+                    // 判断请求地址
+                    switch (ctx.Request.Url.LocalPath)
+                    {
+                        // 图标
+                        case "/favicon.ico":
+                            {
+                                ctx.Response.ContentType = "image/x-icon";
+                                responseData = faviconStream.ToArray();
+                                break;
+                            }
+                        // 图片
+                        case "/image.jpg":
+                            {
+                                ctx.Response.ContentType = "image/jpeg";
+                                responseData = imageStream.ToArray();
+                                break;
+                            }
+                        // 网页
+                        default:
+                            {
+                                ctx.Response.ContentType = "text/html;charset=UTF-8";
+                                responseData = Encoding.UTF8.GetBytes(html);
+                                break;
+                            }
+                    }
                     await ctx.Response.OutputStream.WriteAsync(responseData, 0, responseData.Length);
+                    ctx.Response.Close();
                 }
                 catch (Exception)
                 {
                 }
-                ctx.Response.Close();
             }
         }
 
@@ -289,49 +292,78 @@ namespace ScreenShare
         /// </summary>
         private async void CaptureScreenTask()
         {
+            previewImg.Image = new Bitmap(faviconStream);
             // 判断捕获图片属性
+            // 普通
             if (screen.Size == video && videoQuality == 100)
             {
-                // 正常
                 while (isWorking)
                 {
-                    imageStream.SetLength(0);
-                    CaptureScreenArea(screen, isDisplayCursor).Save(imageStream, ImageFormat.Jpeg);
-                    previewImg.Image = new Bitmap(imageStream);
-                    await Task.Delay(1000 / videoFrame);
+                    try
+                    {
+                        imageStream.SetLength(0);
+                        ImageUtils.Save(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), imageStream);
+                        previewImg.Image.Dispose();
+                        previewImg.Image = new Bitmap(imageStream);
+                        await Task.Delay(1000 / videoFrame);
+                    }
+                    catch (Exception)
+                    {
+                    }
                 }
             }
+            // 缩放
             else if (screen.Size != video && videoQuality == 100)
             {
-                // 缩放
                 while (isWorking)
                 {
-                    imageStream.SetLength(0);
-                    ZoomImage(CaptureScreenArea(screen, isDisplayCursor), video, scaling).Save(imageStream, ImageFormat.Jpeg);
-                    previewImg.Image = new Bitmap(imageStream);
-                    await Task.Delay(1000 / videoFrame);
+                    try
+                    {
+                        imageStream.SetLength(0);
+                        ImageUtils.Save(ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video), imageStream);
+                        previewImg.Image.Dispose();
+                        previewImg.Image = new Bitmap(imageStream);
+                        await Task.Delay(1000 / videoFrame);
+                    }
+                    catch (Exception)
+                    {
+                    }
                 }
             }
+            // 压缩
             else if (screen.Size == video && videoQuality != 100)
             {
-                // 压缩
                 while (isWorking)
                 {
-                    imageStream.SetLength(0);
-                    QualitySave(CaptureScreenArea(screen, isDisplayCursor), videoQuality, imageStream);
-                    previewImg.Image = new Bitmap(imageStream);
-                    await Task.Delay(1000 / videoFrame);
+                    try
+                    {
+                        imageStream.SetLength(0);
+                        ImageUtils.QualitySave(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), videoQuality, imageStream);
+                        previewImg.Image.Dispose();
+                        previewImg.Image = new Bitmap(imageStream);
+                        await Task.Delay(1000 / videoFrame);
+                    }
+                    catch (Exception)
+                    {
+                    }
                 }
             }
+            // 缩放+压缩
             else
             {
-                // 缩放+压缩
                 while (isWorking)
                 {
-                    imageStream.SetLength(0);
-                    QualitySave(ZoomImage(CaptureScreenArea(screen, isDisplayCursor), video, scaling), videoQuality, imageStream);
-                    previewImg.Image = new Bitmap(imageStream);
-                    await Task.Delay(1000 / videoFrame);
+                    try
+                    {
+                        imageStream.SetLength(0);
+                        ImageUtils.QualitySave(ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video), videoQuality, imageStream);
+                        previewImg.Image.Dispose();
+                        previewImg.Image = new Bitmap(imageStream);
+                        await Task.Delay(1000 / videoFrame);
+                    }
+                    catch (Exception)
+                    {
+                    }
                 }
             }
         }
@@ -360,15 +392,64 @@ namespace ScreenShare
                 isWorking = false;
                 Log("屏幕共享已停止。");
                 startSharingScreenBtn.Text = "开始共享";
+                server.Stop();
+                // 手动gc
+                GC.Collect();
             }
             else
             {
-                isWorking = true;
-                Log("屏幕共享已开启。");
-                startSharingScreenBtn.Text = "停止共享";
+                try
+                {
+                    // 加载配置
+                    LoadConfig();
+                    server.Prefixes.Clear();
+                    server.Prefixes.Add(shareLink);
+                    server.Start();
+                    isWorking = true;
+                    // 开启屏幕捕获
+                    CaptureScreenTask();
+                    // 开启HTTP服务器
+                    StartServerTask();
+                    Log("屏幕共享已开启。");
+                    startSharingScreenBtn.Text = "停止共享";
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("启动失败，可能是端口号冲突，请更换端口号！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // 报错后Prefixes会被清空
+                    server = new HttpListener();
+                }
             }
-            StartServerTask();
-            CaptureScreenTask();
+        }
+
+        /// <summary>
+        /// IP地址改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void IpAddressComboBox_SelectedValueChanged(object sender, EventArgs e)
+        {
+            shareLinkText.Text = "http://" + ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value + "/";
+        }
+
+        /// <summary>
+        /// IP端口号改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void IpPortNud_ValueChanged(object sender, EventArgs e)
+        {
+            shareLinkText.Text = "http://" + ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value + "/";
+        }
+
+        /// <summary>
+        /// 点击重新加载配置按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ReloadConfigBtn_Click(object sender, EventArgs e)
+        {
+            Init();
         }
 
         /// <summary>
@@ -388,8 +469,116 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void CopyBtn_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(shareLinkText.Text);
-            Log("分享链接已复制。");
+            try
+            {
+                Clipboard.SetText(shareLinkText.Text);
+                Log("分享链接已复制。");
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("复制失败，请手动复制！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 点击用浏览器打开按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OpenBtn_Click(object sender, EventArgs e)
+        {
+            Process.Start(shareLink);
+        }
+
+        /// <summary>
+        /// 开启密码CheckBox状态改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void IsEncryptionCb_CheckStateChanged(object sender, EventArgs e)
+        {
+            accountText.Enabled = pwdText.Enabled = ((CheckBox)sender).Checked;
+        }
+
+        /// <summary>
+        /// 全屏CheckBox状态改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void IsFullScreenCb_CheckStateChanged(object sender, EventArgs e)
+        {
+            bool isChecked = ((CheckBox)sender).Checked;
+            screenXNud.Enabled = screenYNud.Enabled = screenWNud.Enabled = screenHNud.Enabled = !isChecked;
+            if (isChecked)
+            {
+                Rectangle selectedScreen = screenList.ElementAt(screenComboBox.SelectedIndex).Item2;
+                screenXNud.Value = selectedScreen.X;
+                screenYNud.Value = selectedScreen.Y;
+                screenWNud.Value = selectedScreen.Width;
+                screenHNud.Value = selectedScreen.Height;
+            }
+        }
+
+        /// <summary>
+        /// 显示器改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ScreenComboBox_SelectedValueChanged(object sender, EventArgs e)
+        {
+            Rectangle selectedScreen = screenList.ElementAt(screenComboBox.SelectedIndex).Item2;
+            screenXNud.Minimum = selectedScreen.Left;
+            screenXNud.Maximum = selectedScreen.Right - 2;
+            screenXNud.Value = selectedScreen.X;
+            screenYNud.Minimum = selectedScreen.Top;
+            screenYNud.Maximum = selectedScreen.Bottom - 2;
+            screenYNud.Value = selectedScreen.Y;
+            screenWNud.Maximum = selectedScreen.Width;
+            screenWNud.Value = selectedScreen.Width;
+            screenHNud.Maximum = selectedScreen.Height;
+            screenHNud.Value = selectedScreen.Height;
+        }
+
+        /// <summary>
+        /// 屏幕的X发生改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ScreenXNud_ValueChanged(object sender, EventArgs e)
+        {
+            Rectangle selectedScreen = screenList.ElementAt(screenComboBox.SelectedIndex).Item2;
+            screenWNud.Maximum = selectedScreen.Right - screenXNud.Value;
+        }
+
+        /// <summary>
+        /// 屏幕的Y发生改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ScreenYNud_ValueChanged(object sender, EventArgs e)
+        {
+            Rectangle selectedScreen = screenList.ElementAt(screenComboBox.SelectedIndex).Item2;
+            screenHNud.Maximum = selectedScreen.Bottom - screenYNud.Value;
+        }
+
+        /// <summary>
+        /// 屏幕的宽发生改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ScreenWNud_ValueChanged(object sender, EventArgs e)
+        {
+            videoWNud.Value = screenWNud.Value * scalingNud.Value / 100;
+        }
+
+        /// <summary>
+        /// 屏幕的高发生改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ScreenHNud_ValueChanged(object sender, EventArgs e)
+        {
+            videoHNud.Value = screenHNud.Value * scalingNud.Value / 100;
         }
 
         /// <summary>
@@ -399,10 +588,10 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void CaptureScreenCoordinatesBtn_Click(object sender, EventArgs e)
         {
-            DrawScreen drawScreen = new DrawScreen();
+            DrawScreen drawScreen = new DrawScreen(screenList.ElementAt(screenComboBox.SelectedIndex).Item2);
             if (drawScreen.ShowDialog() == DialogResult.OK)
             {
-                Rectangle rect = drawScreen.ResultRect;
+                Rectangle rect = drawScreen.rect;
                 if (rect.Width != 0 && rect.Height != 0)
                 {
                     isFullScreenCb.Checked = false;
@@ -415,65 +604,7 @@ namespace ScreenShare
         }
 
         /// <summary>
-        /// 是否开启密码
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void IsEncryptionCb_CheckStateChanged(object sender, EventArgs e)
-        {
-            accountText.Enabled = pwdText.Enabled = ((CheckBox)sender).Checked;
-        }
-
-        /// <summary>
-        /// 是否全屏
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void IsFullScreenCb_CheckStateChanged(object sender, EventArgs e)
-        {
-            bool isChecked = ((CheckBox)sender).Checked;
-            screenXNud.Enabled = screenYNud.Enabled = screenWNud.Enabled = screenHNud.Enabled = !isChecked;
-            if (isChecked)
-            {
-                screenXNud.Value = screenYNud.Value = 0;
-                screenWNud.Value = screen.Width;
-                screenHNud.Value = screen.Height;
-            }
-        }
-
-        /// <summary>
-        ///  截图的宽发生改变
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ScreenWNud_ValueChanged(object sender, EventArgs e)
-        {
-            videoWNud.Value = screenWNud.Value * scalingNud.Value / 100;
-        }
-
-        /// <summary>
-        /// 截图的高发生改变
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ScreenHNud_ValueChanged(object sender, EventArgs e)
-        {
-            videoHNud.Value = screenHNud.Value * scalingNud.Value / 100;
-        }
-
-        /// <summary>
-        /// 视频缩放比例发生改变
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ScalingNud_ValueChanged(object sender, EventArgs e)
-        {
-            videoWNud.Value = screenWNud.Value * scalingNud.Value / 100;
-            videoHNud.Value = screenHNud.Value * scalingNud.Value / 100;
-        }
-
-        /// <summary>
-        /// 是否锁定纵横比
+        /// 锁定纵横比CheckBox状态改变
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -490,33 +621,14 @@ namespace ScreenShare
         }
 
         /// <summary>
-        /// IP端口号改变
+        /// 视频的缩放比例发生改变
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IpPortNud_ValueChanged(object sender, EventArgs e)
+        private void ScalingNud_ValueChanged(object sender, EventArgs e)
         {
-            shareLinkText.Text = "http://" + ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value;
-        }
-
-        /// <summary>
-        /// IP地址改变
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void IpAddressComboBox_SelectedValueChanged(object sender, EventArgs e)
-        {
-            shareLinkText.Text = "http://" + ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value;
-        }
-
-        /// <summary>
-        /// 显示器改变
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ScreenComboBox_SelectedValueChanged(object sender, EventArgs e)
-        {
-
+            videoWNud.Value = screenWNud.Value * scalingNud.Value / 100;
+            videoHNud.Value = screenHNud.Value * scalingNud.Value / 100;
         }
 
         /// <summary>
@@ -534,201 +646,6 @@ namespace ScreenShare
             {
                 previewImg.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             }
-        }
-        /// <summary>
-        /// 重新加载配置
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ReloadConfigBtn_Click(object sender, EventArgs e)
-        {
-            Init();
-        }
-
-        /// <summary>
-        /// 用浏览器打开
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OpenBtn_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        /********** 图像工具类 **********/
-        /// <summary>
-        /// jpg图片的ImageCodecInfo
-        /// </summary>
-        private static readonly ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
-
-        /// <summary>
-        /// 捕获指定区域屏幕截图
-        /// </summary>
-        /// <param name="r">矩形</param>
-        /// <param name="captureCursor">捕获光标</param>
-        /// <returns>Bitmap</returns>
-        private static Bitmap CaptureScreenArea(Rectangle r, bool captureCursor)
-        {
-            try
-            {
-                Bitmap bitmap = new Bitmap(r.Width, r.Height);
-                Graphics g = Graphics.FromImage(bitmap);
-                g.CopyFromScreen(r.X, r.Y, 0, 0, r.Size, CopyPixelOperation.SourceCopy);
-                if (captureCursor)
-                {
-                    Point p = Control.MousePosition;
-                    g.DrawImage(Resources.cursor, new Point(p.X - r.X, p.Y - r.Y));
-                    g.Dispose();
-                    g = null;
-                }
-                return bitmap;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// 缩放图片
-        /// <para>scale大于0时，size无效</para>
-        /// <para>sourceBitmap会被释放掉</para>
-        /// </summary>
-        /// <param name="sourceBitmap">源图片bitmap</param>
-        /// <param name="size">指定目的图片的尺寸</param>
-        /// <param name="scale">指定目的图片相对于原图片的缩放比例(大于0，原尺寸数值为100)</param>
-        /// <returns>Bitmap</returns>
-        private static Bitmap ZoomImage(Bitmap sourceBitmap, Size size, int scale)
-        {
-            if (scale <= 0 || scale == 100)
-            {
-                return sourceBitmap;
-            }
-            try
-            {
-                if (scale > 0)
-                {
-                    size.Width = sourceBitmap.Width * scale / 100;
-                    size.Height = sourceBitmap.Height * scale / 100;
-                }
-                Bitmap bitmap = new Bitmap(size.Width, size.Height);
-                Graphics g = Graphics.FromImage(bitmap);
-                g.DrawImage(sourceBitmap, new Rectangle(0, 0, size.Width, size.Height), 0, 0, sourceBitmap.Width, sourceBitmap.Height, GraphicsUnit.Pixel);
-                g.Dispose();
-                g = null;
-                sourceBitmap.Dispose();
-                sourceBitmap = null;
-                return bitmap;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// 按质量保存图片到内存流
-        /// <para>bitmap会被释放掉</para>
-        /// </summary>
-        /// <param name="bitmap">图片bitmap</param>
-        /// <param name="quality">图片质量(0-100]</param>
-        /// <param name="memoryStream">MemoryStream</param>
-        private static void QualitySave(Bitmap bitmap, int quality, MemoryStream memoryStream)
-        {
-            if (quality < 0 || quality >= 100)
-            {
-                bitmap.Save(memoryStream, ImageFormat.Jpeg);
-            }
-            else
-            {
-                EncoderParameters encoderParameters = new EncoderParameters(1);
-                encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, quality);
-                bitmap.Save(memoryStream, jpgEncoder, encoderParameters);
-            }
-            bitmap.Dispose();
-            bitmap = null;
-        }
-
-        /// <summary>
-        /// 获取图片编码
-        /// </summary>
-        /// <param name="format">图片类型</param>
-        /// <returns>ImageCodecInfo</returns>
-        private static ImageCodecInfo GetEncoder(ImageFormat format)
-        {
-            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
-            foreach (ImageCodecInfo codec in codecs)
-            {
-                if (codec.FormatID == format.Guid)
-                {
-                    return codec;
-                }
-            }
-            return null;
-        }
-
-        /********** 工具类 **********/
-        /// <summary>
-        /// 获取所有的IP地址
-        /// </summary>
-        /// <returns>List&lt;Tuple&lt;名称, IP地址&gt;&gt;</returns>
-        private static List<Tuple<string, string>> GetAllIPv4Address()
-        {
-            var ipList = new List<Tuple<string, string>>();
-            foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
-            {
-                foreach (var ua in ni.GetIPProperties().UnicastAddresses)
-                {
-                    if (ua.Address.AddressFamily == AddressFamily.InterNetwork)
-                    {
-                        ipList.Add(Tuple.Create(ni.Name, ua.Address.ToString()));
-                    }
-                }
-            }
-            return ipList;
-        }
-
-        /// <summary>
-        /// 获取所有屏幕信息
-        /// <para>当有1个屏幕时，返回1个Tuple</para>
-        /// <para>当有n个屏幕时，
-        /// 第一个(下标0)是全部屏幕的叠加态，
-        /// 第二个(下标1)是主屏幕，
-        /// 后面是其他屏幕，
-        /// 总共返回n+1个Tuple
-        /// </para>
-        /// </summary>
-        /// <returns>List&lt;Tuple&lt;名称, 屏幕Rectangle&gt;&gt;</returns>
-        private static List<Tuple<string, Rectangle>> GetAllScreen()
-        {
-            var screenList = new List<Tuple<string, Rectangle>>();
-            var screens = Screen.AllScreens;
-            int screenLength = screens.Length;
-            if (screenLength == 1)
-            {
-                screenList.Add(Tuple.Create(screens[0].DeviceName.Remove(0, 11) + "(主)", screens[0].Bounds));
-            }
-            else
-            {
-                for (int i = 0; i < screenLength; i++)
-                {
-                    if (screens[i].Primary)
-                    {
-                        screenList.Insert(0, Tuple.Create(screens[i].DeviceName.Remove(0, 11) + "(主)", screens[i].Bounds));
-                    }
-                    else
-                    {
-                        screenList.Add(Tuple.Create(screens[i].DeviceName.Remove(0, 11), screens[i].Bounds));
-                    }
-                }
-                // 计算全部屏幕的叠加态
-                int xMin = screenList.Min(t => t.Item2.Left);
-                int yMin = screenList.Min(t => t.Item2.Top);
-                int xMax = screenList.Max(t => t.Item2.Right);
-                int yMax = screenList.Max(t => t.Item2.Bottom);
-                screenList.Insert(0, Tuple.Create("0(全)", new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin)));
-            }
-            return screenList;
         }
 
     }

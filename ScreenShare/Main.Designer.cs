@@ -141,6 +141,11 @@
             0,
             0,
             0});
+            this.ipPortNud.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.ipPortNud.Name = "ipPortNud";
             this.ipPortNud.Size = new System.Drawing.Size(80, 21);
             this.ipPortNud.TabIndex = 3;
@@ -335,21 +340,22 @@
             // screenXNud
             // 
             this.screenXNud.Enabled = false;
-            this.screenXNud.Location = new System.Drawing.Point(30, 40);
-            this.screenXNud.Maximum = new decimal(new int[] {
-            65535,
+            this.screenXNud.Increment = new decimal(new int[] {
+            10,
             0,
             0,
             0});
-            this.screenXNud.Minimum = new decimal(new int[] {
-            65536,
+            this.screenXNud.Location = new System.Drawing.Point(30, 40);
+            this.screenXNud.Maximum = new decimal(new int[] {
+            1918,
             0,
             0,
-            -2147483648});
+            0});
             this.screenXNud.Name = "screenXNud";
             this.screenXNud.Size = new System.Drawing.Size(50, 21);
             this.screenXNud.TabIndex = 3;
             this.toolTip.SetToolTip(this.screenXNud, "选取矩形左上角的横坐标X");
+            this.screenXNud.ValueChanged += new System.EventHandler(this.ScreenXNud_ValueChanged);
             // 
             // screenYLabel
             // 
@@ -363,21 +369,22 @@
             // screenYNud
             // 
             this.screenYNud.Enabled = false;
-            this.screenYNud.Location = new System.Drawing.Point(30, 70);
-            this.screenYNud.Maximum = new decimal(new int[] {
-            65535,
+            this.screenYNud.Increment = new decimal(new int[] {
+            10,
             0,
             0,
             0});
-            this.screenYNud.Minimum = new decimal(new int[] {
-            65536,
+            this.screenYNud.Location = new System.Drawing.Point(30, 70);
+            this.screenYNud.Maximum = new decimal(new int[] {
+            1078,
             0,
             0,
-            -2147483648});
+            0});
             this.screenYNud.Name = "screenYNud";
             this.screenYNud.Size = new System.Drawing.Size(50, 21);
             this.screenYNud.TabIndex = 4;
             this.toolTip.SetToolTip(this.screenYNud, "选取矩形左上角的纵坐标Y");
+            this.screenYNud.ValueChanged += new System.EventHandler(this.ScreenYNud_ValueChanged);
             // 
             // screenWLabel
             // 
@@ -391,9 +398,14 @@
             // screenWNud
             // 
             this.screenWNud.Enabled = false;
+            this.screenWNud.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
             this.screenWNud.Location = new System.Drawing.Point(120, 40);
             this.screenWNud.Maximum = new decimal(new int[] {
-            65535,
+            1920,
             0,
             0,
             0});
@@ -425,9 +437,14 @@
             // screenHNud
             // 
             this.screenHNud.Enabled = false;
+            this.screenHNud.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
             this.screenHNud.Location = new System.Drawing.Point(120, 70);
             this.screenHNud.Maximum = new decimal(new int[] {
-            65535,
+            1080,
             0,
             0,
             0});
@@ -504,12 +521,12 @@
             0});
             this.scalingNud.Location = new System.Drawing.Point(70, 40);
             this.scalingNud.Maximum = new decimal(new int[] {
-            1000,
+            65535,
             0,
             0,
             0});
             this.scalingNud.Minimum = new decimal(new int[] {
-            10,
+            1,
             0,
             0,
             0});
@@ -536,6 +553,11 @@
             // videoWNud
             // 
             this.videoWNud.Enabled = false;
+            this.videoWNud.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
             this.videoWNud.Location = new System.Drawing.Point(35, 70);
             this.videoWNud.Maximum = new decimal(new int[] {
             65535,
@@ -568,6 +590,11 @@
             // videoHNud
             // 
             this.videoHNud.Enabled = false;
+            this.videoHNud.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
             this.videoHNud.Location = new System.Drawing.Point(125, 70);
             this.videoHNud.Maximum = new decimal(new int[] {
             65535,
@@ -657,6 +684,11 @@
             // 
             // videoQualityNud
             // 
+            this.videoQualityNud.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
             this.videoQualityNud.Location = new System.Drawing.Point(70, 70);
             this.videoQualityNud.Minimum = new decimal(new int[] {
             1,
