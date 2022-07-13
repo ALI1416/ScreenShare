@@ -347,7 +347,7 @@
             0});
             this.screenXNud.Location = new System.Drawing.Point(30, 40);
             this.screenXNud.Maximum = new decimal(new int[] {
-            1918,
+            1919,
             0,
             0,
             0});
@@ -376,7 +376,7 @@
             0});
             this.screenYNud.Location = new System.Drawing.Point(30, 70);
             this.screenYNud.Maximum = new decimal(new int[] {
-            1078,
+            1079,
             0,
             0,
             0});
@@ -739,6 +739,7 @@
             this.previewLabel.TabIndex = 0;
             this.previewLabel.Text = "点击此处预览\r\n再次点击退出预览";
             this.previewLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.previewLabel.Visible = false;
             // 
             // previewImg
             // 
@@ -756,6 +757,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(768, 432);
+            this.Controls.Add(this.previewLabel);
+            this.Controls.Add(this.previewImg);
             this.Controls.Add(this.shareScreenLabel);
             this.Controls.Add(this.ipAddressLabel);
             this.Controls.Add(this.ipAddressComboBox);
@@ -773,8 +776,6 @@
             this.Controls.Add(this.videoBox);
             this.Controls.Add(this.startSharingScreenBtn);
             this.Controls.Add(this.logText);
-            this.Controls.Add(this.previewLabel);
-            this.Controls.Add(this.previewImg);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = global::ScreenShare.Properties.Resources.icon;
             this.MaximizeBox = false;

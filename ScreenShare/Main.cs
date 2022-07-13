@@ -188,6 +188,9 @@ namespace ScreenShare
             videoFrameNud.Value = 5;
             // 视频质量
             videoQualityNud.Value = 100;
+
+            /* 预览图像 */
+            previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
         }
 
         /// <summary>
@@ -292,7 +295,6 @@ namespace ScreenShare
         /// </summary>
         private async void CaptureScreenTask()
         {
-            previewImg.Image = new Bitmap(faviconStream);
             // 判断捕获图片属性
             // 普通
             if (screen.Size == video && videoQuality == 100)
@@ -303,8 +305,8 @@ namespace ScreenShare
                     {
                         imageStream.SetLength(0);
                         ImageUtils.Save(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), imageStream);
-                        previewImg.Image.Dispose();
-                        previewImg.Image = new Bitmap(imageStream);
+                        //previewImg.Image.Dispose();
+                        //previewImg.Image = new Bitmap(imageStream);
                         await Task.Delay(1000 / videoFrame);
                     }
                     catch (Exception)
@@ -321,8 +323,8 @@ namespace ScreenShare
                     {
                         imageStream.SetLength(0);
                         ImageUtils.Save(ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video), imageStream);
-                        previewImg.Image.Dispose();
-                        previewImg.Image = new Bitmap(imageStream);
+                        //previewImg.Image.Dispose();
+                        //previewImg.Image = new Bitmap(imageStream);
                         await Task.Delay(1000 / videoFrame);
                     }
                     catch (Exception)
@@ -339,8 +341,8 @@ namespace ScreenShare
                     {
                         imageStream.SetLength(0);
                         ImageUtils.QualitySave(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), videoQuality, imageStream);
-                        previewImg.Image.Dispose();
-                        previewImg.Image = new Bitmap(imageStream);
+                        //previewImg.Image.Dispose();
+                        //previewImg.Image = new Bitmap(imageStream);
                         await Task.Delay(1000 / videoFrame);
                     }
                     catch (Exception)
@@ -357,8 +359,8 @@ namespace ScreenShare
                     {
                         imageStream.SetLength(0);
                         ImageUtils.QualitySave(ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video), videoQuality, imageStream);
-                        previewImg.Image.Dispose();
-                        previewImg.Image = new Bitmap(imageStream);
+                        //previewImg.Image.Dispose();
+                        //previewImg.Image = new Bitmap(imageStream);
                         await Task.Delay(1000 / videoFrame);
                     }
                     catch (Exception)
@@ -379,6 +381,63 @@ namespace ScreenShare
             logText.ScrollToCaret();
         }
 
+        /// <summary>
+        /// 设置选项是否可以选择
+        /// </summary>
+        /// <param name="enable"></param>
+        private void SetEnable(bool enable)
+        {
+            ipAddressComboBox.Enabled = enable;
+            ipPortNud.Enabled = enable;
+            isEncryptionCb.Enabled = enable;
+            isFullScreenCb.Enabled = enable;
+            screenComboBox.Enabled = enable;
+            isLockAspectRatioCb.Enabled = enable;
+            isDisplayCursorCb.Enabled = enable;
+            videoFrameNud.Enabled = enable;
+            videoQualityNud.Enabled = enable;
+            reloadConfigBtn.Enabled = enable;
+            captureScreenCoordinatesBtn.Enabled = enable;
+            // 可选择
+            if (enable)
+            {
+                if (isEncryptionCb.Checked)
+                {
+                    accountText.Enabled = enable;
+                    pwdText.Enabled = enable;
+                }
+                if (!isFullScreenCb.Checked)
+                {
+                    screenXNud.Enabled = enable;
+                    screenYNud.Enabled = enable;
+                    screenWNud.Enabled = enable;
+                    screenHNud.Enabled = enable;
+                }
+                if (isLockAspectRatioCb.Checked)
+                {
+                    scalingNud.Enabled = enable;
+                }
+                else
+                {
+                    videoWNud.Enabled = enable;
+                    videoHNud.Enabled = enable;
+                }
+            }
+            // 不可选择
+            else
+            {
+                accountText.Enabled = enable;
+                pwdText.Enabled = enable;
+                screenXNud.Enabled = enable;
+                screenYNud.Enabled = enable;
+                screenWNud.Enabled = enable;
+                screenHNud.Enabled = enable;
+                scalingNud.Enabled = enable;
+                videoWNud.Enabled = enable;
+                videoHNud.Enabled = enable;
+            }
+        }
+
         /********** 界面事件 **********/
         /// <summary>
         /// 点击开始共享按钮
@@ -395,6 +454,11 @@ namespace ScreenShare
                 server.Stop();
                 // 手动gc
                 GC.Collect();
+                // 设置选项可以选择
+                SetEnable(true);
+                // 显示图像预览
+                previewLabel.Visible = false;
+                previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
             }
             else
             {
@@ -406,16 +470,22 @@ namespace ScreenShare
                     server.Prefixes.Add(shareLink);
                     server.Start();
                     isWorking = true;
-                    // 开启屏幕捕获
-                    CaptureScreenTask();
                     // 开启HTTP服务器
                     StartServerTask();
+                    // 开启屏幕捕获
+                    CaptureScreenTask();
                     Log("屏幕共享已开启。");
                     startSharingScreenBtn.Text = "停止共享";
+                    // 设置选项不可选择
+                    SetEnable(false);
+                    // 关闭图像预览
+                    previewLabel.Visible = true;
+                    previewImg.Image.Dispose();
+                    previewImg.Image = null;
                 }
                 catch (Exception)
                 {
-                    MessageBox.Show("启动失败，可能是端口号冲突，请更换端口号！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("启动失败！可能是IP地址错误或端口号冲突。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     // 报错后Prefixes会被清空
                     server = new HttpListener();
                 }
@@ -476,7 +546,7 @@ namespace ScreenShare
             }
             catch (Exception)
             {
-                MessageBox.Show("复制失败，请手动复制！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("复制失败！请手动复制。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -528,10 +598,10 @@ namespace ScreenShare
         {
             Rectangle selectedScreen = screenList.ElementAt(screenComboBox.SelectedIndex).Item2;
             screenXNud.Minimum = selectedScreen.Left;
-            screenXNud.Maximum = selectedScreen.Right - 2;
+            screenXNud.Maximum = selectedScreen.Right - 1;
             screenXNud.Value = selectedScreen.X;
             screenYNud.Minimum = selectedScreen.Top;
-            screenYNud.Maximum = selectedScreen.Bottom - 2;
+            screenYNud.Maximum = selectedScreen.Bottom - 1;
             screenYNud.Value = selectedScreen.Y;
             screenWNud.Maximum = selectedScreen.Width;
             screenWNud.Value = selectedScreen.Width;
@@ -548,6 +618,9 @@ namespace ScreenShare
         {
             Rectangle selectedScreen = screenList.ElementAt(screenComboBox.SelectedIndex).Item2;
             screenWNud.Maximum = selectedScreen.Right - screenXNud.Value;
+            // TODO 屏幕的XY宽高发生改变可能会重复渲染多次预览图
+            previewImg.Image.Dispose();
+            previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
         }
 
         /// <summary>
@@ -559,6 +632,8 @@ namespace ScreenShare
         {
             Rectangle selectedScreen = screenList.ElementAt(screenComboBox.SelectedIndex).Item2;
             screenHNud.Maximum = selectedScreen.Bottom - screenYNud.Value;
+            previewImg.Image.Dispose();
+            previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
         }
 
         /// <summary>
@@ -569,6 +644,8 @@ namespace ScreenShare
         private void ScreenWNud_ValueChanged(object sender, EventArgs e)
         {
             videoWNud.Value = screenWNud.Value * scalingNud.Value / 100;
+            previewImg.Image.Dispose();
+            previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
         }
 
         /// <summary>
@@ -579,6 +656,8 @@ namespace ScreenShare
         private void ScreenHNud_ValueChanged(object sender, EventArgs e)
         {
             videoHNud.Value = screenHNud.Value * scalingNud.Value / 100;
+            previewImg.Image.Dispose();
+            previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
         }
 
         /// <summary>
