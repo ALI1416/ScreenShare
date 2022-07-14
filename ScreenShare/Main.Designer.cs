@@ -78,6 +78,7 @@
             this.previewLabel = new System.Windows.Forms.Label();
             this.previewImg = new System.Windows.Forms.PictureBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.ipPortNud)).BeginInit();
             this.encryptionBox.SuspendLayout();
             this.coordinatesBox.SuspendLayout();
@@ -752,6 +753,13 @@
             this.previewImg.TabStop = false;
             this.previewImg.Click += new System.EventHandler(this.PreviewImg_Click);
             // 
+            // notifyIcon
+            // 
+            this.notifyIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.notifyIcon.Icon = global::ScreenShare.Properties.Resources.icon;
+            this.notifyIcon.Text = "屏幕共享";
+            this.notifyIcon.Click += new System.EventHandler(this.NotifyIcon_Click);
+            // 
             // ScreenShare
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -782,6 +790,8 @@
             this.Name = "ScreenShare";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "屏幕共享";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ScreenShare_FormClosing);
+            this.SizeChanged += new System.EventHandler(this.ScreenShare_SizeChanged);
             ((System.ComponentModel.ISupportInitialize)(this.ipPortNud)).EndInit();
             this.encryptionBox.ResumeLayout(false);
             this.encryptionBox.PerformLayout();
@@ -1021,5 +1031,11 @@
         /// 提示ToolTip
         /// </summary>
         private System.Windows.Forms.ToolTip toolTip;
+
+        /* 通知 */
+        /// <summary>
+        /// 通知NotifyIcon
+        /// </summary>
+        private System.Windows.Forms.NotifyIcon notifyIcon;
     }
 }

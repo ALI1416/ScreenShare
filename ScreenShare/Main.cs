@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -85,7 +84,7 @@ namespace ScreenShare
         /// <summary>
         /// 服务器
         /// </summary>
-        private HttpListener server = new HttpListener();
+        private HttpListener server;
         /// <summary>
         /// 接收和返回上下文
         /// </summary>
@@ -106,6 +105,11 @@ namespace ScreenShare
             Init();
             // 读取图标
             Resources.favicon.Save(faviconStream);
+            server = new HttpListener
+            {
+                IgnoreWriteExceptions = true
+            };
+            Utils.AddNetFw("ScreenShare", Process.GetCurrentProcess().MainModule.FileName);
             Log("屏幕共享初始化完成！");
         }
 
@@ -304,9 +308,17 @@ namespace ScreenShare
                     try
                     {
                         imageStream.SetLength(0);
-                        ImageUtils.Save(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), imageStream);
-                        //previewImg.Image.Dispose();
-                        //previewImg.Image = new Bitmap(imageStream);
+                        Bitmap bitmap = ImageUtils.CaptureScreenArea(screen, isDisplayCursor);
+                        ImageUtils.Save(bitmap, imageStream);
+                        if (previewImg.Dock == DockStyle.None)
+                        {
+                            bitmap.Dispose();
+                        }
+                        else
+                        {
+                            previewImg.Image.Dispose();
+                            previewImg.Image = bitmap;
+                        }
                         await Task.Delay(1000 / videoFrame);
                     }
                     catch (Exception)
@@ -322,9 +334,17 @@ namespace ScreenShare
                     try
                     {
                         imageStream.SetLength(0);
-                        ImageUtils.Save(ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video), imageStream);
-                        //previewImg.Image.Dispose();
-                        //previewImg.Image = new Bitmap(imageStream);
+                        Bitmap bitmap = ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video, true);
+                        ImageUtils.Save(bitmap, imageStream);
+                        if (previewImg.Dock == DockStyle.None)
+                        {
+                            bitmap.Dispose();
+                        }
+                        else
+                        {
+                            previewImg.Image.Dispose();
+                            previewImg.Image = bitmap;
+                        }
                         await Task.Delay(1000 / videoFrame);
                     }
                     catch (Exception)
@@ -340,9 +360,17 @@ namespace ScreenShare
                     try
                     {
                         imageStream.SetLength(0);
-                        ImageUtils.QualitySave(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), videoQuality, imageStream);
-                        //previewImg.Image.Dispose();
-                        //previewImg.Image = new Bitmap(imageStream);
+                        Bitmap bitmap = ImageUtils.CaptureScreenArea(screen, isDisplayCursor);
+                        ImageUtils.QualitySave(bitmap, videoQuality, imageStream);
+                        if (previewImg.Dock == DockStyle.None)
+                        {
+                            bitmap.Dispose();
+                        }
+                        else
+                        {
+                            previewImg.Image.Dispose();
+                            previewImg.Image = bitmap;
+                        }
                         await Task.Delay(1000 / videoFrame);
                     }
                     catch (Exception)
@@ -358,9 +386,17 @@ namespace ScreenShare
                     try
                     {
                         imageStream.SetLength(0);
-                        ImageUtils.QualitySave(ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video), videoQuality, imageStream);
-                        //previewImg.Image.Dispose();
-                        //previewImg.Image = new Bitmap(imageStream);
+                        Bitmap bitmap = ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video, true);
+                        ImageUtils.QualitySave(bitmap, videoQuality, imageStream);
+                        if (previewImg.Dock == DockStyle.None)
+                        {
+                            bitmap.Dispose();
+                        }
+                        else
+                        {
+                            previewImg.Image.Dispose();
+                            previewImg.Image = bitmap;
+                        }
                         await Task.Delay(1000 / videoFrame);
                     }
                     catch (Exception)
@@ -450,6 +486,7 @@ namespace ScreenShare
             {
                 isWorking = false;
                 Log("屏幕共享已停止。");
+                notifyIcon.ShowBalloonTip(1000, "屏幕共享", "屏幕共享已停止！", ToolTipIcon.Info);
                 startSharingScreenBtn.Text = "开始共享";
                 server.Stop();
                 // 手动gc
@@ -475,6 +512,7 @@ namespace ScreenShare
                     // 开启屏幕捕获
                     CaptureScreenTask();
                     Log("屏幕共享已开启。");
+                    notifyIcon.ShowBalloonTip(1000, "屏幕共享", "屏幕共享已开启！", ToolTipIcon.Info);
                     startSharingScreenBtn.Text = "停止共享";
                     // 设置选项不可选择
                     SetEnable(false);
@@ -485,9 +523,13 @@ namespace ScreenShare
                 }
                 catch (Exception)
                 {
+                    Log("启动失败！可能是IP地址错误或端口号冲突。");
                     MessageBox.Show("启动失败！可能是IP地址错误或端口号冲突。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     // 报错后Prefixes会被清空
-                    server = new HttpListener();
+                    server = new HttpListener
+                    {
+                        IgnoreWriteExceptions = true
+                    };
                 }
             }
         }
@@ -546,6 +588,7 @@ namespace ScreenShare
             }
             catch (Exception)
             {
+                Log("复制失败！请手动复制。");
                 MessageBox.Show("复制失败！请手动复制。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -618,7 +661,7 @@ namespace ScreenShare
         {
             Rectangle selectedScreen = screenList.ElementAt(screenComboBox.SelectedIndex).Item2;
             screenWNud.Maximum = selectedScreen.Right - screenXNud.Value;
-            // TODO 屏幕的XY宽高发生改变可能会重复渲染多次预览图
+            // TODO 屏幕的XY宽高同时发生改变可能会重复渲染多次预览图
             previewImg.Image.Dispose();
             previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
         }
@@ -711,20 +754,105 @@ namespace ScreenShare
         }
 
         /// <summary>
-        /// 点击图片，全窗口展示
+        /// 点击预览图
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void PreviewImg_Click(object sender, EventArgs e)
         {
+            // 如果是小窗口，则切换到全屏
             if (previewImg.Dock == DockStyle.None)
             {
                 previewImg.Dock = DockStyle.Fill;
+                FormBorderStyle = FormBorderStyle.Sizable;
+                MaximizeBox = true;
+                if (isWorking)
+                {
+                    previewImg.Image = new Bitmap(imageStream);
+                    previewLabel.Visible = false;
+                }
             }
+            // 如果是全屏，则切换到小窗口
             else
             {
+                Size = new Size(784, 471);
+                WindowState = FormWindowState.Normal;
                 previewImg.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+                FormBorderStyle = FormBorderStyle.FixedDialog;
+                MaximizeBox = false;
+                if (isWorking)
+                {
+                    previewImg.Image.Dispose();
+                    previewImg.Image = null;
+                    previewLabel.Visible = true;
+                }
             }
+        }
+
+        /// <summary>
+        /// 窗口大小改变后
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ScreenShare_SizeChanged(object sender, EventArgs e)
+        {
+            // 最小化
+            if (WindowState == FormWindowState.Minimized)
+            {
+                // 如果是全屏，则切换到小窗口
+                if (previewImg.Dock == DockStyle.Fill)
+                {
+                    PreviewImg_Click(null, null);
+                    // PreviewImg_Click可能会还原窗口，所以要重新最小化一次
+                    WindowState = FormWindowState.Minimized;
+                }
+                // 如果未在运行
+                if (!isWorking && previewImg.Image != null)
+                {
+                    previewImg.Image.Dispose();
+                    previewImg.Image = null;
+                }
+            }
+            // 如果未在运行、未显示预览图
+            else if (!isWorking && previewImg.Image == null)
+            {
+                previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
+            }
+        }
+
+        /// <summary>
+        /// 点击关闭按钮前
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ScreenShare_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // 如果正在运行，则托盘
+            if (isWorking)
+            {
+                // 如果是全屏，则切换到小窗口
+                if (previewImg.Dock == DockStyle.Fill)
+                {
+                    PreviewImg_Click(null, null);
+                }
+                e.Cancel = true;
+                Visible = false;
+                notifyIcon.Visible = true;
+                Log("屏幕共享继续在后台运行！");
+                notifyIcon.ShowBalloonTip(1000, "屏幕共享", "屏幕共享继续在后台运行！", ToolTipIcon.Info);
+            }
+        }
+
+        /// <summary>
+        /// 点击托盘图标
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NotifyIcon_Click(object sender, EventArgs e)
+        {
+            Visible = true;
+            notifyIcon.Visible = false;
+            Focus();
         }
 
     }

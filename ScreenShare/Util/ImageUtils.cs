@@ -23,7 +23,7 @@ namespace ScreenShare
         /// <summary>
         /// 捕获指定区域屏幕截图
         /// </summary>
-        /// <param name="r">矩形</param>
+        /// <param name="r">Rectangle</param>
         /// <param name="captureCursor">捕获光标</param>
         /// <returns>Bitmap</returns>
         public static Bitmap CaptureScreenArea(Rectangle r, bool captureCursor)
@@ -43,47 +43,49 @@ namespace ScreenShare
 
         /// <summary>
         /// 缩放图片
-        /// <para>原图片和目的图片尺寸不同时sourceBitmap会被释放掉</para>
         /// </summary>
-        /// <param name="sourceBitmap">源图片bitmap</param>
-        /// <param name="size">指定目的图片的尺寸</param>
+        /// <param name="bitmap">源图片bitmap</param>
+        /// <param name="size">目的图片的尺寸</param>
+        /// <param name="dispose">释放bitmap(默认否)</param>
         /// <returns>Bitmap</returns>
-        public static Bitmap ZoomImage(Bitmap sourceBitmap, Size size)
+        public static Bitmap ZoomImage(Bitmap bitmap, Size size, bool dispose=false)
         {
-            if (sourceBitmap.Size == size)
+            Bitmap destBitmap = new Bitmap(size.Width, size.Height);
+            using (Graphics g = Graphics.FromImage(destBitmap))
             {
-                return sourceBitmap;
+                g.DrawImage(bitmap, new Rectangle(0, 0, size.Width, size.Height), 0, 0, bitmap.Width, bitmap.Height, GraphicsUnit.Pixel);
             }
-            Bitmap bitmap = new Bitmap(size.Width, size.Height);
-            using (Graphics g = Graphics.FromImage(bitmap))
+            if (dispose)
             {
-                g.DrawImage(sourceBitmap, new Rectangle(0, 0, size.Width, size.Height), 0, 0, sourceBitmap.Width, sourceBitmap.Height, GraphicsUnit.Pixel);
+                bitmap.Dispose();
             }
-            sourceBitmap.Dispose();
-            return bitmap;
+            return destBitmap;
         }
 
         /// <summary>
         /// 保存图片到内存流
-        /// <para>bitmap会被释放掉</para>
         /// </summary>
-        /// <param name="bitmap">图片bitmap</param>
+        /// <param name="bitmap">源图片bitmap</param>
         /// <param name="memoryStream">MemoryStream</param>
-        public static void Save(Bitmap bitmap, MemoryStream memoryStream)
+        /// <param name="dispose">释放bitmap(默认否)</param>
+        public static void Save(Bitmap bitmap, MemoryStream memoryStream, bool dispose = false)
         {
             bitmap.Save(memoryStream, defaultFormat);
-            bitmap.Dispose();
+            if (dispose)
+            {
+                bitmap.Dispose();
+            }
         }
 
         /// <summary>
         /// 按质量保存图片到内存流
         /// <para>图片质量&lt;=0或>=100时，保存原图</para>
-        /// <para>bitmap会被释放掉</para>
         /// </summary>
-        /// <param name="bitmap">图片bitmap</param>
+        /// <param name="bitmap">源图片bitmap</param>
         /// <param name="quality">图片质量(0-100)</param>
         /// <param name="memoryStream">MemoryStream</param>
-        public static void QualitySave(Bitmap bitmap, int quality, MemoryStream memoryStream)
+        /// <param name="dispose">释放bitmap(默认否)</param>
+        public static void QualitySave(Bitmap bitmap, int quality, MemoryStream memoryStream, bool dispose = false)
         {
             if (quality <= 0 || quality >= 100)
             {
@@ -95,7 +97,10 @@ namespace ScreenShare
                 encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, quality);
                 bitmap.Save(memoryStream, defaultEncoder, encoderParameters);
             }
-            bitmap.Dispose();
+            if (dispose)
+            {
+                bitmap.Dispose();
+            }
         }
 
         /// <summary>

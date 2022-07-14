@@ -21,7 +21,7 @@ namespace ScreenShare
         /// <summary>
         /// 填充
         /// </summary>
-        private Brush brush = new SolidBrush(Color.White);
+        private readonly Brush brush = new SolidBrush(Color.White);
         /// <summary>
         /// 正在绘画
         /// </summary>
@@ -54,11 +54,7 @@ namespace ScreenShare
         private void DrawScreen_MouseMove(object sender, MouseEventArgs e)
         {
             if (!isDraw) return;
-            int xMin = Math.Min(start.X, e.X);
-            int yMin = Math.Min(start.Y, e.Y);
-            int xMax = Math.Max(start.X, e.X);
-            int yMax = Math.Max(start.Y, e.Y);
-            rect = new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin);
+            rect = new Rectangle(Math.Min(start.X, e.X), Math.Min(start.Y, e.Y), Math.Abs(start.X - e.X), Math.Abs(start.Y - e.Y));
             Refresh();
         }
 

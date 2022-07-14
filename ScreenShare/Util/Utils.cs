@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetFwTypeLib;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -74,6 +75,31 @@ namespace ScreenShare
                 screenList.Insert(0, Tuple.Create("0(全)", new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin)));
             }
             return screenList;
+        }
+
+        /// <summary>
+        /// 添加防火墙规则
+        /// </summary>
+        /// <param name="name">名称</param>
+        /// <param name="path">路径</param>
+        public static void AddNetFw(string name,string path)
+        {
+            INetFwMgr netFwMgr = (INetFwMgr)Activator.CreateInstance(Type.GetTypeFromProgID("HNetCfg.FwMgr"));
+            INetFwAuthorizedApplication app = (INetFwAuthorizedApplication)Activator.CreateInstance(
+            Type.GetTypeFromProgID("HNetCfg.FwAuthorizedApplication"));
+            app.Name = name;
+            app.ProcessImageFileName = path;
+            app.Enabled = true;
+            // 查询是否存在
+            foreach (INetFwAuthorizedApplication mApp in netFwMgr.LocalPolicy.CurrentProfile.AuthorizedApplications)
+            {
+                if (app == mApp)
+                {
+                    return;
+                }
+            }
+            // 不存在去添加
+            netFwMgr.LocalPolicy.CurrentProfile.AuthorizedApplications.Add(app);
         }
 
     }
