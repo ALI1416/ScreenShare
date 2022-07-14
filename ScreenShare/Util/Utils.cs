@@ -81,25 +81,17 @@ namespace ScreenShare
         /// 添加防火墙规则
         /// </summary>
         /// <param name="name">名称</param>
-        /// <param name="path">路径</param>
-        public static void AddNetFw(string name,string path)
+        /// <param name="port">端口号</param>
+        public static void AddNetFw(string name, int port)
         {
             INetFwMgr netFwMgr = (INetFwMgr)Activator.CreateInstance(Type.GetTypeFromProgID("HNetCfg.FwMgr"));
-            INetFwAuthorizedApplication app = (INetFwAuthorizedApplication)Activator.CreateInstance(
-            Type.GetTypeFromProgID("HNetCfg.FwAuthorizedApplication"));
-            app.Name = name;
-            app.ProcessImageFileName = path;
-            app.Enabled = true;
-            // 查询是否存在
-            foreach (INetFwAuthorizedApplication mApp in netFwMgr.LocalPolicy.CurrentProfile.AuthorizedApplications)
-            {
-                if (app == mApp)
-                {
-                    return;
-                }
-            }
-            // 不存在去添加
-            netFwMgr.LocalPolicy.CurrentProfile.AuthorizedApplications.Add(app);
+            INetFwOpenPort openPort = (INetFwOpenPort)Activator.CreateInstance(Type.GetTypeFromProgID("HNetCfg.FwOpenPort"));
+            openPort.Name = name;
+            openPort.Port = port;
+            openPort.Protocol = NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP;
+            openPort.Scope = NET_FW_SCOPE_.NET_FW_SCOPE_ALL;
+            openPort.Enabled = true;
+            netFwMgr.LocalPolicy.CurrentProfile.GloballyOpenPorts.Add(openPort);
         }
 
     }

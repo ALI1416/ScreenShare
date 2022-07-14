@@ -109,7 +109,6 @@ namespace ScreenShare
             {
                 IgnoreWriteExceptions = true
             };
-            Utils.AddNetFw("ScreenShare", Process.GetCurrentProcess().MainModule.FileName);
             Log("屏幕共享初始化完成！");
         }
 
@@ -486,7 +485,6 @@ namespace ScreenShare
             {
                 isWorking = false;
                 Log("屏幕共享已停止。");
-                notifyIcon.ShowBalloonTip(1000, "屏幕共享", "屏幕共享已停止！", ToolTipIcon.Info);
                 startSharingScreenBtn.Text = "开始共享";
                 server.Stop();
                 // 手动gc
@@ -507,12 +505,12 @@ namespace ScreenShare
                     server.Prefixes.Add(shareLink);
                     server.Start();
                     isWorking = true;
+                    Utils.AddNetFw("ScreenShare", (int)ipPortNud.Value);
                     // 开启HTTP服务器
                     StartServerTask();
                     // 开启屏幕捕获
                     CaptureScreenTask();
                     Log("屏幕共享已开启。");
-                    notifyIcon.ShowBalloonTip(1000, "屏幕共享", "屏幕共享已开启！", ToolTipIcon.Info);
                     startSharingScreenBtn.Text = "停止共享";
                     // 设置选项不可选择
                     SetEnable(false);
@@ -838,7 +836,6 @@ namespace ScreenShare
                 e.Cancel = true;
                 Visible = false;
                 notifyIcon.Visible = true;
-                Log("屏幕共享继续在后台运行！");
                 notifyIcon.ShowBalloonTip(1000, "屏幕共享", "屏幕共享继续在后台运行！", ToolTipIcon.Info);
             }
         }
