@@ -1,6 +1,7 @@
 ﻿using ScreenShare.Properties;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -294,6 +295,41 @@ namespace ScreenShare
         }
 
         /// <summary>
+        /// 显示预览图片
+        /// </summary>
+        /// <param name="bitmap">Bitmap</param>
+        private void DisplayPreviewImg(Bitmap bitmap)
+        {
+            if (previewImg.Dock == DockStyle.None)
+            {
+                bitmap.Dispose();
+            }
+            else
+            {
+                previewImg.Image.Dispose();
+                previewImg.Image = bitmap;
+            }
+        }
+
+        /// <summary>
+        /// 异常终止
+        /// </summary>
+        private void ExceptionStop()
+        {
+            isWorking = false;
+            startSharingScreenBtn.Text = "开始共享";
+            Log("异常终止屏幕共享！可能是锁定了账户。");
+            server.Stop();
+            // 手动gc
+            GC.Collect();
+            // 设置选项可以选择
+            SetEnable(true);
+            // 显示图像预览
+            previewLabel.Visible = false;
+            previewImg.Image = new Bitmap(imageStream);
+        }
+
+        /// <summary>
         /// 开启屏幕捕获
         /// </summary>
         private async void CaptureScreenTask()
@@ -306,23 +342,19 @@ namespace ScreenShare
                 {
                     try
                     {
-                        imageStream.SetLength(0);
                         Bitmap bitmap = ImageUtils.CaptureScreenArea(screen, isDisplayCursor);
+                        imageStream.SetLength(0);
                         ImageUtils.Save(bitmap, imageStream);
-                        if (previewImg.Dock == DockStyle.None)
-                        {
-                            bitmap.Dispose();
-                        }
-                        else
-                        {
-                            previewImg.Image.Dispose();
-                            previewImg.Image = bitmap;
-                        }
-                        await Task.Delay(1000 / videoFrame);
+                        DisplayPreviewImg(bitmap);
+                    }
+                    catch (Win32Exception)
+                    {
+                        ExceptionStop();
                     }
                     catch (Exception)
                     {
                     }
+                    await Task.Delay(1000 / videoFrame);
                 }
             }
             // 缩放
@@ -332,23 +364,19 @@ namespace ScreenShare
                 {
                     try
                     {
-                        imageStream.SetLength(0);
                         Bitmap bitmap = ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video, true);
+                        imageStream.SetLength(0);
                         ImageUtils.Save(bitmap, imageStream);
-                        if (previewImg.Dock == DockStyle.None)
-                        {
-                            bitmap.Dispose();
-                        }
-                        else
-                        {
-                            previewImg.Image.Dispose();
-                            previewImg.Image = bitmap;
-                        }
-                        await Task.Delay(1000 / videoFrame);
+                        DisplayPreviewImg(bitmap);
+                    }
+                    catch (Win32Exception)
+                    {
+                        ExceptionStop();
                     }
                     catch (Exception)
                     {
                     }
+                    await Task.Delay(1000 / videoFrame);
                 }
             }
             // 压缩
@@ -358,23 +386,19 @@ namespace ScreenShare
                 {
                     try
                     {
-                        imageStream.SetLength(0);
                         Bitmap bitmap = ImageUtils.CaptureScreenArea(screen, isDisplayCursor);
+                        imageStream.SetLength(0);
                         ImageUtils.QualitySave(bitmap, videoQuality, imageStream);
-                        if (previewImg.Dock == DockStyle.None)
-                        {
-                            bitmap.Dispose();
-                        }
-                        else
-                        {
-                            previewImg.Image.Dispose();
-                            previewImg.Image = bitmap;
-                        }
-                        await Task.Delay(1000 / videoFrame);
+                        DisplayPreviewImg(bitmap);
+                    }
+                    catch (Win32Exception)
+                    {
+                        ExceptionStop();
                     }
                     catch (Exception)
                     {
                     }
+                    await Task.Delay(1000 / videoFrame);
                 }
             }
             // 缩放+压缩
@@ -384,23 +408,19 @@ namespace ScreenShare
                 {
                     try
                     {
-                        imageStream.SetLength(0);
                         Bitmap bitmap = ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video, true);
+                        imageStream.SetLength(0);
                         ImageUtils.QualitySave(bitmap, videoQuality, imageStream);
-                        if (previewImg.Dock == DockStyle.None)
-                        {
-                            bitmap.Dispose();
-                        }
-                        else
-                        {
-                            previewImg.Image.Dispose();
-                            previewImg.Image = bitmap;
-                        }
-                        await Task.Delay(1000 / videoFrame);
+                        DisplayPreviewImg(bitmap);
+                    }
+                    catch (Win32Exception)
+                    {
+                        ExceptionStop();
                     }
                     catch (Exception)
                     {
                     }
+                    await Task.Delay(1000 / videoFrame);
                 }
             }
         }
@@ -836,6 +856,7 @@ namespace ScreenShare
                 e.Cancel = true;
                 Visible = false;
                 notifyIcon.Visible = true;
+                Log("屏幕共享继续在后台运行！");
                 notifyIcon.ShowBalloonTip(1000, "屏幕共享", "屏幕共享继续在后台运行！", ToolTipIcon.Info);
             }
         }
