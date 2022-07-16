@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>屏幕共享</title>
+</head>
+<body style="overflow:hidden">
+<img
+    id="img"
+    src="image.jpg"
+    alt="网络连接异常"
+    style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:none"
+    ondblclick="end()"
+>
+<div id="div">
+  <h1>屏幕共享</h1>
+  <p id="origin" style="font-size:20px;"></p>
+  <p id="current" style="font-size:20px;">当前屏幕尺寸：1900x1000px</p>
+  <button onclick="start()" style="font-size:30px;">点击开始</button>
+  <p style="font-size:20px;">双击图像结束</p>
+</div>
+<script>
+  // 图片宽(px)
+  const imgWidth = 1920;
+  // 图片高(px)
+  const imgHeight = 1080;
+  // 每秒帧数(fps)
+  const frame = 5;
+  // 刷新速度(ms)
+  const speed = 1000 / frame;
+  // 图片
+  const img = document.getElementById("img");
+  // 内容
+  const div = document.getElementById("div");
+  // 远端
+  const origin = document.getElementById("origin");
+  // 当前
+  const current = document.getElementById("current");
+  // 错误计数器
+  let count = 0;
+  // 刷新图片
+  let refreshImg;
+
+  origin.innerHTML="远端视频尺寸：" + imgWidth + "x" + imgHeight + "px，帧率：" + frame + "FPS";
+  adjustImg();
+
+  // 调整图片大小
+  function adjustImg() {
+    if (imgWidth / window.innerWidth < imgHeight / window.innerHeight) {
+      img.style.height = "100%";
+      img.style.width = null;
+    } else {
+      img.style.width = "100%";
+      img.style.height = null;
+    }
+    current.innerHTML="当前屏幕尺寸：" + window.innerWidth + "x" + window.innerHeight + "px";
+  }
+
+  // 开始
+  function start() {
+    refreshImg = setInterval(getImg, speed);
+    div.style.display = "none";
+    img.style.display = "block";
+  }
+
+  // 结束
+  function end() {
+    img.style.display = "none";
+    div.style.display = "block";
+    clearInterval(refreshImg);
+    count = 0;
+  }
+
+  // 获取图片
+  function getImg() {
+    img.src = "image.jpg?r=" + Math.random();
+  }
+
+  // 窗口大小发生变化时
+  window.onresize = () => {
+    adjustImg();
+  };
+
+  // 图片发生错误
+  img.addEventListener("error", () => {
+    if (count++ === 10) {
+      end();
+    }
+  });
+</script>
+</body>
+</html>

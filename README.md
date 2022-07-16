@@ -1,19 +1,31 @@
 # ScreenShare
 
-局域网屏幕共享
+## 屏幕共享
 
-支持加密传输，对方输入账号密码才能访问
+版本：2.0.0
 
-支持自定义区域
+## 功能
 
-支持自定义视频尺寸
+- 加密传输
+- 支持多显示器
+- 支持高DPI
+- 自定义选择区域
+- 视频尺寸调节
+- 视频质量调节
+- 视频帧数调节
+- 光标显示
+- 视频预览
+- 托盘运行
 
-支持光标显示
+## 运行示例
 
-支持帧数和视频质量设置
+![示例](demo.png)
 
-示例：
-![示例](demo.jpg)
+## 致谢
+
+[EslaMx7](https://github.com/EslaMx7/ScreenTask)
+
+[xChivalrouSx](https://github.com/xChivalrouSx/CaptureScreen)
 
 ## 项目链接
 [Github](https://github.com/ALI1416/ScreenShare)
@@ -21,7 +33,7 @@
 [Gitee](https://gitee.com/ALI1416/ScreenShare)
 
 ## 许可证
-[![License](https://img.shields.io/badge/license-BSD-brightgreen)](https://opensource.org/licenses/BSD-3-Clause)
+[![License](https://img.shields.io/badge/license-Apache-brightgreen)](http://www.apache.org/licenses/)
 
 ## 交流
 QQ：1416978277  
