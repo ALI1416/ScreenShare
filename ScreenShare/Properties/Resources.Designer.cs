@@ -61,15 +61,7 @@ namespace ScreenShare.Properties {
         }
         
         /// <summary>
-        ///   查找类似 &lt;!DOCTYPE html&gt;
-        ///&lt;html lang=&quot;zh-cmn-Hans&quot;&gt;
-        ///&lt;head&gt;
-        ///  &lt;meta charset=&quot;UTF-8&quot;&gt;
-        ///  &lt;title&gt;屏幕共享&lt;/title&gt;
-        ///&lt;/head&gt;
-        ///&lt;body&gt;
-        ///  &lt;h1 align=&quot;center&quot;&gt;屏幕共享&lt;/h1&gt;
-        ///  &lt;h2 align=&quot;center&quot;&gt;版本： 的本地化字符串。
+        ///   查找类似 &lt;!DOCTYPE html&gt;&lt;html lang=&quot;zh-cmn-Hans&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;title&gt;屏幕共享&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1 align=&quot;center&quot;&gt;屏幕共享&lt;/h1&gt;&lt;h2 align=&quot;center&quot;&gt;版本： 的本地化字符串。
         /// </summary>
         internal static string aboutHtml1 {
             get {
@@ -78,29 +70,7 @@ namespace ScreenShare.Properties {
         }
         
         /// <summary>
-        ///   查找类似 &lt;/h2&gt;
-        ///  &lt;hr&gt;
-        ///  &lt;h3&gt;功能&lt;/h3&gt;
-        ///  &lt;ul&gt;
-        ///    &lt;li&gt;加密传输&lt;/li&gt;
-        ///    &lt;li&gt;支持多显示器&lt;/li&gt;
-        ///    &lt;li&gt;支持高DPI&lt;/li&gt;
-        ///    &lt;li&gt;自定义选择区域&lt;/li&gt;
-        ///    &lt;li&gt;视频尺寸调节&lt;/li&gt;
-        ///    &lt;li&gt;视频质量调节&lt;/li&gt;
-        ///    &lt;li&gt;视频帧数调节&lt;/li&gt;
-        ///    &lt;li&gt;光标显示&lt;/li&gt;
-        ///    &lt;li&gt;视频预览&lt;/li&gt;
-        ///    &lt;li&gt;托盘运行&lt;/li&gt;
-        ///  &lt;/ul&gt;
-        ///  &lt;hr&gt;
-        ///  &lt;h3&gt;作者：ALI1416&lt;/h3&gt;
-        ///  &lt;a href=&quot;https://github.com/ALI1416&quot; target=&quot;_blank&quot;&gt;GitHub&lt;/a&gt;
-        ///  &lt;a href=&quot;https://gitee.com/ALI1416&quot;&gt;Gitee&lt;/a&gt;
-        ///  &lt;hr&gt;
-        ///  &lt;h3&gt;项目：ScreenShare&lt;/h3&gt;
-        ///  &lt;a href=&quot;https://github.com/ALI1416/ScreenShare&quot;&gt;GitHub&lt;/a&gt;
-        ///  &lt;a href=&quot;https: [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///   查找类似 &lt;/h2&gt;&lt;hr&gt;&lt;h3&gt;功能&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;加密传输&lt;/li&gt;&lt;li&gt;支持多显示器&lt;/li&gt;&lt;li&gt;支持高DPI&lt;/li&gt;&lt;li&gt;自定义选择区域&lt;/li&gt;&lt;li&gt;视频尺寸调节&lt;/li&gt;&lt;li&gt;视频质量调节&lt;/li&gt;&lt;li&gt;视频帧数调节&lt;/li&gt;&lt;li&gt;光标显示&lt;/li&gt;&lt;li&gt;视频预览&lt;/li&gt;&lt;li&gt;托盘运行&lt;/li&gt;&lt;/ul&gt;&lt;hr&gt;&lt;h3&gt;作者：ALI1416&lt;/h3&gt;&lt;a href=&quot;https://github.com/ALI1416&quot;target=&quot;_blank&quot;&gt;GitHub&lt;/a&gt; &lt;a href=&quot;https://gitee.com/ALI1416&quot;&gt;Gitee&lt;/a&gt;&lt;hr&gt;&lt;h3&gt;项目：ScreenShare&lt;/h3&gt;&lt;a href=&quot;https://github.com/ALI1416/ScreenShare&quot;&gt;GitHub&lt;/a&gt; &lt;a href=&quot;https://gitee.com/ALI1416/ScreenShare&quot;&gt;Gitee&lt;/a&gt;&lt;hr&gt;&lt;h3&gt;致谢&lt;/h3&gt;&lt;a href=&quot;https://github.com/EslaMx7/ScreenTask&quot;&gt;Es [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string aboutHtml2 {
             get {
@@ -139,7 +109,7 @@ namespace ScreenShare.Properties {
         }
         
         /// <summary>
-        ///   查找类似 &lt;!DOCTYPE html&gt;&lt;html lang=&quot;zh-cmn-Hans&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;meta http-equiv=&quot;X-UA-Compatible&quot;content=&quot;IE=edge&quot;&gt;&lt;meta name=&quot;viewport&quot;content=&quot;width=device-width, initial-scale=1.0&quot;&gt;&lt;title&gt;屏幕共享&lt;/title&gt;&lt;/head&gt;&lt;body style=&quot;overflow:hidden&quot;&gt;&lt;img id=&quot;img&quot;src=&quot;image.jpg&quot;alt=&quot;网络连接异常&quot;style=&quot;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:none&quot;ondblclick=&quot;end()&quot;&gt;&lt;div id=&quot;div&quot;&gt;&lt;h1&gt;屏幕共享&lt;/h1&gt;&lt;p id=&quot;origin&quot;style=&quot;font-size:20px;&quot;&gt;&lt;/p&gt;&lt;p id=&quot;current&quot;style=&quot;font-size:20px;&quot;&gt;当前屏幕尺寸：1900x10 [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///   查找类似 &lt;!DOCTYPE html&gt;&lt;html lang=&quot;zh-cmn-Hans&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;meta http-equiv=&quot;X-UA-Compatible&quot;content=&quot;IE=edge&quot;&gt;&lt;meta name=&quot;viewport&quot;content=&quot;width=device-width, initial-scale=1.0&quot;&gt;&lt;title&gt;屏幕共享&lt;/title&gt;&lt;/head&gt;&lt;body style=&quot;overflow:hidden&quot;&gt;&lt;img id=&quot;img&quot;src=&quot;image.jpg&quot;alt=&quot;网络连接异常&quot;style=&quot;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:none&quot;ondblclick=&quot;end()&quot;&gt;&lt;div id=&quot;div&quot;&gt;&lt;h1&gt;屏幕共享&lt;/h1&gt;&lt;p id=&quot;origin&quot;style=&quot;font-size:20px;&quot;&gt;&lt;/p&gt;&lt;p id=&quot;current&quot;style=&quot;font-size:20px;&quot;&gt;&lt;/p&gt;&lt;button on [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string indexHtml1 {
             get {

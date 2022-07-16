@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="indexHtml1" xml:space="preserve">
-    <value>&lt;!DOCTYPE html&gt;&lt;html lang="zh-cmn-Hans"&gt;&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;meta http-equiv="X-UA-Compatible"content="IE=edge"&gt;&lt;meta name="viewport"content="width=device-width, initial-scale=1.0"&gt;&lt;title&gt;屏幕共享&lt;/title&gt;&lt;/head&gt;&lt;body style="overflow:hidden"&gt;&lt;img id="img"src="image.jpg"alt="网络连接异常"style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:none"ondblclick="end()"&gt;&lt;div id="div"&gt;&lt;h1&gt;屏幕共享&lt;/h1&gt;&lt;p id="origin"style="font-size:20px;"&gt;&lt;/p&gt;&lt;p id="current"style="font-size:20px;"&gt;当前屏幕尺寸：1900x1000px&lt;/p&gt;&lt;button onclick="start()"style="font-size:30px;"&gt;点击开始&lt;/button&gt;&lt;p style="font-size:20px;"&gt;双击图像结束&lt;/p&gt;&lt;/div&gt;&lt;script&gt;const imgWidth=</value>
+    <value>&lt;!DOCTYPE html&gt;&lt;html lang="zh-cmn-Hans"&gt;&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;meta http-equiv="X-UA-Compatible"content="IE=edge"&gt;&lt;meta name="viewport"content="width=device-width, initial-scale=1.0"&gt;&lt;title&gt;屏幕共享&lt;/title&gt;&lt;/head&gt;&lt;body style="overflow:hidden"&gt;&lt;img id="img"src="image.jpg"alt="网络连接异常"style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:none"ondblclick="end()"&gt;&lt;div id="div"&gt;&lt;h1&gt;屏幕共享&lt;/h1&gt;&lt;p id="origin"style="font-size:20px;"&gt;&lt;/p&gt;&lt;p id="current"style="font-size:20px;"&gt;&lt;/p&gt;&lt;button onclick="start()"style="font-size:30px;"&gt;点击开始&lt;/button&gt;&lt;p style="font-size:20px;"&gt;双击图像结束&lt;/p&gt;&lt;/div&gt;&lt;script&gt;const imgWidth=</value>
   </data>
   <data name="indexHtml2" xml:space="preserve">
     <value>;const speed=1000/frame;const img=document.getElementById("img");const div=document.getElementById("div");const origin=document.getElementById("origin");const current=document.getElementById("current");let count=0;let refreshImg;origin.innerHTML="远端视频尺寸："+imgWidth+"x"+imgHeight+"px，帧率："+frame+"FPS";adjustImg();function adjustImg(){if(imgWidth/window.innerWidth&lt;imgHeight/window.innerHeight){img.style.height="100%";img.style.width=null}else{img.style.width="100%";img.style.height=null}current.innerHTML="当前屏幕尺寸："+window.innerWidth+"x"+window.innerHeight+"px"}function start(){refreshImg=setInterval(getImg,speed);div.style.display="none";img.style.display="block"}function end(){img.style.display="none";div.style.display="block";clearInterval(refreshImg);count=0}function getImg(){img.src="image.jpg?r="+Math.random()}window.onresize=()=&gt;{adjustImg()};img.addEventListener("error",()=&gt;{if(count++===10){end()}});&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;</value>
@@ -134,48 +134,10 @@
     <value>..\Resources\favicon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="aboutHtml1" xml:space="preserve">
-    <value>&lt;!DOCTYPE html&gt;
-&lt;html lang="zh-cmn-Hans"&gt;
-&lt;head&gt;
-  &lt;meta charset="UTF-8"&gt;
-  &lt;title&gt;屏幕共享&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-  &lt;h1 align="center"&gt;屏幕共享&lt;/h1&gt;
-  &lt;h2 align="center"&gt;版本：</value>
+    <value>&lt;!DOCTYPE html&gt;&lt;html lang="zh-cmn-Hans"&gt;&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;title&gt;屏幕共享&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1 align="center"&gt;屏幕共享&lt;/h1&gt;&lt;h2 align="center"&gt;版本：</value>
   </data>
   <data name="aboutHtml2" xml:space="preserve">
-    <value>&lt;/h2&gt;
-  &lt;hr&gt;
-  &lt;h3&gt;功能&lt;/h3&gt;
-  &lt;ul&gt;
-    &lt;li&gt;加密传输&lt;/li&gt;
-    &lt;li&gt;支持多显示器&lt;/li&gt;
-    &lt;li&gt;支持高DPI&lt;/li&gt;
-    &lt;li&gt;自定义选择区域&lt;/li&gt;
-    &lt;li&gt;视频尺寸调节&lt;/li&gt;
-    &lt;li&gt;视频质量调节&lt;/li&gt;
-    &lt;li&gt;视频帧数调节&lt;/li&gt;
-    &lt;li&gt;光标显示&lt;/li&gt;
-    &lt;li&gt;视频预览&lt;/li&gt;
-    &lt;li&gt;托盘运行&lt;/li&gt;
-  &lt;/ul&gt;
-  &lt;hr&gt;
-  &lt;h3&gt;作者：ALI1416&lt;/h3&gt;
-  &lt;a href="https://github.com/ALI1416" target="_blank"&gt;GitHub&lt;/a&gt;
-  &lt;a href="https://gitee.com/ALI1416"&gt;Gitee&lt;/a&gt;
-  &lt;hr&gt;
-  &lt;h3&gt;项目：ScreenShare&lt;/h3&gt;
-  &lt;a href="https://github.com/ALI1416/ScreenShare"&gt;GitHub&lt;/a&gt;
-  &lt;a href="https://gitee.com/ALI1416/ScreenShare"&gt;Gitee&lt;/a&gt;
-  &lt;hr&gt;
-  &lt;h3&gt;致谢&lt;/h3&gt;
-  &lt;a href="https://github.com/EslaMx7/ScreenTask"&gt;EslaMx7&lt;/a&gt;
-  &lt;a href="https://github.com/xChivalrouSx/CaptureScreen"&gt;xChivalrouSx&lt;/a&gt;
-  &lt;hr&gt;
-  &lt;h3&gt;开源许可证：Apache 2.0&lt;/h3&gt;
-  &lt;pre&gt;
-                                 Apache License
+    <value>&lt;/h2&gt;&lt;hr&gt;&lt;h3&gt;功能&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;加密传输&lt;/li&gt;&lt;li&gt;支持多显示器&lt;/li&gt;&lt;li&gt;支持高DPI&lt;/li&gt;&lt;li&gt;自定义选择区域&lt;/li&gt;&lt;li&gt;视频尺寸调节&lt;/li&gt;&lt;li&gt;视频质量调节&lt;/li&gt;&lt;li&gt;视频帧数调节&lt;/li&gt;&lt;li&gt;光标显示&lt;/li&gt;&lt;li&gt;视频预览&lt;/li&gt;&lt;li&gt;托盘运行&lt;/li&gt;&lt;/ul&gt;&lt;hr&gt;&lt;h3&gt;作者：ALI1416&lt;/h3&gt;&lt;a href="https://github.com/ALI1416"target="_blank"&gt;GitHub&lt;/a&gt; &lt;a href="https://gitee.com/ALI1416"&gt;Gitee&lt;/a&gt;&lt;hr&gt;&lt;h3&gt;项目：ScreenShare&lt;/h3&gt;&lt;a href="https://github.com/ALI1416/ScreenShare"&gt;GitHub&lt;/a&gt; &lt;a href="https://gitee.com/ALI1416/ScreenShare"&gt;Gitee&lt;/a&gt;&lt;hr&gt;&lt;h3&gt;致谢&lt;/h3&gt;&lt;a href="https://github.com/EslaMx7/ScreenTask"&gt;EslaMx7&lt;/a&gt; &lt;a href="https://github.com/xChivalrouSx/CaptureScreen"&gt;xChivalrouSx&lt;/a&gt;&lt;hr&gt;&lt;h3&gt;开源许可证：Apache 2.0&lt;/h3&gt;&lt;pre&gt;                                 Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -375,9 +337,6 @@
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
-   limitations under the License.
-  &lt;/pre&gt;
-&lt;/body&gt;
-&lt;/html&gt;</value>
+   limitations under the License.&lt;/pre&gt;&lt;/body&gt;&lt;/html&gt;</value>
   </data>
 </root>

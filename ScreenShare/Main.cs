@@ -211,7 +211,7 @@ namespace ScreenShare
             isDisplayCursor = isDisplayCursorCb.Checked;
             videoFrame = (int)videoFrameNud.Value;
             videoQuality = (int)videoQualityNud.Value;
-            html = Resources.indexHtml1 + screen.Width + ";const imgHeight=" + screen.Height + ";const frame=" + videoFrame + Resources.indexHtml2;
+            html = Resources.indexHtml1 + video.Width + ";const imgHeight=" + video.Height + ";const frame=" + videoFrame + Resources.indexHtml2;
             auth = account + ":" + pwd;
         }
 

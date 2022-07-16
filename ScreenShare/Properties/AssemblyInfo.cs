@@ -2,8 +2,8 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("ScreenShare")]
-[assembly: AssemblyDescription("屏幕共享")]
+[assembly: AssemblyTitle("屏幕共享")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ALI1416")]
 [assembly: AssemblyProduct("https://github.com/ALI1416/ScreenShare")]
@@ -16,5 +16,5 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("000e46c2-90df-48d2-94cb-364bc2514050")]
 
-[assembly: AssemblyVersion("2.0.0.0")]
-[assembly: AssemblyFileVersion("2.0.0.0")]
+[assembly: AssemblyVersion("2.0.1.2")]
+[assembly: AssemblyFileVersion("2.0.1.2")]
