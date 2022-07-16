@@ -2,7 +2,7 @@
 
 ## 屏幕共享
 
-版本：2.0.0
+版本：2.0.1
 
 ## 功能
 
@@ -16,6 +16,10 @@
 - 光标显示
 - 视频预览
 - 托盘运行
+
+## 下载
+
+[点击下载](https://gitee.com/ALI1416/ScreenShare/attach_files/1128908/download/ScreenShare.zip)
 
 ## 软件截图
 
