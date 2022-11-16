@@ -43,7 +43,7 @@
   // 刷新图片
   let refreshImg;
 
-  origin.innerHTML="远端视频尺寸：" + imgWidth + "x" + imgHeight + "px，帧率：" + frame + "FPS";
+  origin.innerHTML="远端视频尺寸：<code>" + imgWidth + "x" + imgHeight + "px</code>，帧率：<code>" + frame + "FPS</code>";
   adjustImg();
 
   // 调整图片大小
@@ -55,7 +55,7 @@
       img.style.width = "100%";
       img.style.height = null;
     }
-    current.innerHTML="当前屏幕尺寸：" + window.innerWidth + "x" + window.innerHeight + "px";
+    current.innerHTML="当前屏幕尺寸：<code>" + window.innerWidth + "x" + window.innerHeight + "px</code>";
   }
 
   // 开始

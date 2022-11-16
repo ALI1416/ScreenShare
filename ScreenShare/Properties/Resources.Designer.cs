@@ -70,7 +70,7 @@ namespace ScreenShare.Properties {
         }
         
         /// <summary>
-        ///   查找类似 &lt;/h2&gt;&lt;hr&gt;&lt;h3&gt;功能&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;加密传输&lt;/li&gt;&lt;li&gt;支持多显示器&lt;/li&gt;&lt;li&gt;支持高DPI&lt;/li&gt;&lt;li&gt;自定义选择区域&lt;/li&gt;&lt;li&gt;视频尺寸调节&lt;/li&gt;&lt;li&gt;视频质量调节&lt;/li&gt;&lt;li&gt;视频帧数调节&lt;/li&gt;&lt;li&gt;光标显示&lt;/li&gt;&lt;li&gt;视频预览&lt;/li&gt;&lt;li&gt;托盘运行&lt;/li&gt;&lt;/ul&gt;&lt;hr&gt;&lt;h3&gt;作者：ALI1416&lt;/h3&gt;&lt;a href=&quot;https://github.com/ALI1416&quot;target=&quot;_blank&quot;&gt;GitHub&lt;/a&gt; &lt;a href=&quot;https://gitee.com/ALI1416&quot;&gt;Gitee&lt;/a&gt;&lt;hr&gt;&lt;h3&gt;项目：ScreenShare&lt;/h3&gt;&lt;a href=&quot;https://github.com/ALI1416/ScreenShare&quot;&gt;GitHub&lt;/a&gt; &lt;a href=&quot;https://gitee.com/ALI1416/ScreenShare&quot;&gt;Gitee&lt;/a&gt;&lt;hr&gt;&lt;h3&gt;致谢&lt;/h3&gt;&lt;a href=&quot;https://github.com/EslaMx7/ScreenTask&quot;&gt;Es [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///   查找类似 &lt;/h2&gt;&lt;hr&gt;&lt;h3&gt;功能&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;加密传输&lt;/li&gt;&lt;li&gt;支持多显示器&lt;/li&gt;&lt;li&gt;支持高DPI&lt;/li&gt;&lt;li&gt;自定义选择区域&lt;/li&gt;&lt;li&gt;视频尺寸调节&lt;/li&gt;&lt;li&gt;视频质量调节&lt;/li&gt;&lt;li&gt;视频帧数调节&lt;/li&gt;&lt;li&gt;光标显示&lt;/li&gt;&lt;li&gt;视频预览&lt;/li&gt;&lt;li&gt;托盘运行&lt;/li&gt;&lt;/ul&gt;&lt;h3&gt;接口&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;/api/getVideoInfo&lt;/code&gt;获取视频信息&lt;/li&gt;&lt;/ul&gt;&lt;hr&gt;&lt;h3&gt;作者：ALI1416&lt;/h3&gt;&lt;a href=&quot;https://github.com/ALI1416&quot;target=&quot;_blank&quot;&gt;GitHub&lt;/a&gt; &lt;a href=&quot;https://gitee.com/ALI1416&quot;&gt;Gitee&lt;/a&gt;&lt;hr&gt;&lt;h3&gt;项目：ScreenShare&lt;/h3&gt;&lt;a href=&quot;https://github.com/ALI1416/ScreenShare&quot;&gt;GitHub&lt;/a&gt; &lt;a href=&quot;https://gitee.com/ALI1416/ScreenShare&quot;&gt;Gitee&lt;/a&gt; [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string aboutHtml2 {
             get {
@@ -118,7 +118,7 @@ namespace ScreenShare.Properties {
         }
         
         /// <summary>
-        ///   查找类似 ;const speed=1000/frame;const img=document.getElementById(&quot;img&quot;);const div=document.getElementById(&quot;div&quot;);const origin=document.getElementById(&quot;origin&quot;);const current=document.getElementById(&quot;current&quot;);let count=0;let refreshImg;origin.innerHTML=&quot;远端视频尺寸：&quot;+imgWidth+&quot;x&quot;+imgHeight+&quot;px，帧率：&quot;+frame+&quot;FPS&quot;;adjustImg();function adjustImg(){if(imgWidth/window.innerWidth&lt;imgHeight/window.innerHeight){img.style.height=&quot;100%&quot;;img.style.width=null}else{img.style.width=&quot;100%&quot;;img.style.height=null}current.innerHTML=&quot;当前屏幕尺 [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///   查找类似 ;const speed=1000/frame;const img=document.getElementById(&quot;img&quot;);const div=document.getElementById(&quot;div&quot;);const origin=document.getElementById(&quot;origin&quot;);const current=document.getElementById(&quot;current&quot;);let count=0;let refreshImg;origin.innerHTML=&quot;远端视频尺寸：&lt;code&gt;&quot;+imgWidth+&quot;x&quot;+imgHeight+&quot;px&lt;/code&gt;，帧率：&lt;code&gt;&quot;+frame+&quot;FPS&lt;/code&gt;&quot;;adjustImg();function adjustImg(){if(imgWidth/window.innerWidth&lt;imgHeight/window.innerHeight){img.style.height=&quot;100%&quot;;img.style.width=null}else{img.style.width=&quot;100%&quot;;img.style.height=nul [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string indexHtml2 {
             get {

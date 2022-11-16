@@ -123,6 +123,7 @@
             this.ipAddressComboBox.Name = "ipAddressComboBox";
             this.ipAddressComboBox.Size = new System.Drawing.Size(350, 20);
             this.ipAddressComboBox.TabIndex = 2;
+            this.toolTip.SetToolTip(this.ipAddressComboBox, "请选择分享IP地址");
             this.ipAddressComboBox.SelectedValueChanged += new System.EventHandler(this.IpAddressComboBox_SelectedValueChanged);
             // 
             // ipPortLabel
@@ -150,6 +151,7 @@
             this.ipPortNud.Name = "ipPortNud";
             this.ipPortNud.Size = new System.Drawing.Size(80, 21);
             this.ipPortNud.TabIndex = 3;
+            this.toolTip.SetToolTip(this.ipPortNud, "IP地址对应的端口号");
             this.ipPortNud.Value = new decimal(new int[] {
             7070,
             0,
@@ -238,7 +240,7 @@
             this.isEncryptionCb.Size = new System.Drawing.Size(72, 16);
             this.isEncryptionCb.TabIndex = 1;
             this.isEncryptionCb.Text = "开启加密";
-            this.toolTip.SetToolTip(this.isEncryptionCb, "开启后需要输入账号密码才能访问。");
+            this.toolTip.SetToolTip(this.isEncryptionCb, "开启后需要输入账号密码才能访问");
             this.isEncryptionCb.UseVisualStyleBackColor = true;
             this.isEncryptionCb.CheckStateChanged += new System.EventHandler(this.IsEncryptionCb_CheckStateChanged);
             // 
@@ -258,6 +260,7 @@
             this.accountText.Name = "accountText";
             this.accountText.Size = new System.Drawing.Size(80, 21);
             this.accountText.TabIndex = 2;
+            this.toolTip.SetToolTip(this.accountText, "请输入账号");
             // 
             // pwdLabel
             // 
@@ -275,6 +278,7 @@
             this.pwdText.Name = "pwdText";
             this.pwdText.Size = new System.Drawing.Size(80, 21);
             this.pwdText.TabIndex = 3;
+            this.toolTip.SetToolTip(this.pwdText, "请输入密码");
             // 
             // coordinatesBox
             // 
@@ -307,6 +311,7 @@
             this.isFullScreenCb.Size = new System.Drawing.Size(48, 16);
             this.isFullScreenCb.TabIndex = 1;
             this.isFullScreenCb.Text = "全屏";
+            this.toolTip.SetToolTip(this.isFullScreenCb, "是否选择全屏共享");
             this.isFullScreenCb.UseVisualStyleBackColor = true;
             this.isFullScreenCb.CheckStateChanged += new System.EventHandler(this.IsFullScreenCb_CheckStateChanged);
             // 
@@ -327,6 +332,7 @@
             this.screenComboBox.Name = "screenComboBox";
             this.screenComboBox.Size = new System.Drawing.Size(130, 20);
             this.screenComboBox.TabIndex = 2;
+            this.toolTip.SetToolTip(this.screenComboBox, "请选择要共享的显示器");
             this.screenComboBox.SelectedValueChanged += new System.EventHandler(this.ScreenComboBox_SelectedValueChanged);
             // 
             // screenXLabel
@@ -501,6 +507,7 @@
             this.isLockAspectRatioCb.Size = new System.Drawing.Size(84, 16);
             this.isLockAspectRatioCb.TabIndex = 1;
             this.isLockAspectRatioCb.Text = "锁定纵横比";
+            this.toolTip.SetToolTip(this.isLockAspectRatioCb, "锁定纵横比");
             this.isLockAspectRatioCb.UseVisualStyleBackColor = true;
             this.isLockAspectRatioCb.CheckStateChanged += new System.EventHandler(this.IsLockAspectRatioCb_CheckStateChanged);
             // 
@@ -534,7 +541,7 @@
             this.scalingNud.Name = "scalingNud";
             this.scalingNud.Size = new System.Drawing.Size(50, 21);
             this.scalingNud.TabIndex = 2;
-            this.toolTip.SetToolTip(this.scalingNud, "相对于选取的矩形的缩放比例，建议100%。最好不要修改，否则会卡顿。");
+            this.toolTip.SetToolTip(this.scalingNud, "相对于选取的矩形的缩放比例");
             this.scalingNud.Value = new decimal(new int[] {
             100,
             0,
@@ -573,6 +580,7 @@
             this.videoWNud.Name = "videoWNud";
             this.videoWNud.Size = new System.Drawing.Size(50, 21);
             this.videoWNud.TabIndex = 3;
+            this.toolTip.SetToolTip(this.videoWNud, "视频宽");
             this.videoWNud.Value = new decimal(new int[] {
             1920,
             0,
@@ -610,6 +618,7 @@
             this.videoHNud.Name = "videoHNud";
             this.videoHNud.Size = new System.Drawing.Size(50, 21);
             this.videoHNud.TabIndex = 4;
+            this.toolTip.SetToolTip(this.videoHNud, "视频高");
             this.videoHNud.Value = new decimal(new int[] {
             1080,
             0,
@@ -640,6 +649,7 @@
             this.isDisplayCursorCb.Size = new System.Drawing.Size(72, 16);
             this.isDisplayCursorCb.TabIndex = 1;
             this.isDisplayCursorCb.Text = "显示光标";
+            this.toolTip.SetToolTip(this.isDisplayCursorCb, "是否显示光标");
             this.isDisplayCursorCb.UseVisualStyleBackColor = true;
             // 
             // videoFrameLabel
@@ -667,7 +677,7 @@
             this.videoFrameNud.Name = "videoFrameNud";
             this.videoFrameNud.Size = new System.Drawing.Size(50, 21);
             this.videoFrameNud.TabIndex = 2;
-            this.toolTip.SetToolTip(this.videoFrameNud, "每秒刷新次数，数字越大越流畅，建议5帧/秒。不要调太高，否则会卡顿。");
+            this.toolTip.SetToolTip(this.videoFrameNud, "每秒刷新次数，数字越大越流畅");
             this.videoFrameNud.Value = new decimal(new int[] {
             5,
             0,
@@ -699,7 +709,7 @@
             this.videoQualityNud.Name = "videoQualityNud";
             this.videoQualityNud.Size = new System.Drawing.Size(50, 21);
             this.videoQualityNud.TabIndex = 3;
-            this.toolTip.SetToolTip(this.videoQualityNud, "视频清晰度，数字越大越清晰，建议100%。最好不要改，否则会卡顿。");
+            this.toolTip.SetToolTip(this.videoQualityNud, "视频清晰度，数字越大越清晰");
             this.videoQualityNud.Value = new decimal(new int[] {
             100,
             0,

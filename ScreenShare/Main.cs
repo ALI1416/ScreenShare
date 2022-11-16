@@ -61,6 +61,10 @@ namespace ScreenShare
         /// </summary>
         private string html;
         /// <summary>
+        /// API:获取视频信息
+        /// </summary>
+        private string apiGetVideoInfo;
+        /// <summary>
         /// 账号密码
         /// </summary>
         private string auth;
@@ -212,6 +216,7 @@ namespace ScreenShare
             videoFrame = (int)videoFrameNud.Value;
             videoQuality = (int)videoQualityNud.Value;
             html = Resources.indexHtml1 + video.Width + ";const imgHeight=" + video.Height + ";const frame=" + videoFrame + Resources.indexHtml2;
+            apiGetVideoInfo = "{\"width\":" + video.Width + ",\"height\":" + video.Height + ",\"frame\":" + videoFrame + "}";
             auth = account + ":" + pwd;
         }
 
@@ -275,6 +280,13 @@ namespace ScreenShare
                             {
                                 ctx.Response.ContentType = "image/jpeg";
                                 responseData = imageStream.ToArray();
+                                break;
+                            }
+                        // API:获取视频信息
+                        case "/api/getVideoInfo":
+                            {
+                                ctx.Response.ContentType = "application/json;charset=UTF-8";
+                                responseData = Encoding.UTF8.GetBytes(apiGetVideoInfo);
                                 break;
                             }
                         // 网页
@@ -705,8 +717,11 @@ namespace ScreenShare
         private void ScreenWNud_ValueChanged(object sender, EventArgs e)
         {
             videoWNud.Value = screenWNud.Value * scalingNud.Value / 100;
-            previewImg.Image.Dispose();
-            previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
+            if (previewImg.Image == null)
+            {
+                previewImg.Image.Dispose();
+                previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
+            }
         }
 
         /// <summary>
@@ -717,8 +732,11 @@ namespace ScreenShare
         private void ScreenHNud_ValueChanged(object sender, EventArgs e)
         {
             videoHNud.Value = screenHNud.Value * scalingNud.Value / 100;
-            previewImg.Image.Dispose();
-            previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
+            if (previewImg.Image == null)
+            {
+                previewImg.Image.Dispose();
+                previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
+            }
         }
 
         /// <summary>
