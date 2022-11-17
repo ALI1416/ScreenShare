@@ -2,7 +2,7 @@
 
 ## 屏幕共享
 
-版本：2.1.0
+版本：2.1.1
 
 ## 功能
 
@@ -23,7 +23,7 @@
 
 ## 下载
 
-[点击下载](https://gitee.com/ALI1416/ScreenShare/releases/download/v2.1.0/ScreenShare.zip)
+[点击下载](https://gitee.com/ALI1416/ScreenShare/releases/download/v2.1.1/ScreenShare.zip)
 
 ## 软件截图
 
