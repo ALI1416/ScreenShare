@@ -94,5 +94,15 @@ namespace ScreenShare
             netFwMgr.LocalPolicy.CurrentProfile.GloballyOpenPorts.Add(openPort);
         }
 
+        /// <summary>
+        /// 删除防火墙规则
+        /// </summary>
+        /// <param name="port">端口号</param>
+        public static void RemoveNetFw(int port)
+        {
+            INetFwMgr netFwMgr = (INetFwMgr)Activator.CreateInstance(Type.GetTypeFromProgID("HNetCfg.FwMgr"));
+            netFwMgr.LocalPolicy.CurrentProfile.GloballyOpenPorts.Remove(port, NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP);
+        }
+
     }
 }

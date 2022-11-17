@@ -136,6 +136,7 @@ namespace ScreenShare
             ipPortNud.Value = 7070;
             // 分享地址
             shareLinkText.Text = "http://" + ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value + "/";
+            shareLink = shareLinkText.Text;
 
             /* 加密传输 */
             // 开启加密
@@ -516,8 +517,9 @@ namespace ScreenShare
             if (isWorking)
             {
                 isWorking = false;
-                Log("屏幕共享已停止。");
                 startSharingScreenBtn.Text = "开始共享";
+                Log("屏幕共享已停止。");
+                // 停止HTTP服务
                 server.Stop();
                 // 手动gc
                 GC.Collect();
@@ -526,30 +528,33 @@ namespace ScreenShare
                 // 显示图像预览
                 previewLabel.Visible = false;
                 previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
+                // 删除防火墙规则
+                Utils.RemoveNetFw((int)ipPortNud.Value);
             }
             else
             {
                 try
                 {
+                    isWorking = true;
+                    startSharingScreenBtn.Text = "停止共享";
+                    Log("屏幕共享已开启。");
                     // 加载配置
                     LoadConfig();
+                    // 开启HTTP服务
                     server.Prefixes.Clear();
                     server.Prefixes.Add(shareLink);
                     server.Start();
-                    isWorking = true;
-                    Utils.AddNetFw("ScreenShare", (int)ipPortNud.Value);
-                    // 开启HTTP服务器
                     StartServerTask();
                     // 开启屏幕捕获
                     CaptureScreenTask();
-                    Log("屏幕共享已开启。");
-                    startSharingScreenBtn.Text = "停止共享";
                     // 设置选项不可选择
                     SetEnable(false);
                     // 关闭图像预览
                     previewLabel.Visible = true;
                     previewImg.Image.Dispose();
                     previewImg.Image = null;
+                    // 添加防火墙规则
+                    Utils.AddNetFw("ScreenShare", (int)ipPortNud.Value);
                 }
                 catch (Exception)
                 {
@@ -689,9 +694,8 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void ScreenXNud_ValueChanged(object sender, EventArgs e)
         {
-            Rectangle selectedScreen = screenList.ElementAt(screenComboBox.SelectedIndex).Item2;
-            screenWNud.Maximum = selectedScreen.Right - screenXNud.Value;
-            // TODO 屏幕的XY宽高同时发生改变可能会重复渲染多次预览图
+            screenWNud.Maximum = screenList.ElementAt(screenComboBox.SelectedIndex).Item2.Right - screenXNud.Value;
+            // TODO 屏幕的XY宽高同时发生改变可能会渲染多次预览图
             previewImg.Image.Dispose();
             previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
         }
@@ -703,8 +707,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void ScreenYNud_ValueChanged(object sender, EventArgs e)
         {
-            Rectangle selectedScreen = screenList.ElementAt(screenComboBox.SelectedIndex).Item2;
-            screenHNud.Maximum = selectedScreen.Bottom - screenYNud.Value;
+            screenHNud.Maximum = screenList.ElementAt(screenComboBox.SelectedIndex).Item2.Bottom - screenYNud.Value;
             previewImg.Image.Dispose();
             previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
         }
@@ -717,7 +720,7 @@ namespace ScreenShare
         private void ScreenWNud_ValueChanged(object sender, EventArgs e)
         {
             videoWNud.Value = screenWNud.Value * scalingNud.Value / 100;
-            if (previewImg.Image == null)
+            if (previewImg.Image != null)
             {
                 previewImg.Image.Dispose();
                 previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
@@ -732,7 +735,7 @@ namespace ScreenShare
         private void ScreenHNud_ValueChanged(object sender, EventArgs e)
         {
             videoHNud.Value = screenHNud.Value * scalingNud.Value / 100;
-            if (previewImg.Image == null)
+            if (previewImg.Image != null)
             {
                 previewImg.Image.Dispose();
                 previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);

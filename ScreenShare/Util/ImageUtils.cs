@@ -31,7 +31,7 @@ namespace ScreenShare
             Bitmap bitmap = new Bitmap(r.Width, r.Height);
             using (Graphics g = Graphics.FromImage(bitmap))
             {
-                g.CopyFromScreen(r.X, r.Y, 0, 0, r.Size, CopyPixelOperation.SourceCopy);
+                g.CopyFromScreen(r.X, r.Y, 0, 0, r.Size);
                 if (captureCursor)
                 {
                     Point p = Control.MousePosition;
@@ -48,7 +48,7 @@ namespace ScreenShare
         /// <param name="size">目的图片的尺寸</param>
         /// <param name="dispose">释放bitmap(默认否)</param>
         /// <returns>Bitmap</returns>
-        public static Bitmap ZoomImage(Bitmap bitmap, Size size, bool dispose=false)
+        public static Bitmap ZoomImage(Bitmap bitmap, Size size, bool dispose = false)
         {
             Bitmap destBitmap = new Bitmap(size.Width, size.Height);
             using (Graphics g = Graphics.FromImage(destBitmap))
