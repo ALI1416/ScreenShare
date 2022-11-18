@@ -21,56 +21,6 @@ namespace ScreenShare
         /// </summary>
         private bool isWorking = false;
         /// <summary>
-        /// 分享地址
-        /// </summary>
-        private string shareLink;
-        /// <summary>
-        /// 开启加密
-        /// </summary>
-        private bool isEncryption;
-        /// <summary>
-        /// 账号
-        /// </summary>
-        private string account;
-        /// <summary>
-        /// 密码
-        /// </summary>
-        private string pwd;
-        /// <summary>
-        /// 显示器
-        /// </summary>
-        private Rectangle screen;
-        /// <summary>
-        /// 视频
-        /// </summary>
-        private Size video;
-        /// <summary>
-        /// 显示光标
-        /// </summary>
-        private bool isDisplayCursor;
-        /// <summary>
-        /// 每秒帧数
-        /// </summary>
-        private int videoFrame;
-        /// <summary>
-        /// 视频质量
-        /// </summary>
-        private int videoQuality;
-        /// <summary>
-        /// 网页内容
-        /// </summary>
-        private string html;
-        /// <summary>
-        /// API:获取视频信息
-        /// </summary>
-        private string apiGetVideoInfo;
-        /// <summary>
-        /// 账号密码
-        /// </summary>
-        private string auth;
-
-        /********** 其他参数 **********/
-        /// <summary>
         /// IP地址列表
         /// </summary>
         private List<Tuple<string, string>> ipList;
@@ -87,17 +37,9 @@ namespace ScreenShare
         /// </summary>
         private readonly MemoryStream imageStream = new MemoryStream();
         /// <summary>
-        /// 服务器
+        /// http服务器
         /// </summary>
-        private HttpListener server;
-        /// <summary>
-        /// 接收和返回上下文
-        /// </summary>
-        private HttpListenerContext ctx;
-        /// <summary>
-        /// 返回结果
-        /// </summary>
-        private byte[] responseData;
+        private HttpListener httpServer;
 
         /********** 主方法 **********/
         /// <summary>
@@ -110,7 +52,8 @@ namespace ScreenShare
             Init();
             // 读取图标
             Resources.favicon.Save(faviconStream);
-            server = new HttpListener
+            // 初始化HTTP服务器
+            httpServer = new HttpListener
             {
                 IgnoreWriteExceptions = true
             };
@@ -136,7 +79,6 @@ namespace ScreenShare
             ipPortNud.Value = 7070;
             // 分享地址
             shareLinkText.Text = "http://" + ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value + "/";
-            shareLink = shareLinkText.Text;
 
             /* 加密传输 */
             // 开启加密
@@ -203,36 +145,22 @@ namespace ScreenShare
         }
 
         /// <summary>
-        /// 加载配置
-        /// </summary>
-        private void LoadConfig()
-        {
-            shareLink = shareLinkText.Text;
-            isEncryption = isEncryptionCb.Checked;
-            account = accountText.Text;
-            pwd = pwdText.Text;
-            screen = new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value);
-            video = new Size((int)videoWNud.Value, (int)videoHNud.Value);
-            isDisplayCursor = isDisplayCursorCb.Checked;
-            videoFrame = (int)videoFrameNud.Value;
-            videoQuality = (int)videoQualityNud.Value;
-            html = Resources.indexHtml1 + video.Width + ";const imgHeight=" + video.Height + ";const frame=" + videoFrame + Resources.indexHtml2;
-            apiGetVideoInfo = "{\"width\":" + video.Width + ",\"height\":" + video.Height + ",\"frame\":" + videoFrame + "}";
-            auth = account + ":" + pwd;
-        }
-
-        /// <summary>
         /// 开启HTTP服务器
         /// </summary>
-        private async void StartServerTask()
+        private async void ServerTask()
         {
+            HttpListenerContext ctx;
+            byte[] responseData;
+            string html = Resources.indexHtml1 + videoWNud.Value + ";const imgHeight=" + videoHNud.Value + ";const frame=" + videoFrameNud.Value + Resources.indexHtml2;
+            string apiGetVideoInfo = "{\"width\":" + videoWNud.Value + ",\"height\":" + videoHNud.Value + ",\"frame\":" + videoFrameNud.Value + "}";
+            string correctAuth = accountText.Text + ":" + pwdText.Text;
             while (isWorking)
             {
                 try
                 {
-                    ctx = await server.GetContextAsync();
+                    ctx = await httpServer.GetContextAsync();
                     // 开启加密
-                    if (isEncryption)
+                    if (isEncryptionCb.Checked)
                     {
                         // 未输入账号密码
                         if (!ctx.Request.Headers.AllKeys.Contains("Authorization"))
@@ -252,7 +180,7 @@ namespace ScreenShare
                             // 解码账号密码
                             auth = Encoding.UTF8.GetString(Convert.FromBase64String(auth));
                             // 账号密码错误
-                            if (auth != this.auth)
+                            if (auth != correctAuth)
                             {
                                 responseData = Encoding.UTF8.GetBytes("<h1 style=\"color:red\">Not Authorized !");
                                 ctx.Response.ContentType = "text/html";
@@ -301,8 +229,109 @@ namespace ScreenShare
                     await ctx.Response.OutputStream.WriteAsync(responseData, 0, responseData.Length);
                     ctx.Response.Close();
                 }
-                catch (Exception)
+                catch
                 {
+                }
+            }
+        }
+
+        /// <summary>
+        /// 开启屏幕捕获
+        /// </summary>
+        private async void CaptureScreenTask()
+        {
+            Bitmap bitmap;
+            int delay = (int)(1000 / videoFrameNud.Value);
+            int videoQuality = (int)videoQualityNud.Value;
+            Rectangle screen = new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value);
+            Size video = new Size((int)videoWNud.Value, (int)videoHNud.Value);
+            /* 判断捕获图片属性 */
+            // 普通
+            if (screen.Size == video && videoQuality == 100)
+            {
+                while (isWorking)
+                {
+                    try
+                    {
+                        bitmap = ImageUtils.CaptureScreenArea(screen, isDisplayCursorCb.Checked);
+                        imageStream.SetLength(0);
+                        ImageUtils.Save(bitmap, imageStream);
+                        DisplayPreviewImg(bitmap);
+                    }
+                    catch (Win32Exception)
+                    {
+                        ExceptionStop();
+                    }
+                    catch
+                    {
+                    }
+                    await Task.Delay(delay);
+                }
+            }
+            // 缩放
+            else if (screen.Size != video && videoQualityNud.Value == 100)
+            {
+                while (isWorking)
+                {
+                    try
+                    {
+                        bitmap = ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursorCb.Checked), video, true);
+                        imageStream.SetLength(0);
+                        ImageUtils.Save(bitmap, imageStream);
+                        DisplayPreviewImg(bitmap);
+                    }
+                    catch (Win32Exception)
+                    {
+                        ExceptionStop();
+                    }
+                    catch
+                    {
+                    }
+                    await Task.Delay(delay);
+                }
+            }
+            // 压缩
+            else if (screen.Size == video && videoQuality != 100)
+            {
+                while (isWorking)
+                {
+                    try
+                    {
+                        bitmap = ImageUtils.CaptureScreenArea(screen, isDisplayCursorCb.Checked);
+                        imageStream.SetLength(0);
+                        ImageUtils.QualitySave(bitmap, videoQuality, imageStream);
+                        DisplayPreviewImg(bitmap);
+                    }
+                    catch (Win32Exception)
+                    {
+                        ExceptionStop();
+                    }
+                    catch
+                    {
+                    }
+                    await Task.Delay(delay);
+                }
+            }
+            // 缩放+压缩
+            else
+            {
+                while (isWorking)
+                {
+                    try
+                    {
+                        bitmap = ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursorCb.Checked), video, true);
+                        imageStream.SetLength(0);
+                        ImageUtils.QualitySave(bitmap, videoQuality, imageStream);
+                        DisplayPreviewImg(bitmap);
+                    }
+                    catch (Win32Exception)
+                    {
+                        ExceptionStop();
+                    }
+                    catch
+                    {
+                    }
+                    await Task.Delay(delay);
                 }
             }
         }
@@ -332,7 +361,8 @@ namespace ScreenShare
             isWorking = false;
             startSharingScreenBtn.Text = "开始共享";
             Log("异常终止屏幕共享！可能是锁定了账户。");
-            server.Stop();
+            // 关闭HTTP服务器
+            httpServer.Stop();
             // 手动gc
             GC.Collect();
             // 设置选项可以选择
@@ -340,113 +370,6 @@ namespace ScreenShare
             // 显示图像预览
             previewLabel.Visible = false;
             previewImg.Image = new Bitmap(imageStream);
-        }
-
-        /// <summary>
-        /// 开启屏幕捕获
-        /// </summary>
-        private async void CaptureScreenTask()
-        {
-            // 判断捕获图片属性
-            // 普通
-            if (screen.Size == video && videoQuality == 100)
-            {
-                while (isWorking)
-                {
-                    try
-                    {
-                        Bitmap bitmap = ImageUtils.CaptureScreenArea(screen, isDisplayCursor);
-                        imageStream.SetLength(0);
-                        ImageUtils.Save(bitmap, imageStream);
-                        DisplayPreviewImg(bitmap);
-                    }
-                    catch (Win32Exception)
-                    {
-                        ExceptionStop();
-                    }
-                    catch (Exception)
-                    {
-                    }
-                    await Task.Delay(1000 / videoFrame);
-                }
-            }
-            // 缩放
-            else if (screen.Size != video && videoQuality == 100)
-            {
-                while (isWorking)
-                {
-                    try
-                    {
-                        Bitmap bitmap = ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video, true);
-                        imageStream.SetLength(0);
-                        ImageUtils.Save(bitmap, imageStream);
-                        DisplayPreviewImg(bitmap);
-                    }
-                    catch (Win32Exception)
-                    {
-                        ExceptionStop();
-                    }
-                    catch (Exception)
-                    {
-                    }
-                    await Task.Delay(1000 / videoFrame);
-                }
-            }
-            // 压缩
-            else if (screen.Size == video && videoQuality != 100)
-            {
-                while (isWorking)
-                {
-                    try
-                    {
-                        Bitmap bitmap = ImageUtils.CaptureScreenArea(screen, isDisplayCursor);
-                        imageStream.SetLength(0);
-                        ImageUtils.QualitySave(bitmap, videoQuality, imageStream);
-                        DisplayPreviewImg(bitmap);
-                    }
-                    catch (Win32Exception)
-                    {
-                        ExceptionStop();
-                    }
-                    catch (Exception)
-                    {
-                    }
-                    await Task.Delay(1000 / videoFrame);
-                }
-            }
-            // 缩放+压缩
-            else
-            {
-                while (isWorking)
-                {
-                    try
-                    {
-                        Bitmap bitmap = ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video, true);
-                        imageStream.SetLength(0);
-                        ImageUtils.QualitySave(bitmap, videoQuality, imageStream);
-                        DisplayPreviewImg(bitmap);
-                    }
-                    catch (Win32Exception)
-                    {
-                        ExceptionStop();
-                    }
-                    catch (Exception)
-                    {
-                    }
-                    await Task.Delay(1000 / videoFrame);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 写日志
-        /// </summary>
-        /// <param name="text">内容</param>
-        private void Log(string text)
-        {
-            logText.Text += DateTime.Now.ToLongTimeString() + " : " + text + "\r\n";
-            logText.SelectionStart = logText.Text.Length;
-            logText.ScrollToCaret();
         }
 
         /// <summary>
@@ -506,6 +429,17 @@ namespace ScreenShare
             }
         }
 
+        /// <summary>
+        /// 写日志
+        /// </summary>
+        /// <param name="text">内容</param>
+        private void Log(string text)
+        {
+            logText.Text += DateTime.Now.ToLongTimeString() + " : " + text + "\r\n";
+            logText.SelectionStart = logText.Text.Length;
+            logText.ScrollToCaret();
+        }
+
         /********** 界面事件 **********/
         /// <summary>
         /// 点击开始共享按钮
@@ -519,8 +453,8 @@ namespace ScreenShare
                 isWorking = false;
                 startSharingScreenBtn.Text = "开始共享";
                 Log("屏幕共享已停止。");
-                // 停止HTTP服务
-                server.Stop();
+                // 关闭HTTP服务器
+                httpServer.Stop();
                 // 手动gc
                 GC.Collect();
                 // 设置选项可以选择
@@ -538,13 +472,11 @@ namespace ScreenShare
                     isWorking = true;
                     startSharingScreenBtn.Text = "停止共享";
                     Log("屏幕共享已开启。");
-                    // 加载配置
-                    LoadConfig();
-                    // 开启HTTP服务
-                    server.Prefixes.Clear();
-                    server.Prefixes.Add(shareLink);
-                    server.Start();
-                    StartServerTask();
+                    // 开启HTTP服务器
+                    httpServer.Prefixes.Clear();
+                    httpServer.Prefixes.Add(shareLinkText.Text);
+                    httpServer.Start();
+                    ServerTask();
                     // 开启屏幕捕获
                     CaptureScreenTask();
                     // 设置选项不可选择
@@ -556,12 +488,12 @@ namespace ScreenShare
                     // 添加防火墙规则
                     Utils.AddNetFw("ScreenShare", (int)ipPortNud.Value);
                 }
-                catch (Exception)
+                catch
                 {
                     Log("启动失败！可能是IP地址错误或端口号冲突。");
                     MessageBox.Show("启动失败！可能是IP地址错误或端口号冲突。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    // 报错后Prefixes会被清空
-                    server = new HttpListener
+                    // 报错后Prefixes会被清空，初始化HTTP服务器
+                    httpServer = new HttpListener
                     {
                         IgnoreWriteExceptions = true
                     };
@@ -621,7 +553,7 @@ namespace ScreenShare
                 Clipboard.SetText(shareLinkText.Text);
                 Log("分享链接已复制。");
             }
-            catch (Exception)
+            catch
             {
                 Log("复制失败！请手动复制。");
                 MessageBox.Show("复制失败！请手动复制。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -635,7 +567,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void OpenBtn_Click(object sender, EventArgs e)
         {
-            Process.Start(shareLink);
+            Process.Start(shareLinkText.Text);
         }
 
         /// <summary>
