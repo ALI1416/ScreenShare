@@ -7,7 +7,9 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -15,7 +17,9 @@ namespace ScreenShare
 {
     public partial class ScreenShare : Form
     {
-        /********** 配置参数 **********/
+        #region 参数和常量
+
+        /********** 参数 **********/
         /// <summary>
         /// 已启动
         /// </summary>
@@ -37,9 +41,41 @@ namespace ScreenShare
         /// </summary>
         private readonly MemoryStream imageStream = new MemoryStream();
         /// <summary>
+        /// http服务器线程
+        /// </summary>
+        private Thread httpServerThread;
+        /// <summary>
         /// http服务器
         /// </summary>
         private HttpListener httpServer;
+        /// <summary>
+        /// socket服务器线程
+        /// </summary>
+        private Thread socketServerThread;
+        /// <summary>
+        /// socket服务器
+        /// </summary>
+        private Socket socketServer;
+        /// <summary>
+        /// socket服务器端口号
+        /// </summary>
+        private int socketServerPort = 0;
+        /// <summary>
+        /// socket客户端
+        /// </summary>
+        private static readonly List<Socket> socketClient = new List<Socket>();
+        /// <summary>
+        /// socket接收数据缓冲区
+        /// </summary>
+        static readonly byte[] socketBuffer = new byte[1024];
+
+        /********** 常量 **********/
+        private readonly static byte[] socketResponseHeader = Encoding.ASCII.GetBytes("HTTP/1.1 200 OK\nContent-Type: multipart/x-mixed-replace; boundary=--boundary\n");
+        private readonly static byte[] socketResponseEnd = Encoding.ASCII.GetBytes("\n");
+
+        #endregion
+
+        #region 方法
 
         /********** 主方法 **********/
         /// <summary>
@@ -48,15 +84,9 @@ namespace ScreenShare
         public ScreenShare()
         {
             InitializeComponent();
-            // 初始化
-            Init();
-            // 读取图标
+            // 初始化图标
             Resources.favicon.Save(faviconStream);
-            // 初始化HTTP服务器
-            httpServer = new HttpListener
-            {
-                IgnoreWriteExceptions = true
-            };
+            Init();
             Log("屏幕共享初始化完成！");
         }
 
@@ -83,8 +113,6 @@ namespace ScreenShare
             /* 加密传输 */
             // 开启加密
             isEncryptionCb.Checked = false;
-            // 账号
-            accountText.Text = "";
             // 密码
             pwdText.Text = "";
 
@@ -145,53 +173,19 @@ namespace ScreenShare
         }
 
         /// <summary>
-        /// 开启HTTP服务器
+        /// 开启http服务器
         /// </summary>
-        private async void ServerTask()
+        private async void HttpServerTask()
         {
             HttpListenerContext ctx;
             byte[] responseData;
             string html = Resources.indexHtml1 + videoWNud.Value + ";const imgHeight=" + videoHNud.Value + ";const frame=" + videoFrameNud.Value + Resources.indexHtml2;
             string apiGetVideoInfo = "{\"width\":" + videoWNud.Value + ",\"height\":" + videoHNud.Value + ",\"frame\":" + videoFrameNud.Value + "}";
-            string correctAuth = accountText.Text + ":" + pwdText.Text;
             while (isWorking)
             {
                 try
                 {
                     ctx = await httpServer.GetContextAsync();
-                    // 开启加密
-                    if (isEncryptionCb.Checked)
-                    {
-                        // 未输入账号密码
-                        if (!ctx.Request.Headers.AllKeys.Contains("Authorization"))
-                        {
-                            ctx.Response.StatusCode = 401;
-                            ctx.Response.AddHeader("WWW-Authenticate", "Basic realm=ScreenShare Authentication");
-                            ctx.Response.Close();
-                            continue;
-                        }
-                        // 已输入账号密码
-                        else
-                        {
-                            // 获取到输入的账号密码
-                            string auth = ctx.Request.Headers["Authorization"];
-                            // 移除头部"Basic "字符串
-                            auth = auth.Remove(0, 6);
-                            // 解码账号密码
-                            auth = Encoding.UTF8.GetString(Convert.FromBase64String(auth));
-                            // 账号密码错误
-                            if (auth != correctAuth)
-                            {
-                                responseData = Encoding.UTF8.GetBytes("<h1 style=\"color:red\">Not Authorized !");
-                                ctx.Response.ContentType = "text/html";
-                                ctx.Response.StatusCode = 401;
-                                ctx.Response.AddHeader("WWW-Authenticate", "Basic realm=ScreenShare Authentication");
-                                await ctx.Response.OutputStream.WriteAsync(responseData, 0, responseData.Length);
-                                ctx.Response.Close();
-                                continue;
-                            }
-                        }
-                    }
                     // 请求成功
                     ctx.Response.StatusCode = 200;
                     // 判断请求地址
@@ -202,13 +196,6 @@ namespace ScreenShare
                             {
                                 ctx.Response.ContentType = "image/x-icon";
                                 responseData = faviconStream.ToArray();
-                                break;
-                            }
-                        // 图片
-                        case "/image.jpg":
-                            {
-                                ctx.Response.ContentType = "image/jpeg";
-                                responseData = imageStream.ToArray();
                                 break;
                             }
                         // API:获取视频信息
@@ -235,6 +222,7 @@ namespace ScreenShare
             }
         }
 
+
         /// <summary>
         /// 开启屏幕捕获
         /// </summary>
@@ -260,7 +248,8 @@ namespace ScreenShare
                     }
                     catch (Win32Exception)
                     {
-                        ExceptionStop();
+                        Log("异常终止屏幕共享！可能是锁定了账户。");
+                        Stop();
                     }
                     catch
                     {
@@ -282,7 +271,8 @@ namespace ScreenShare
                     }
                     catch (Win32Exception)
                     {
-                        ExceptionStop();
+                        Log("异常终止屏幕共享！可能是锁定了账户。");
+                        Stop();
                     }
                     catch
                     {
@@ -304,7 +294,8 @@ namespace ScreenShare
                     }
                     catch (Win32Exception)
                     {
-                        ExceptionStop();
+                        Log("异常终止屏幕共享！可能是锁定了账户。");
+                        Stop();
                     }
                     catch
                     {
@@ -326,7 +317,8 @@ namespace ScreenShare
                     }
                     catch (Win32Exception)
                     {
-                        ExceptionStop();
+                        Log("异常终止屏幕共享！可能是锁定了账户。");
+                        Stop();
                     }
                     catch
                     {
@@ -334,6 +326,150 @@ namespace ScreenShare
                     await Task.Delay(delay);
                 }
             }
+        }
+
+        /// <summary>
+        /// 启动
+        /// </summary>
+        private void Start()
+        {
+            isWorking = true;
+            startSharingScreenBtn.Text = "停止共享";
+            // 设置选项不可选择
+            SetEnable(false);
+            try
+            {
+                // 启动http服务器
+                StartHttpServer();
+            }
+            catch
+            {
+                Stop();
+                Log("http服务器启动失败！请更换IP端口号或重启程序或联系开发者！");
+                MessageBox.Show("http服务器启动失败！请更换IP端口号重启程序或联系开发者！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            try
+            {
+                // 启动socket服务器
+                StartSocketServer();
+            }
+            catch
+            {
+                Stop();
+                Log("socket服务器启动失败！请重启程序或联系开发者！");
+                MessageBox.Show("socket服务器启动失败！请重启程序或联系开发者！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            try
+            {
+                // 开启http服务器
+                httpServer = new HttpListener
+                {
+                    IgnoreWriteExceptions = true
+                };
+                httpServer.Prefixes.Clear();
+                httpServer.Prefixes.Add(shareLinkText.Text);
+                httpServer.Start();
+                HttpServerTask();
+                // 开启socket服务器
+                socketServer = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                socketServer.Bind(new IPEndPoint(IPAddress.Parse(ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2), 0));
+                socketServer.Listen(10);
+                socketServerPort = ((IPEndPoint)socketServer.LocalEndPoint).Port;
+                Log("" + socketServerPort);
+            }
+            catch
+            {
+                Stop();
+                Log("启动失败！请重启程序或联系开发者！");
+                MessageBox.Show("启动失败！请重启程序或联系开发者！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            // 关闭图像预览
+            //previewLabel.Visible = true;
+            //previewImg.Image.Dispose();
+            //previewImg.Image = null;
+            //// 添加防火墙规则
+            //Utils.AddNetFw("ScreenShare", (int)ipPortNud.Value);
+            //Utils.AddNetFw("ScreenShare", socketServerPort);
+            Log("屏幕共享已开启。");
+        }
+
+        /// <summary>
+        /// 启动http服务器
+        /// </summary>
+        private void StartHttpServer()
+        {
+            // 新建http服务器
+            httpServer = new HttpListener
+            {
+                // 忽视客户端写入异常
+                IgnoreWriteExceptions = true
+            };
+            // 清空URI
+            httpServer.Prefixes.Clear();
+            // 指定URI
+            httpServer.Prefixes.Add(shareLinkText.Text);
+            // 开启http服务器
+            httpServer.Start();
+            // 异步监听客户端请求
+            httpServer.BeginGetContext(HttpHandle, null);
+        }
+
+        /// <summary>
+        /// 启动socket服务器
+        /// </summary>
+        private void StartSocketServer()
+        {
+
+        }
+
+        /// <summary>
+        /// 启动捕获屏幕
+        /// </summary>
+        private void StartCaptureScreen()
+        {
+
+        }
+
+        /// <summary>
+        /// http处理
+        /// </summary>
+        /// <param name="ar">IAsyncResult</param>
+        private void HttpHandle(IAsyncResult ar)
+        {
+            // 继续异步监听客户端请求
+            httpServer.BeginGetContext(HttpHandle, null);
+            // 获取context对象
+            var context = httpServer.EndGetContext(ar);
+            var request = context.Request;
+            var response = context.Response;
+        }
+
+
+        /// <summary>
+        /// 终止
+        /// </summary>
+        private void Stop()
+        {
+            isWorking = false;
+            startSharingScreenBtn.Text = "开始共享";
+            // 关闭http服务器
+            httpServer.Close();
+            // 关闭socket服务器
+            //socketServer.Close();
+            //// 显示图像预览
+            //previewLabel.Visible = false;
+            //previewImg.Image = new Bitmap(imageStream);
+            //// 删除防火墙规则
+            //Utils.RemoveNetFw((int)ipPortNud.Value);
+            //Utils.RemoveNetFw(socketServerPort);
+            //// 设置选项可以选择
+            //SetEnable(true);
+            //// 手动gc
+            //GC.Collect();
+            Log("屏幕共享已停止。");
         }
 
         /// <summary>
@@ -351,25 +487,6 @@ namespace ScreenShare
                 previewImg.Image.Dispose();
                 previewImg.Image = bitmap;
             }
-        }
-
-        /// <summary>
-        /// 异常终止
-        /// </summary>
-        private void ExceptionStop()
-        {
-            isWorking = false;
-            startSharingScreenBtn.Text = "开始共享";
-            Log("异常终止屏幕共享！可能是锁定了账户。");
-            // 关闭HTTP服务器
-            httpServer.Stop();
-            // 手动gc
-            GC.Collect();
-            // 设置选项可以选择
-            SetEnable(true);
-            // 显示图像预览
-            previewLabel.Visible = false;
-            previewImg.Image = new Bitmap(imageStream);
         }
 
         /// <summary>
@@ -394,7 +511,6 @@ namespace ScreenShare
             {
                 if (isEncryptionCb.Checked)
                 {
-                    accountText.Enabled = enable;
                     pwdText.Enabled = enable;
                 }
                 if (!isFullScreenCb.Checked)
@@ -417,7 +533,6 @@ namespace ScreenShare
             // 不可选择
             else
             {
-                accountText.Enabled = enable;
                 pwdText.Enabled = enable;
                 screenXNud.Enabled = enable;
                 screenYNud.Enabled = enable;
@@ -440,6 +555,10 @@ namespace ScreenShare
             logText.ScrollToCaret();
         }
 
+        #endregion
+
+        #region 界面事件
+
         /********** 界面事件 **********/
         /// <summary>
         /// 点击开始共享按钮
@@ -450,54 +569,11 @@ namespace ScreenShare
         {
             if (isWorking)
             {
-                isWorking = false;
-                startSharingScreenBtn.Text = "开始共享";
-                Log("屏幕共享已停止。");
-                // 关闭HTTP服务器
-                httpServer.Stop();
-                // 手动gc
-                GC.Collect();
-                // 设置选项可以选择
-                SetEnable(true);
-                // 显示图像预览
-                previewLabel.Visible = false;
-                previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
-                // 删除防火墙规则
-                Utils.RemoveNetFw((int)ipPortNud.Value);
+                Stop();
             }
             else
             {
-                try
-                {
-                    isWorking = true;
-                    startSharingScreenBtn.Text = "停止共享";
-                    Log("屏幕共享已开启。");
-                    // 开启HTTP服务器
-                    httpServer.Prefixes.Clear();
-                    httpServer.Prefixes.Add(shareLinkText.Text);
-                    httpServer.Start();
-                    ServerTask();
-                    // 开启屏幕捕获
-                    CaptureScreenTask();
-                    // 设置选项不可选择
-                    SetEnable(false);
-                    // 关闭图像预览
-                    previewLabel.Visible = true;
-                    previewImg.Image.Dispose();
-                    previewImg.Image = null;
-                    // 添加防火墙规则
-                    Utils.AddNetFw("ScreenShare", (int)ipPortNud.Value);
-                }
-                catch
-                {
-                    Log("启动失败！可能是IP地址错误或端口号冲突。");
-                    MessageBox.Show("启动失败！可能是IP地址错误或端口号冲突。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    // 报错后Prefixes会被清空，初始化HTTP服务器
-                    httpServer = new HttpListener
-                    {
-                        IgnoreWriteExceptions = true
-                    };
-                }
+                Start();
             }
         }
 
@@ -577,7 +653,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void IsEncryptionCb_CheckStateChanged(object sender, EventArgs e)
         {
-            accountText.Enabled = pwdText.Enabled = ((CheckBox)sender).Checked;
+            pwdText.Enabled = ((CheckBox)sender).Checked;
         }
 
         /// <summary>
@@ -761,6 +837,16 @@ namespace ScreenShare
         }
 
         /// <summary>
+        /// 点击预览图上的文字
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PreviewLabel_Click(object sender, EventArgs e)
+        {
+            PreviewImg_Click(null, null);
+        }
+
+        /// <summary>
         /// 窗口大小改变后
         /// </summary>
         /// <param name="sender"></param>
@@ -789,6 +875,16 @@ namespace ScreenShare
             {
                 previewImg.Image = ImageUtils.CaptureScreenArea(new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value), isDisplayCursorCb.Checked);
             }
+        }
+
+        /// <summary>
+        /// 点击当前在线用户数量链接
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UserCountLinkLabel_Click(object sender, EventArgs e)
+        {
+
         }
 
         /// <summary>
@@ -826,5 +922,6 @@ namespace ScreenShare
             Focus();
         }
 
+        #endregion
     }
 }
