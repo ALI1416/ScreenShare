@@ -61,20 +61,11 @@ namespace ScreenShare.Properties {
         }
         
         /// <summary>
-        ///   查找类似 &lt;!DOCTYPE html&gt;&lt;html lang=&quot;zh-cmn-Hans&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;title&gt;屏幕共享&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1 align=&quot;center&quot;&gt;屏幕共享&lt;/h1&gt;&lt;h2 align=&quot;center&quot;&gt;版本： 的本地化字符串。
+        ///   查找类似  的本地化字符串。
         /// </summary>
-        internal static string aboutHtml1 {
+        internal static string about {
             get {
-                return ResourceManager.GetString("aboutHtml1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 &lt;/h2&gt;&lt;hr&gt;&lt;h3&gt;功能&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;加密传输&lt;/li&gt;&lt;li&gt;支持多显示器&lt;/li&gt;&lt;li&gt;支持高DPI&lt;/li&gt;&lt;li&gt;自定义选择区域&lt;/li&gt;&lt;li&gt;视频尺寸调节&lt;/li&gt;&lt;li&gt;视频质量调节&lt;/li&gt;&lt;li&gt;视频帧数调节&lt;/li&gt;&lt;li&gt;光标显示&lt;/li&gt;&lt;li&gt;视频预览&lt;/li&gt;&lt;li&gt;托盘运行&lt;/li&gt;&lt;/ul&gt;&lt;h3&gt;接口&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;/api/getVideoInfo&lt;/code&gt;获取视频信息&lt;/li&gt;&lt;/ul&gt;&lt;hr&gt;&lt;h3&gt;作者：ALI1416&lt;/h3&gt;&lt;a href=&quot;https://github.com/ALI1416&quot;target=&quot;_blank&quot;&gt;GitHub&lt;/a&gt; &lt;a href=&quot;https://gitee.com/ALI1416&quot;&gt;Gitee&lt;/a&gt;&lt;hr&gt;&lt;h3&gt;项目：ScreenShare&lt;/h3&gt;&lt;a href=&quot;https://github.com/ALI1416/ScreenShare&quot;&gt;GitHub&lt;/a&gt; &lt;a href=&quot;https://gitee.com/ALI1416/ScreenShare&quot;&gt;Gitee&lt;/a&gt; [字符串的其余部分被截断]&quot;; 的本地化字符串。
-        /// </summary>
-        internal static string aboutHtml2 {
-            get {
-                return ResourceManager.GetString("aboutHtml2", resourceCulture);
+                return ResourceManager.GetString("about", resourceCulture);
             }
         }
         
@@ -109,20 +100,11 @@ namespace ScreenShare.Properties {
         }
         
         /// <summary>
-        ///   查找类似 &lt;!DOCTYPE html&gt;&lt;html lang=&quot;zh-cmn-Hans&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;meta http-equiv=&quot;X-UA-Compatible&quot;content=&quot;IE=edge&quot;&gt;&lt;meta name=&quot;viewport&quot;content=&quot;width=device-width, initial-scale=1.0&quot;&gt;&lt;title&gt;屏幕共享&lt;/title&gt;&lt;/head&gt;&lt;body style=&quot;overflow:hidden&quot;&gt;&lt;img id=&quot;img&quot;src=&quot;image.jpg&quot;alt=&quot;网络连接异常&quot;style=&quot;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:none&quot;ondblclick=&quot;end()&quot;&gt;&lt;div id=&quot;div&quot;&gt;&lt;h1&gt;屏幕共享&lt;/h1&gt;&lt;p id=&quot;origin&quot;style=&quot;font-size:20px;&quot;&gt;&lt;/p&gt;&lt;p id=&quot;current&quot;style=&quot;font-size:20px;&quot;&gt;&lt;/p&gt;&lt;button on [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///   查找类似  的本地化字符串。
         /// </summary>
-        internal static string indexHtml1 {
+        internal static string index {
             get {
-                return ResourceManager.GetString("indexHtml1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 ;const speed=1000/frame;const img=document.getElementById(&quot;img&quot;);const div=document.getElementById(&quot;div&quot;);const origin=document.getElementById(&quot;origin&quot;);const current=document.getElementById(&quot;current&quot;);let count=0;let refreshImg;origin.innerHTML=&quot;远端视频尺寸：&lt;code&gt;&quot;+imgWidth+&quot;x&quot;+imgHeight+&quot;px&lt;/code&gt;，帧率：&lt;code&gt;&quot;+frame+&quot;FPS&lt;/code&gt;&quot;;adjustImg();function adjustImg(){if(imgWidth/window.innerWidth&lt;imgHeight/window.innerHeight){img.style.height=&quot;100%&quot;;img.style.width=null}else{img.style.width=&quot;100%&quot;;img.style.height=nul [字符串的其余部分被截断]&quot;; 的本地化字符串。
-        /// </summary>
-        internal static string indexHtml2 {
-            get {
-                return ResourceManager.GetString("indexHtml2", resourceCulture);
+                return ResourceManager.GetString("index", resourceCulture);
             }
         }
     }

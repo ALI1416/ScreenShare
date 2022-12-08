@@ -1,7 +1,6 @@
 ﻿using ScreenShare.Properties;
 using System;
 using System.Diagnostics;
-using System.Reflection;
 using System.Windows.Forms;
 
 namespace ScreenShare
@@ -12,8 +11,7 @@ namespace ScreenShare
         public About()
         {
             InitializeComponent();
-            Version version = Assembly.GetExecutingAssembly().GetName().Version;
-            webBrowser.DocumentText = Resources.aboutHtml1 + version.Major + "." + version.Minor + "." + version.Build + Resources.aboutHtml2;
+            webBrowser.DocumentText = Resources.about;
         }
 
         /// <summary>

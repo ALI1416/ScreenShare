@@ -2,19 +2,22 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("屏幕共享")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("ALI1416")]
-[assembly: AssemblyProduct("https://github.com/ALI1416/ScreenShare")]
-[assembly: AssemblyCopyright("Copyright (c) 1998-present, Cheng Kai (ali-k@foxmail.com) All rights reserved.")]
+// 描述&文件说明
+[assembly: AssemblyTitle("局域网屏幕共享")]
+// 产品名称
+[assembly: AssemblyProduct("屏幕共享")]
+// 版权
+[assembly: AssemblyCopyright("https://github.com/ALI1416/ScreenShare")]
+// 合法商标
 [assembly: AssemblyTrademark("404z.cn")]
+// 文件版本&产品版本
+[assembly: AssemblyFileVersion("2.1.1.4")]
+// 不显示
+[assembly: AssemblyVersion("2.1.1.4")]
+[assembly: AssemblyDescription("局域网屏幕共享")]
+[assembly: AssemblyConfiguration("retail")]
+[assembly: AssemblyCompany("ALI1416")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("zh-CN")]
-
 [assembly: ComVisible(false)]
-
 [assembly: Guid("000e46c2-90df-48d2-94cb-364bc2514050")]
-
-[assembly: AssemblyVersion("2.1.1.4")]
-[assembly: AssemblyFileVersion("2.1.1.4")]
