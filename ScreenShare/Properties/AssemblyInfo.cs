@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 
 // 描述&文件说明
-[assembly: AssemblyTitle("局域网屏幕共享")]
+[assembly: AssemblyTitle("屏幕共享")]
 // 产品名称
 [assembly: AssemblyProduct("屏幕共享")]
 // 版权
@@ -11,9 +11,9 @@ using System.Runtime.InteropServices;
 // 合法商标
 [assembly: AssemblyTrademark("404z.cn")]
 // 文件版本&产品版本
-[assembly: AssemblyFileVersion("2.1.1.4")]
+[assembly: AssemblyFileVersion("2.2.0.5")]
 // 不显示
-[assembly: AssemblyVersion("2.1.1.4")]
+[assembly: AssemblyVersion("2.2.0.5")]
 [assembly: AssemblyDescription("局域网屏幕共享")]
 [assembly: AssemblyConfiguration("retail")]
 [assembly: AssemblyCompany("ALI1416")]

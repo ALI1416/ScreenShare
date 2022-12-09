@@ -210,7 +210,23 @@ namespace ScreenShare
                     {
                         // 设置response类型：JSON
                         response.ContentType = "application/json;charset=UTF-8";
-                        string apiGetVideoInfo = "{\"width\":" + videoWNud.Value + ",\"height\":" + videoHNud.Value + ",\"frame\":" + videoFrameNud.Value + ",\"port\":" + ((IPEndPoint)socketServer.LocalEndPoint).Port + "}";
+                        string apiGetVideoInfo = null;
+                        // 开启加密
+                        if (isEncryptionCb.Checked)
+                        {
+                            // 解决中文乱码问题
+                            var pathAndQuery = request.Url.ToString().Split('?');
+                            // 密码未输入或密码错误
+                            if (pathAndQuery.Length != 2 || pathAndQuery[1] != ("code=" + pwdText.Text))
+                            {
+                                apiGetVideoInfo = "{\"width\":" + videoWNud.Value + ",\"height\":" + videoHNud.Value + ",\"frame\":" + videoFrameNud.Value + ",\"port\":0}";
+                            }
+                        }
+                        // 无需密码或密码正确
+                        if (apiGetVideoInfo == null)
+                        {
+                            apiGetVideoInfo = "{\"width\":" + videoWNud.Value + ",\"height\":" + videoHNud.Value + ",\"frame\":" + videoFrameNud.Value + ",\"port\":" + ((IPEndPoint)socketServer.LocalEndPoint).Port + "}";
+                        }
                         HttpResponseWrite(response, Encoding.UTF8.GetBytes(apiGetVideoInfo));
                         break;
                     }

@@ -9,8 +9,8 @@
 <body style="overflow:hidden">
 <img
     id="img"
-    src="image.jpg"
-    alt="网络连接异常"
+    src=""
+    alt=""
     style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:none"
     ondblclick="end()"
 >
@@ -23,13 +23,13 @@
 </div>
 <script>
   // 图片宽(px)
-  const imgWidth = 1920;
+  let imgWidth;
   // 图片高(px)
-  const imgHeight = 1080;
+  let imgHeight;
   // 每秒帧数(fps)
-  const frame = 5;
-  // 刷新速度(ms)
-  const speed = 1000 / frame;
+  let frame;
+  // socket端口号
+  let port;
   // 图片
   const img = document.getElementById("img");
   // 内容
@@ -38,13 +38,9 @@
   const origin = document.getElementById("origin");
   // 当前
   const current = document.getElementById("current");
-  // 错误计数器
-  let count = 0;
-  // 刷新图片
-  let refreshImg;
 
-  origin.innerHTML="远端视频尺寸：<code>" + imgWidth + "x" + imgHeight + "px</code>，帧率：<code>" + frame + "FPS</code>";
   adjustImg();
+  getVideoInfo();
 
   // 调整图片大小
   function adjustImg() {
@@ -55,27 +51,48 @@
       img.style.width = "100%";
       img.style.height = null;
     }
-    current.innerHTML="当前屏幕尺寸：<code>" + window.innerWidth + "x" + window.innerHeight + "px</code>";
+    current.innerHTML="当前屏幕尺寸&ensp;<code>" + window.innerWidth + "x" + window.innerHeight + "px</code>";
+  }
+
+  // 获取视频信息
+  function getVideoInfo() {
+    fetch("/api/getVideoInfo")
+    .then(resp => resp.json())
+    .then(json => {
+      imgWidth=json.width;
+      imgHeight=json.height;
+      frame=json.frame;
+      port=json.port;
+      origin.innerHTML="远端视频尺寸&ensp;<code>" + imgWidth + "x" + imgHeight + "px</code>&emsp;每秒帧数&ensp;<code>" + frame + "FPS</code>&emsp;开启加密&ensp;<code>"+(port==0?"是":"否")+"</code>";
+    })
   }
 
   // 开始
   function start() {
-    refreshImg = setInterval(getImg, speed);
     div.style.display = "none";
     img.style.display = "block";
+    getVideoInfo();
+    if(port==0){
+     const code= prompt("请输入密码");
+     fetch("/api/getVideoInfo?code="+code)
+    .then(resp => resp.json())
+    .then(json => {
+      if(json.port==0){
+        alert("密码错误！");
+      }else{
+        img.src="http://"+window.location.hostname+":"+json.port;
+      }
+    })
+    }else{
+      img.src="http://"+window.location.hostname+":"+port;
+    }
   }
 
   // 结束
   function end() {
     img.style.display = "none";
     div.style.display = "block";
-    clearInterval(refreshImg);
-    count = 0;
-  }
-
-  // 获取图片
-  function getImg() {
-    img.src = "image.jpg?r=" + Math.random();
+    img.src="";
   }
 
   // 窗口大小发生变化时
@@ -83,12 +100,6 @@
     adjustImg();
   };
 
-  // 图片发生错误
-  img.addEventListener("error", () => {
-    if (count++ === 10) {
-      end();
-    }
-  });
 </script>
 </body>
 </html>

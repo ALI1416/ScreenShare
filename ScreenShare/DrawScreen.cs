@@ -54,7 +54,7 @@ namespace ScreenShare
         private void DrawScreen_MouseMove(object sender, MouseEventArgs e)
         {
             if (!isDraw) return;
-            rect = new Rectangle(Math.Min(start.X, e.X), Math.Min(start.Y, e.Y), Math.Abs(start.X - e.X), Math.Abs(start.Y - e.Y));
+            rect = new Rectangle(Math.Min(start.X, e.X), Math.Min(start.Y, e.Y), Math.Abs(start.X - e.X) + 1, Math.Abs(start.Y - e.Y) + 1);
             Refresh();
         }
 
