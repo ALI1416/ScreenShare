@@ -10,37 +10,32 @@
 <img
     id="img"
     src=""
-    alt=""
+    alt="网络连接异常，请刷新页面重试！"
     style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:none"
     ondblclick="end()"
 >
 <div id="div">
   <h1>屏幕共享</h1>
-  <p id="origin" style="font-size:20px;"></p>
-  <p id="current" style="font-size:20px;"></p>
-  <button onclick="start()" style="font-size:30px;">点击开始</button>
-  <p style="font-size:20px;">双击图像结束</p>
+  <h2 id="info"></h2>
+  <div id="online" style="display:none">
+    <h2 id="screen"></h2>
+    <button onclick="start(true)" style="font-size:30px;">点击开始</button>
+    <h2>双击图像结束</h2>
+  </div>
 </div>
 <script>
-  // 图片宽(px)
   let imgWidth;
-  // 图片高(px)
   let imgHeight;
-  // 每秒帧数(fps)
   let frame;
-  // socket端口号
   let port;
-  // 图片
   const img = document.getElementById("img");
-  // 内容
   const div = document.getElementById("div");
-  // 远端
-  const origin = document.getElementById("origin");
-  // 当前
-  const current = document.getElementById("current");
+  const info = document.getElementById("info");
+  const screen = document.getElementById("screen");
+  const online = document.getElementById("online");
 
   adjustImg();
-  getVideoInfo();
+  start(false);
 
   // 调整图片大小
   function adjustImg() {
@@ -51,48 +46,42 @@
       img.style.width = "100%";
       img.style.height = null;
     }
-    current.innerHTML="当前屏幕尺寸&ensp;<code>" + window.innerWidth + "x" + window.innerHeight + "px</code>";
+    screen.innerHTML = "当前屏幕尺寸&ensp;<code>" + window.innerWidth + "x" + window.innerHeight + "px</code>";
   }
 
   // 获取视频信息
-  function getVideoInfo() {
-    fetch("/api/getVideoInfo")
-    .then(resp => resp.json())
-    .then(json => {
-      imgWidth=json.width;
-      imgHeight=json.height;
-      frame=json.frame;
-      port=json.port;
-      origin.innerHTML="远端视频尺寸&ensp;<code>" + imgWidth + "x" + imgHeight + "px</code>&emsp;每秒帧数&ensp;<code>" + frame + "FPS</code>&emsp;开启加密&ensp;<code>"+(port==0?"是":"否")+"</code>";
-    })
-  }
-
-  // 开始
-  function start() {
-    div.style.display = "none";
-    img.style.display = "block";
-    getVideoInfo();
-    if(port==0){
-     const code= prompt("请输入密码");
-     fetch("/api/getVideoInfo?code="+code)
-    .then(resp => resp.json())
-    .then(json => {
-      if(json.port==0){
-        alert("密码错误！");
-      }else{
-        img.src="http://"+window.location.hostname+":"+json.port;
-      }
-    })
-    }else{
-      img.src="http://"+window.location.hostname+":"+port;
-    }
+  function start(open) {
+    fetch("/api/getVideoInfo" + (port == 0 ? "?code=" + prompt("请输入密码") : ""))
+        .then(resp => resp.json())
+        .then(json => {
+          imgWidth = json.width;
+          imgHeight = json.height;
+          frame = json.frame;
+          port = json.port;
+          online.style.display = "block";
+          info.innerHTML = "远端视频尺寸&ensp;<code>" + imgWidth + "x" + imgHeight + "px</code>&emsp;每秒帧数&ensp;<code>" + frame + "FPS</code>";
+          if (open) {
+            if (port == 0) {
+              alert("密码错误！");
+            } else {
+              img.src = "http://" + window.location.hostname + ":" + port;
+              div.style.display = "none";
+              img.style.display = "block";
+            }
+          }
+        })
+        .catch(() => {
+          img.src = "";
+          online.style.display = "none";
+          info.innerHTML = "网络连接异常，请刷新页面重试！";
+        })
   }
 
   // 结束
   function end() {
+    img.src = "";
     img.style.display = "none";
     div.style.display = "block";
-    img.src="";
   }
 
   // 窗口大小发生变化时

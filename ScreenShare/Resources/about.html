@@ -5,120 +5,130 @@
   <title>屏幕共享</title>
 </head>
 <body>
-  <h1 align="center">屏幕共享</h1>
-  <h2 align="center">版本&emsp;<code>2.2.0</code></h2>
-  <hr>
-  <h3>主要功能</h3>
-  <ul>
-    <li>密码验证</li>
-    <li>支持多显示器</li>
-    <li>支持高DPI</li>
-    <li>自定义选择区域</li>
-    <li>视频尺寸调节</li>
-    <li>视频质量调节</li>
-    <li>视频帧数调节</li>
-    <li>光标显示</li>
-    <li>视频预览</li>
-    <li>托盘运行</li>
-  </ul>
-  <h3>更新历史</h3>
-  <ul>
-   <li>
-      <h4>v2.2.0&emsp;<sup>2022.12.</sup></h4>
-      <h5>新增功能</h5>
-      <ol>
-         <li></li>
-      </ol>
-      <h5>系统优化</h5>
-      <ol>
-         <li></li>
-      </ol>
-   </li>
-   <li>
-      <h4>v2.1.1&emsp;<sup>2022.11.17</sup></h4>
-      <h5>功能优化</h5>
-      <ol>
-         <li>删除防火墙规则</li>
-      </ol>
-      <h5>修复漏洞</h5>
-      <ol>
-         <li>屏幕分辨率不是<code>1920x1080</code>启动后闪退</li>
-         <li>启动后立即点击<code>用浏览器打开</code>闪退</li>
-      </ol>
-   </li>
-   <li>
-      <h4>v2.1.0&emsp;<sup>2022.11.16</sup></h4>
-      <h5>新增功能</h5>
-      <ol>
-         <li>获取视频信息接口</li>
-      </ol>
-      <h5>系统优化</h5>
-      <ol>
-         <li>完善提示</li>
-         <li>美化网页</li>
-      </ol>
-      <h5>修复漏洞</h5>
-      <ol>
-         <li>屏幕分辨率不是<code>1920x1080</code>启动后闪退</li>
-      </ol>
-   </li>
-   <li>
-      <h4>v2.0.1&emsp;<sup>2022.7.16</sup></h4>
-      <h5>修复漏洞</h5>
-      <ol>
-         <li>视频尺寸返回给前端错误</li>
-      </ol>
-   </li>
-   <li>
-      <h4>v2.0.0&emsp;<sup>2022.7.16</sup></h4>
-      <h5>新增功能</h5>
-      <ol>
-         <li>支持多显示器</li>
-         <li>支持高DPI</li>
-         <li>托盘运行</li>
-      </ol>
-      <h5>系统优化</h5>
-      <ol>
-         <li><code>关于</code>使用<code>HTML</code>显示</li>
-         <li>屏幕截图优化</li>
-         <li>自定义选择区域优化</li>
-         <li>添加防火墙规则</li>
-      </ol>
-      <h5>修复漏洞</h5>
-      <ol>
-         <li>剪切板复制报错</li>
-         <li>外网无法访问</li>
-      </ol>
-   </li>
-   <li>
-      <h4>v1.0.0&emsp;<sup>2020.10.5</sup></h4>
-      <h5>支持功能</h5>
-      <ol>
-         <li>加密传输</li>
-         <li>自定义选择区域</li>
-         <li>视频尺寸调节</li>
-         <li>视频质量调节</li>
-         <li>视频帧数调节</li>
-         <li>光标显示</li>
-         <li>视频预览</li>
-      </ol>
-   </li>
-  </ul>
-  <hr>
-  <h3>作者&emsp;<code>ALI1416</code></h3>
-  <a href="https://github.com/ALI1416">GitHub</a>
-  <a href="https://gitee.com/ALI1416">Gitee</a>
-  <hr>
-  <h3>项目&emsp;<code>ScreenShare</code></h3>
-  <a href="https://github.com/ALI1416/ScreenShare">GitHub</a>
-  <a href="https://gitee.com/ALI1416/ScreenShare">Gitee</a>
-  <hr>
-  <h3>致谢</h3>
-  <a href="https://github.com/EslaMx7/ScreenTask">EslaMx7</a>
-  <a href="https://github.com/xChivalrouSx/CaptureScreen">xChivalrouSx</a>
-  <a href="https://github.com/MrKonstantinSh/OpenScreen">MrKonstantinSh</a>
-  <hr>
-  <h3>许可证</h3>
-  <a href="https://opensource.org/licenses/BSD-3-Clause">BSD</a>
+<h1 align="center">屏幕共享</h1>
+<h2 align="center">版本&emsp;<code>2.2.0</code></h2>
+<hr>
+<h3>主要功能</h3>
+<ul>
+  <li>密码验证</li>
+  <li>支持多显示器</li>
+  <li>支持高DPI</li>
+  <li>自定义选择区域</li>
+  <li>视频尺寸调节</li>
+  <li>视频质量调节</li>
+  <li>视频帧数调节</li>
+  <li>光标显示</li>
+  <li>视频预览</li>
+  <li>托盘运行</li>
+  <li>用户在线数量和历史在线记录</li>
+</ul>
+<h3>更新历史</h3>
+<ul>
+  <li>
+    <h4>v2.2.0&emsp;<sup>2022.12.</sup></h4>
+    <h5>新增功能</h5>
+    <ol>
+      <li>使用socket推流</li>
+      <li>显示<code>用户在线数量</code>和<code>用户历史在线记录</code></li>
+      <li>日志清空</li>
+    </ol>
+    <h5>系统优化</h5>
+    <ol>
+      <li>优化代码可读性</li>
+      <li>http服务器使用异步方式</li>
+      <li>优化页面显示</li>
+    </ol>
+    <h5>修复漏洞</h5>
+    <ol>
+      <li>各种原因引起的软件崩溃</li>
+      <li><code>选取屏幕坐标</code>宽和高都少1个像素</li>
+    </ol>
+  </li>
+  <li>
+    <h4>v2.1.1&emsp;<sup>2022.11.17</sup></h4>
+    <h5>系统优化</h5>
+    <ol>
+      <li>删除防火墙规则</li>
+    </ol>
+    <h5>修复漏洞</h5>
+    <ol>
+      <li>屏幕分辨率不是<code>1920x1080</code>启动后闪退</li>
+      <li>启动后立即点击<code>用浏览器打开</code>闪退</li>
+    </ol>
+  </li>
+  <li>
+    <h4>v2.1.0&emsp;<sup>2022.11.16</sup></h4>
+    <h5>新增功能</h5>
+    <ol>
+      <li>获取视频信息接口</li>
+    </ol>
+    <h5>系统优化</h5>
+    <ol>
+      <li>完善提示</li>
+      <li>美化网页</li>
+    </ol>
+    <h5>修复漏洞</h5>
+    <ol>
+      <li>屏幕分辨率不是<code>1920x1080</code>启动后闪退</li>
+    </ol>
+  </li>
+  <li>
+    <h4>v2.0.1&emsp;<sup>2022.7.16</sup></h4>
+    <h5>修复漏洞</h5>
+    <ol>
+      <li>视频尺寸返回给前端错误</li>
+    </ol>
+  </li>
+  <li>
+    <h4>v2.0.0&emsp;<sup>2022.7.16</sup></h4>
+    <h5>新增功能</h5>
+    <ol>
+      <li>支持多显示器</li>
+      <li>支持高DPI</li>
+      <li>托盘运行</li>
+    </ol>
+    <h5>系统优化</h5>
+    <ol>
+      <li><code>关于</code>使用<code>HTML</code>显示</li>
+      <li>屏幕截图优化</li>
+      <li>自定义选择区域优化</li>
+      <li>添加防火墙规则</li>
+    </ol>
+    <h5>修复漏洞</h5>
+    <ol>
+      <li>剪切板复制报错</li>
+      <li>外网无法访问</li>
+    </ol>
+  </li>
+  <li>
+    <h4>v1.0.0&emsp;<sup>2020.10.5</sup></h4>
+    <h5>支持功能</h5>
+    <ol>
+      <li>加密传输</li>
+      <li>自定义选择区域</li>
+      <li>视频尺寸调节</li>
+      <li>视频质量调节</li>
+      <li>视频帧数调节</li>
+      <li>光标显示</li>
+      <li>视频预览</li>
+    </ol>
+  </li>
+</ul>
+<hr>
+<h3>作者&emsp;<code>ALI1416</code></h3>
+<a href="https://github.com/ALI1416">GitHub</a>
+<a href="https://gitee.com/ALI1416">Gitee</a>
+<hr>
+<h3>项目&emsp;<code>ScreenShare</code></h3>
+<a href="https://github.com/ALI1416/ScreenShare">GitHub</a>
+<a href="https://gitee.com/ALI1416/ScreenShare">Gitee</a>
+<hr>
+<h3>致谢</h3>
+<a href="https://github.com/EslaMx7/ScreenTask">EslaMx7</a>
+<a href="https://github.com/xChivalrouSx/CaptureScreen">xChivalrouSx</a>
+<a href="https://github.com/MrKonstantinSh/OpenScreen">MrKonstantinSh</a>
+<hr>
+<h3>许可证</h3>
+<a href="https://opensource.org/licenses/BSD-3-Clause">BSD</a>
 </body>
 </html>
