@@ -13,6 +13,7 @@ using System.Windows.Forms;
 
 namespace ScreenShare
 {
+
     public partial class ScreenShare : Form
     {
 
@@ -45,7 +46,7 @@ namespace ScreenShare
         /// <summary>
         /// socket客户端历史
         /// </summary>
-        private readonly Dictionary<string, Tuple<DateTime, DateTime>> socketClientHistory = new Dictionary<string, Tuple<DateTime, DateTime>>();
+        private readonly Dictionary<int, SocketHistory> socketClientHistory = new Dictionary<int, SocketHistory>();
         /// <summary>
         /// socket接收数据缓冲区
         /// </summary>
@@ -253,7 +254,7 @@ namespace ScreenShare
             }
             catch
             {
-                // 用户主动关闭连接
+                // 客户端主动关闭连接
             }
         }
 
@@ -283,6 +284,7 @@ namespace ScreenShare
             // 未知错误
             catch
             {
+                socketServer.Close();
                 return false;
             }
             return true;
@@ -295,6 +297,10 @@ namespace ScreenShare
         {
             // 删除防火墙规则
             Utils.RemoveNetFw(((IPEndPoint)socketServer.LocalEndPoint).Port);
+            foreach (Socket client in socketClient.ToArray())
+            {
+                SocketClientOffline(client);
+            }
             socketServer.Close();
         }
 
@@ -312,32 +318,74 @@ namespace ScreenShare
             // 主动关闭socket服务器
             catch
             {
-                foreach (Socket client1 in socketClient.ToArray())
-                {
-                    SocketCloseClient(client1);
-                }
                 return;
             }
-            Socket client = null;
             try
             {
-                // 获取Socket对象
-                client = socketServer.EndAccept(ar);
+                // 客户端上线
+                SocketClientOnline(socketServer.EndAccept(ar));
+            }
+            // 未知错误
+            catch
+            {
+            }
+        }
+
+        /// <summary>
+        /// socket客户端上线
+        /// </summary>
+        /// <param name="client">客户端</param>
+        private void SocketClientOnline(Socket client)
+        {
+            // 已存在
+            if (socketClient.Contains(client))
+            {
+                return;
+            }
+            string ip;
+            try
+            {
+                // 获取IP地址
+                ip = client.RemoteEndPoint.ToString();
                 // 设置超时10秒
                 client.SendTimeout = 10000;
-                // 把当前客户端添加进列表
-                socketClient.Add(client);
-                UpdateSocketClient(client, true);
                 // 接收消息
                 client.BeginReceive(socketBuffer, 0, socketBuffer.Length, SocketFlags.None, SocketRecevice, client);
                 // 发送响应头
                 SocketSendData(client, socketResponseHeader);
             }
-            // 未知错误
             catch
             {
-                SocketCloseClient(client);
+                client.Close();
                 return;
+            }
+            socketClient.Add(client);
+            socketClientHistory.Add(client.GetHashCode(), new SocketHistory(ip, DateTime.Now));
+            UpdateSocketUi(ip, true);
+        }
+
+        /// <summary>
+        /// socket客户端下线
+        /// </summary>
+        /// <param name="client">客户端</param>
+        private void SocketClientOffline(Socket client)
+        {
+            // 不存在
+            if (!socketClient.Contains(client))
+            {
+                return;
+            }
+            client.Close();
+            socketClient.Remove(client);
+            // 获取该客户端
+            if (socketClientHistory.TryGetValue(client.GetHashCode(), out SocketHistory history))
+            {
+                // 没有下线的客户端才可以下线
+                if (history.Offline == DateTime.MinValue)
+                {
+                    history.Offline = DateTime.Now;
+                    UpdateSocketUi(history.Ip, false);
+                }
             }
         }
 
@@ -353,10 +401,10 @@ namespace ScreenShare
             {
                 // 获取接收数据长度
                 int length = client.EndReceive(ar);
-                // 用户主动断开连接时，会发送0字节消息
+                // 客户端主动断开连接时，会发送0字节消息
                 if (length == 0)
                 {
-                    SocketCloseClient(client);
+                    SocketClientOffline(client);
                     return;
                 }
                 // 继续接收消息
@@ -365,20 +413,9 @@ namespace ScreenShare
             // 超时后失去连接、未知错误
             catch
             {
-                SocketCloseClient(client);
+                SocketClientOffline(client);
                 return;
             }
-        }
-
-        /// <summary>
-        /// 关闭socket客户端
-        /// </summary>
-        /// <param name="client">客户端</param>
-        private void SocketCloseClient(Socket client)
-        {
-            UpdateSocketClient(client, false);
-            client.Close();
-            socketClient.Remove(client);
         }
 
         /// <summary>
@@ -393,13 +430,22 @@ namespace ScreenShare
                 // 发送消息
                 client.BeginSend(data, 0, data.Length, SocketFlags.None, asyncResult =>
                 {
-                    client.EndSend(asyncResult);
+                    try
+                    {
+                        client.EndSend(asyncResult);
+                    }
+                    // 已失去连接
+                    catch
+                    {
+                        SocketClientOffline(client);
+                        return;
+                    }
                 }, null);
             }
             catch
             {
-                // 未知错误、已失去连接
-                SocketCloseClient(client);
+                // 未知错误
+                SocketClientOffline(client);
                 return;
             }
         }
@@ -422,64 +468,27 @@ namespace ScreenShare
         }
 
         /// <summary>
-        /// 更新socket客户端
+        /// 更新socket UI
         /// </summary>
-        /// <param name="client">客户端</param>
+        /// <param name="ip">ip</param>
         /// <param name="online">上线和下线</param>
-        private void UpdateSocketClient(Socket client, bool online)
+        private void UpdateSocketUi(string ip, bool online)
         {
             /* 更新在线数量 */
-            string countText = "当前在线用户数量：" + socketClient.Count;
+            string count = "当前在线用户数量：" + socketClient.Count;
             // 利用委托，防止`线程间操作无效`
             Action<string> action = (data) =>
             {
                 userCountLinkLabel.Text = data;
             };
-            Invoke(action, countText);
-            /* 更新在线历史 */
-            string ip;
-            try
+            Invoke(action, count);
+            /* 日志 */
+            string log = "客户端 " + ip + (online ? " 已上线。" : " 已下线。");
+            Action<string> action2 = (data) =>
             {
-                ip = client.LocalEndPoint.ToString();
-            }
-            catch
-            {
-                return;
-            }
-            DateTime now = DateTime.Now;
-            // 上线
-            if (online)
-            {
-                string msgText = "用户 " + ip + " 已上线";
-                Action<string> action2 = (data) =>
-                {
-                    Log(data);
-                };
-                Invoke(action2, msgText);
-                // 相同的ip，移除
-                if (socketClientHistory.ContainsKey(ip))
-                {
-                    socketClientHistory.Remove(ip);
-                }
-                // 起始时间和结束时间一样，代表在线
-                socketClientHistory.Add(ip, Tuple.Create(now, now));
-            }
-            // 下线
-            else
-            {
-                string msgText = "用户 " + ip + " 已下线";
-                Action<string> action2 = (data) =>
-                {
-                    Log(data);
-                };
-                Invoke(action2, msgText);
-                var value = Tuple.Create(now, now);
-                if (socketClientHistory.TryGetValue(ip, out value))
-                {
-                    // 起始时间和结束时间不一样，代表已下线
-                    value = Tuple.Create(value.Item1, now);
-                }
-            }
+                Log(data);
+            };
+            Invoke(action2, log);
         }
 
         #endregion
@@ -493,7 +502,7 @@ namespace ScreenShare
         {
             Bitmap bitmap;
             MemoryStream stream = new MemoryStream();
-            int delay = (int)(1000 / videoFrameNud.Value);
+            int delay = videoFrameNud.Value == 0 ? 1 : (int)(1000 / videoFrameNud.Value);
             int videoQuality = (int)videoQualityNud.Value;
             bool isDisplayCursor = isDisplayCursorCb.Checked;
             Rectangle screen = new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value);
@@ -693,6 +702,7 @@ namespace ScreenShare
             /* 预览图像 */
             UpdatePreviewImgWithCaptureScreen();
         }
+
         /// <summary>
         /// 运行时更新预览图
         /// </summary>
@@ -841,7 +851,7 @@ namespace ScreenShare
         /// <param name="text">内容</param>
         private void Log(string text)
         {
-            logText.Text += DateTime.Now.ToLongTimeString() + " : " + text + "\r\n";
+            logText.Text += DateTime.Now.ToString("HH:mm:ss ") + text + "\r\n";
             logText.SelectionStart = logText.Text.Length;
             logText.ScrollToCaret();
         }
@@ -1147,7 +1157,17 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void UserCountLinkLabel_Click(object sender, EventArgs e)
         {
+            new History(socketClientHistory).ShowDialog();
+        }
 
+        /// <summary>
+        /// 点击清空日志链接
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ClearLogLinkLabel_Click(object sender, EventArgs e)
+        {
+            logText.Text = "";
         }
 
         /// <summary>
@@ -1191,4 +1211,5 @@ namespace ScreenShare
         #endregion
 
     }
+
 }

@@ -76,8 +76,9 @@
             this.previewLabel = new System.Windows.Forms.Label();
             this.previewImg = new System.Windows.Forms.PictureBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.userCountLinkLabel = new System.Windows.Forms.LinkLabel();
+            this.clearLogLinkLabel = new System.Windows.Forms.LinkLabel();
+            this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.ipPortNud)).BeginInit();
             this.encryptionBox.SuspendLayout();
             this.coordinatesBox.SuspendLayout();
@@ -150,7 +151,7 @@
             this.ipPortNud.Name = "ipPortNud";
             this.ipPortNud.Size = new System.Drawing.Size(80, 21);
             this.ipPortNud.TabIndex = 3;
-            this.toolTip.SetToolTip(this.ipPortNud, "IP地址对应的端口号");
+            this.toolTip.SetToolTip(this.ipPortNud, "请输入IP地址对应的端口号");
             this.ipPortNud.Value = new decimal(new int[] {
             7070,
             0,
@@ -165,6 +166,7 @@
             this.reloadConfigBtn.Size = new System.Drawing.Size(90, 23);
             this.reloadConfigBtn.TabIndex = 4;
             this.reloadConfigBtn.Text = "重新加载配置";
+            this.toolTip.SetToolTip(this.reloadConfigBtn, "点击重新加载配置");
             this.reloadConfigBtn.UseVisualStyleBackColor = true;
             this.reloadConfigBtn.Click += new System.EventHandler(this.ReloadConfigBtn_Click);
             // 
@@ -175,6 +177,7 @@
             this.aboutBtn.Size = new System.Drawing.Size(55, 53);
             this.aboutBtn.TabIndex = 5;
             this.aboutBtn.Text = "关于";
+            this.toolTip.SetToolTip(this.aboutBtn, "点击显示关于界面");
             this.aboutBtn.UseVisualStyleBackColor = true;
             this.aboutBtn.Click += new System.EventHandler(this.AboutBtn_Click);
             // 
@@ -457,6 +460,7 @@
             this.captureScreenCoordinatesBtn.Size = new System.Drawing.Size(75, 51);
             this.captureScreenCoordinatesBtn.TabIndex = 7;
             this.captureScreenCoordinatesBtn.Text = "选取\r\n屏幕坐标";
+            this.toolTip.SetToolTip(this.captureScreenCoordinatesBtn, "点击选取屏幕坐标");
             this.captureScreenCoordinatesBtn.UseVisualStyleBackColor = true;
             this.captureScreenCoordinatesBtn.Click += new System.EventHandler(this.CaptureScreenCoordinatesBtn_Click);
             // 
@@ -486,7 +490,7 @@
             this.isLockAspectRatioCb.Size = new System.Drawing.Size(84, 16);
             this.isLockAspectRatioCb.TabIndex = 1;
             this.isLockAspectRatioCb.Text = "锁定纵横比";
-            this.toolTip.SetToolTip(this.isLockAspectRatioCb, "锁定纵横比");
+            this.toolTip.SetToolTip(this.isLockAspectRatioCb, "是否锁定纵横比");
             this.isLockAspectRatioCb.UseVisualStyleBackColor = true;
             this.isLockAspectRatioCb.CheckStateChanged += new System.EventHandler(this.IsLockAspectRatioCb_CheckStateChanged);
             // 
@@ -639,15 +643,10 @@
             0,
             0,
             0});
-            this.videoFrameNud.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
             this.videoFrameNud.Name = "videoFrameNud";
             this.videoFrameNud.Size = new System.Drawing.Size(50, 21);
             this.videoFrameNud.TabIndex = 2;
-            this.toolTip.SetToolTip(this.videoFrameNud, "每秒刷新次数，数字越大越流畅");
+            this.toolTip.SetToolTip(this.videoFrameNud, "每秒刷新次数，数字越大越流畅；为0时以最快速度刷新。\r\n");
             this.videoFrameNud.Value = new decimal(new int[] {
             5,
             0,
@@ -703,6 +702,7 @@
             this.startSharingScreenBtn.Size = new System.Drawing.Size(185, 40);
             this.startSharingScreenBtn.TabIndex = 1;
             this.startSharingScreenBtn.Text = "开始共享";
+            this.toolTip.SetToolTip(this.startSharingScreenBtn, "点击开始共享或结束共享");
             this.startSharingScreenBtn.UseVisualStyleBackColor = true;
             this.startSharingScreenBtn.Click += new System.EventHandler(this.StartSharingScreenBtn_Click);
             // 
@@ -743,13 +743,6 @@
             this.previewImg.TabStop = false;
             this.previewImg.Click += new System.EventHandler(this.PreviewImg_Click);
             // 
-            // notifyIcon
-            // 
-            this.notifyIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
-            this.notifyIcon.Icon = global::ScreenShare.Properties.Resources.icon;
-            this.notifyIcon.Text = "屏幕共享";
-            this.notifyIcon.Click += new System.EventHandler(this.NotifyIcon_Click);
-            // 
             // userCountLinkLabel
             // 
             this.userCountLinkLabel.AutoSize = true;
@@ -759,7 +752,27 @@
             this.userCountLinkLabel.TabIndex = 13;
             this.userCountLinkLabel.TabStop = true;
             this.userCountLinkLabel.Text = "当前在线用户数量：0";
+            this.toolTip.SetToolTip(this.userCountLinkLabel, "点击显示用户在线历史界面");
             this.userCountLinkLabel.Click += new System.EventHandler(this.UserCountLinkLabel_Click);
+            // 
+            // clearLogLinkLabel
+            // 
+            this.clearLogLinkLabel.AutoSize = true;
+            this.clearLogLinkLabel.Location = new System.Drawing.Point(360, 260);
+            this.clearLogLinkLabel.Name = "clearLogLinkLabel";
+            this.clearLogLinkLabel.Size = new System.Drawing.Size(53, 12);
+            this.clearLogLinkLabel.TabIndex = 14;
+            this.clearLogLinkLabel.TabStop = true;
+            this.clearLogLinkLabel.Text = "清空日志";
+            this.toolTip.SetToolTip(this.clearLogLinkLabel, "点击清空日志");
+            this.clearLogLinkLabel.Click += new System.EventHandler(this.ClearLogLinkLabel_Click);
+            // 
+            // notifyIcon
+            // 
+            this.notifyIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.notifyIcon.Icon = global::ScreenShare.Properties.Resources.icon;
+            this.notifyIcon.Text = "屏幕共享";
+            this.notifyIcon.Click += new System.EventHandler(this.NotifyIcon_Click);
             // 
             // ScreenShare
             // 
@@ -786,6 +799,7 @@
             this.Controls.Add(this.startSharingScreenBtn);
             this.Controls.Add(this.logText);
             this.Controls.Add(this.userCountLinkLabel);
+            this.Controls.Add(this.clearLogLinkLabel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = global::ScreenShare.Properties.Resources.icon;
             this.MaximizeBox = false;
@@ -866,13 +880,13 @@
         /// </summary>
         private System.Windows.Forms.Button openBtn;
 
-        /* 加密传输GroupBox */
+        /* 密码验证GroupBox */
         /// <summary>
-        /// 加密传输GroupBox
+        /// 密码验证GroupBox
         /// </summary>
         private System.Windows.Forms.GroupBox encryptionBox;
         /// <summary>
-        /// 开启加密CheckBox
+        /// 开启CheckBox
         /// </summary>
         private System.Windows.Forms.CheckBox isEncryptionCb;
         /// <summary>
@@ -1020,6 +1034,18 @@
         /// </summary>
         private System.Windows.Forms.PictureBox previewImg;
 
+        /* 当前在线用户数量 */
+        /// <summary>
+        /// 当前在线用户数量LinkLabel
+        /// </summary>
+        private System.Windows.Forms.LinkLabel userCountLinkLabel;
+
+        /* 清空日志 */
+        /// <summary>
+        /// 清空日志LinkLabel
+        /// </summary>
+        private System.Windows.Forms.LinkLabel clearLogLinkLabel;
+
         /* 提示 */
         /// <summary>
         /// 提示ToolTip
@@ -1032,10 +1058,5 @@
         /// </summary>
         private System.Windows.Forms.NotifyIcon notifyIcon;
 
-        /* 当前在线用户数量 */
-        /// <summary>
-        /// 当前在线用户数量LinkLabel
-        /// </summary>
-        private System.Windows.Forms.LinkLabel userCountLinkLabel;
     }
 }
