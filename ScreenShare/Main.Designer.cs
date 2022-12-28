@@ -29,17 +29,19 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            this.topPanel = new System.Windows.Forms.Panel();
             this.shareScreenLabel = new System.Windows.Forms.Label();
-            this.ipAddressLabel = new System.Windows.Forms.Label();
             this.ipAddressComboBox = new System.Windows.Forms.ComboBox();
-            this.ipPortLabel = new System.Windows.Forms.Label();
+            this.ipAddressLabel = new System.Windows.Forms.Label();
             this.ipPortNud = new System.Windows.Forms.NumericUpDown();
+            this.ipPortLabel = new System.Windows.Forms.Label();
             this.reloadConfigBtn = new System.Windows.Forms.Button();
             this.aboutBtn = new System.Windows.Forms.Button();
-            this.shareLinkLabel = new System.Windows.Forms.Label();
             this.shareLinkText = new System.Windows.Forms.TextBox();
+            this.shareLinkLabel = new System.Windows.Forms.Label();
             this.copyBtn = new System.Windows.Forms.Button();
             this.openBtn = new System.Windows.Forms.Button();
+            this.middlePanel = new System.Windows.Forms.Panel();
             this.encryptionBox = new System.Windows.Forms.GroupBox();
             this.isEncryptionCb = new System.Windows.Forms.CheckBox();
             this.pwdText = new System.Windows.Forms.TextBox();
@@ -71,15 +73,18 @@
             this.videoFrameLabel = new System.Windows.Forms.Label();
             this.videoQualityNud = new System.Windows.Forms.NumericUpDown();
             this.videoQualityLabel = new System.Windows.Forms.Label();
-            this.startSharingScreenBtn = new System.Windows.Forms.Button();
-            this.logText = new System.Windows.Forms.TextBox();
+            this.userCountLinkLabel = new System.Windows.Forms.LinkLabel();
+            this.bottomPanel = new System.Windows.Forms.Panel();
             this.previewLabel = new System.Windows.Forms.Label();
             this.previewImg = new System.Windows.Forms.PictureBox();
-            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.userCountLinkLabel = new System.Windows.Forms.LinkLabel();
+            this.startSharingScreenBtn = new System.Windows.Forms.Button();
+            this.logText = new System.Windows.Forms.TextBox();
             this.clearLogLinkLabel = new System.Windows.Forms.LinkLabel();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
+            this.topPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ipPortNud)).BeginInit();
+            this.middlePanel.SuspendLayout();
             this.encryptionBox.SuspendLayout();
             this.coordinatesBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.screenXNud)).BeginInit();
@@ -93,8 +98,28 @@
             this.videoBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.videoFrameNud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.videoQualityNud)).BeginInit();
+            this.bottomPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.previewImg)).BeginInit();
             this.SuspendLayout();
+            // 
+            // topPanel
+            // 
+            this.topPanel.Controls.Add(this.shareScreenLabel);
+            this.topPanel.Controls.Add(this.ipAddressComboBox);
+            this.topPanel.Controls.Add(this.ipAddressLabel);
+            this.topPanel.Controls.Add(this.ipPortNud);
+            this.topPanel.Controls.Add(this.ipPortLabel);
+            this.topPanel.Controls.Add(this.reloadConfigBtn);
+            this.topPanel.Controls.Add(this.aboutBtn);
+            this.topPanel.Controls.Add(this.shareLinkText);
+            this.topPanel.Controls.Add(this.shareLinkLabel);
+            this.topPanel.Controls.Add(this.copyBtn);
+            this.topPanel.Controls.Add(this.openBtn);
+            this.topPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.topPanel.Location = new System.Drawing.Point(0, 0);
+            this.topPanel.Name = "topPanel";
+            this.topPanel.Size = new System.Drawing.Size(768, 110);
+            this.topPanel.TabIndex = 2;
             // 
             // shareScreenLabel
             // 
@@ -106,6 +131,17 @@
             this.shareScreenLabel.TabIndex = 0;
             this.shareScreenLabel.Text = "屏幕共享";
             // 
+            // ipAddressComboBox
+            // 
+            this.ipAddressComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ipAddressComboBox.FormattingEnabled = true;
+            this.ipAddressComboBox.Location = new System.Drawing.Point(70, 50);
+            this.ipAddressComboBox.Name = "ipAddressComboBox";
+            this.ipAddressComboBox.Size = new System.Drawing.Size(350, 20);
+            this.ipAddressComboBox.TabIndex = 1;
+            this.toolTip.SetToolTip(this.ipAddressComboBox, "请选择分享IP地址");
+            this.ipAddressComboBox.SelectedValueChanged += new System.EventHandler(this.IpAddressComboBox_SelectedValueChanged);
+            // 
             // ipAddressLabel
             // 
             this.ipAddressLabel.AutoSize = true;
@@ -114,26 +150,6 @@
             this.ipAddressLabel.Size = new System.Drawing.Size(53, 12);
             this.ipAddressLabel.TabIndex = 0;
             this.ipAddressLabel.Text = "IP地址：";
-            // 
-            // ipAddressComboBox
-            // 
-            this.ipAddressComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.ipAddressComboBox.FormattingEnabled = true;
-            this.ipAddressComboBox.Location = new System.Drawing.Point(70, 50);
-            this.ipAddressComboBox.Name = "ipAddressComboBox";
-            this.ipAddressComboBox.Size = new System.Drawing.Size(350, 20);
-            this.ipAddressComboBox.TabIndex = 2;
-            this.toolTip.SetToolTip(this.ipAddressComboBox, "请选择分享IP地址");
-            this.ipAddressComboBox.SelectedValueChanged += new System.EventHandler(this.IpAddressComboBox_SelectedValueChanged);
-            // 
-            // ipPortLabel
-            // 
-            this.ipPortLabel.AutoSize = true;
-            this.ipPortLabel.Location = new System.Drawing.Point(430, 54);
-            this.ipPortLabel.Name = "ipPortLabel";
-            this.ipPortLabel.Size = new System.Drawing.Size(53, 12);
-            this.ipPortLabel.TabIndex = 0;
-            this.ipPortLabel.Text = "端口号：";
             // 
             // ipPortNud
             // 
@@ -150,7 +166,7 @@
             0});
             this.ipPortNud.Name = "ipPortNud";
             this.ipPortNud.Size = new System.Drawing.Size(80, 21);
-            this.ipPortNud.TabIndex = 3;
+            this.ipPortNud.TabIndex = 2;
             this.toolTip.SetToolTip(this.ipPortNud, "请输入IP地址对应的端口号");
             this.ipPortNud.Value = new decimal(new int[] {
             7070,
@@ -159,12 +175,21 @@
             0});
             this.ipPortNud.ValueChanged += new System.EventHandler(this.IpPortNud_ValueChanged);
             // 
+            // ipPortLabel
+            // 
+            this.ipPortLabel.AutoSize = true;
+            this.ipPortLabel.Location = new System.Drawing.Point(430, 54);
+            this.ipPortLabel.Name = "ipPortLabel";
+            this.ipPortLabel.Size = new System.Drawing.Size(53, 12);
+            this.ipPortLabel.TabIndex = 0;
+            this.ipPortLabel.Text = "端口号：";
+            // 
             // reloadConfigBtn
             // 
             this.reloadConfigBtn.Location = new System.Drawing.Point(565, 50);
             this.reloadConfigBtn.Name = "reloadConfigBtn";
             this.reloadConfigBtn.Size = new System.Drawing.Size(90, 23);
-            this.reloadConfigBtn.TabIndex = 4;
+            this.reloadConfigBtn.TabIndex = 3;
             this.reloadConfigBtn.Text = "重新加载配置";
             this.toolTip.SetToolTip(this.reloadConfigBtn, "点击重新加载配置");
             this.reloadConfigBtn.UseVisualStyleBackColor = true;
@@ -175,11 +200,20 @@
             this.aboutBtn.Location = new System.Drawing.Point(705, 50);
             this.aboutBtn.Name = "aboutBtn";
             this.aboutBtn.Size = new System.Drawing.Size(55, 53);
-            this.aboutBtn.TabIndex = 5;
+            this.aboutBtn.TabIndex = 4;
             this.aboutBtn.Text = "关于";
             this.toolTip.SetToolTip(this.aboutBtn, "点击显示关于界面");
             this.aboutBtn.UseVisualStyleBackColor = true;
             this.aboutBtn.Click += new System.EventHandler(this.AboutBtn_Click);
+            // 
+            // shareLinkText
+            // 
+            this.shareLinkText.BackColor = System.Drawing.SystemColors.Window;
+            this.shareLinkText.Location = new System.Drawing.Point(70, 80);
+            this.shareLinkText.Name = "shareLinkText";
+            this.shareLinkText.ReadOnly = true;
+            this.shareLinkText.Size = new System.Drawing.Size(440, 21);
+            this.shareLinkText.TabIndex = 5;
             // 
             // shareLinkLabel
             // 
@@ -190,21 +224,12 @@
             this.shareLinkLabel.TabIndex = 0;
             this.shareLinkLabel.Text = "分享地址：";
             // 
-            // shareLinkText
-            // 
-            this.shareLinkText.BackColor = System.Drawing.SystemColors.Window;
-            this.shareLinkText.Location = new System.Drawing.Point(70, 80);
-            this.shareLinkText.Name = "shareLinkText";
-            this.shareLinkText.ReadOnly = true;
-            this.shareLinkText.Size = new System.Drawing.Size(440, 21);
-            this.shareLinkText.TabIndex = 6;
-            // 
             // copyBtn
             // 
             this.copyBtn.Location = new System.Drawing.Point(515, 80);
             this.copyBtn.Name = "copyBtn";
             this.copyBtn.Size = new System.Drawing.Size(45, 23);
-            this.copyBtn.TabIndex = 7;
+            this.copyBtn.TabIndex = 6;
             this.copyBtn.Text = "复制";
             this.toolTip.SetToolTip(this.copyBtn, "点击可以复制分享地址。");
             this.copyBtn.UseVisualStyleBackColor = true;
@@ -215,20 +240,33 @@
             this.openBtn.Location = new System.Drawing.Point(565, 80);
             this.openBtn.Name = "openBtn";
             this.openBtn.Size = new System.Drawing.Size(90, 23);
-            this.openBtn.TabIndex = 8;
+            this.openBtn.TabIndex = 7;
             this.openBtn.Text = "用浏览器打开";
             this.openBtn.UseVisualStyleBackColor = true;
             this.openBtn.Click += new System.EventHandler(this.OpenBtn_Click);
+            // 
+            // middlePanel
+            // 
+            this.middlePanel.Controls.Add(this.encryptionBox);
+            this.middlePanel.Controls.Add(this.coordinatesBox);
+            this.middlePanel.Controls.Add(this.scalingBox);
+            this.middlePanel.Controls.Add(this.videoBox);
+            this.middlePanel.Controls.Add(this.userCountLinkLabel);
+            this.middlePanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.middlePanel.Location = new System.Drawing.Point(0, 110);
+            this.middlePanel.Name = "middlePanel";
+            this.middlePanel.Size = new System.Drawing.Size(768, 110);
+            this.middlePanel.TabIndex = 3;
             // 
             // encryptionBox
             // 
             this.encryptionBox.Controls.Add(this.isEncryptionCb);
             this.encryptionBox.Controls.Add(this.pwdText);
             this.encryptionBox.Controls.Add(this.pwdLabel);
-            this.encryptionBox.Location = new System.Drawing.Point(10, 120);
+            this.encryptionBox.Location = new System.Drawing.Point(10, 10);
             this.encryptionBox.Name = "encryptionBox";
             this.encryptionBox.Size = new System.Drawing.Size(140, 70);
-            this.encryptionBox.TabIndex = 9;
+            this.encryptionBox.TabIndex = 1;
             this.encryptionBox.TabStop = false;
             this.encryptionBox.Text = "密码验证";
             // 
@@ -250,7 +288,7 @@
             this.pwdText.Location = new System.Drawing.Point(50, 40);
             this.pwdText.Name = "pwdText";
             this.pwdText.Size = new System.Drawing.Size(80, 21);
-            this.pwdText.TabIndex = 3;
+            this.pwdText.TabIndex = 2;
             this.toolTip.SetToolTip(this.pwdText, "请输入密码");
             // 
             // pwdLabel
@@ -276,10 +314,10 @@
             this.coordinatesBox.Controls.Add(this.screenHNud);
             this.coordinatesBox.Controls.Add(this.screenHLabel);
             this.coordinatesBox.Controls.Add(this.captureScreenCoordinatesBtn);
-            this.coordinatesBox.Location = new System.Drawing.Point(160, 120);
+            this.coordinatesBox.Location = new System.Drawing.Point(160, 10);
             this.coordinatesBox.Name = "coordinatesBox";
             this.coordinatesBox.Size = new System.Drawing.Size(265, 100);
-            this.coordinatesBox.TabIndex = 10;
+            this.coordinatesBox.TabIndex = 2;
             this.coordinatesBox.TabStop = false;
             this.coordinatesBox.Text = "选取位置";
             // 
@@ -473,10 +511,10 @@
             this.scalingBox.Controls.Add(this.videoWLabel);
             this.scalingBox.Controls.Add(this.videoHNud);
             this.scalingBox.Controls.Add(this.videoHLabel);
-            this.scalingBox.Location = new System.Drawing.Point(435, 120);
+            this.scalingBox.Location = new System.Drawing.Point(435, 10);
             this.scalingBox.Name = "scalingBox";
             this.scalingBox.Size = new System.Drawing.Size(185, 100);
-            this.scalingBox.TabIndex = 11;
+            this.scalingBox.TabIndex = 3;
             this.scalingBox.TabStop = false;
             this.scalingBox.Text = "视频尺寸";
             // 
@@ -615,10 +653,10 @@
             this.videoBox.Controls.Add(this.videoFrameLabel);
             this.videoBox.Controls.Add(this.videoQualityNud);
             this.videoBox.Controls.Add(this.videoQualityLabel);
-            this.videoBox.Location = new System.Drawing.Point(630, 120);
+            this.videoBox.Location = new System.Drawing.Point(630, 10);
             this.videoBox.Name = "videoBox";
             this.videoBox.Size = new System.Drawing.Size(130, 100);
-            this.videoBox.TabIndex = 12;
+            this.videoBox.TabIndex = 4;
             this.videoBox.TabStop = false;
             this.videoBox.Text = "视频设置";
             // 
@@ -694,36 +732,35 @@
             this.videoQualityLabel.TabIndex = 0;
             this.videoQualityLabel.Text = "视频质量：";
             // 
-            // startSharingScreenBtn
+            // userCountLinkLabel
             // 
-            this.startSharingScreenBtn.Font = new System.Drawing.Font("宋体", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.startSharingScreenBtn.Location = new System.Drawing.Point(125, 230);
-            this.startSharingScreenBtn.Name = "startSharingScreenBtn";
-            this.startSharingScreenBtn.Size = new System.Drawing.Size(185, 40);
-            this.startSharingScreenBtn.TabIndex = 1;
-            this.startSharingScreenBtn.Text = "开始共享";
-            this.toolTip.SetToolTip(this.startSharingScreenBtn, "点击开始共享或结束共享");
-            this.startSharingScreenBtn.UseVisualStyleBackColor = true;
-            this.startSharingScreenBtn.Click += new System.EventHandler(this.StartSharingScreenBtn_Click);
+            this.userCountLinkLabel.AutoSize = true;
+            this.userCountLinkLabel.Location = new System.Drawing.Point(10, 90);
+            this.userCountLinkLabel.Name = "userCountLinkLabel";
+            this.userCountLinkLabel.Size = new System.Drawing.Size(119, 12);
+            this.userCountLinkLabel.TabIndex = 5;
+            this.userCountLinkLabel.TabStop = true;
+            this.userCountLinkLabel.Text = "当前在线用户数量：0";
+            this.toolTip.SetToolTip(this.userCountLinkLabel, "点击显示用户在线历史界面");
+            this.userCountLinkLabel.Click += new System.EventHandler(this.UserCountLinkLabel_Click);
             // 
-            // logText
+            // bottomPanel
             // 
-            this.logText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.logText.BackColor = System.Drawing.SystemColors.Window;
-            this.logText.Location = new System.Drawing.Point(10, 280);
-            this.logText.Multiline = true;
-            this.logText.Name = "logText";
-            this.logText.ReadOnly = true;
-            this.logText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.logText.Size = new System.Drawing.Size(415, 140);
-            this.logText.TabIndex = 0;
-            this.logText.TabStop = false;
+            this.bottomPanel.Controls.Add(this.previewLabel);
+            this.bottomPanel.Controls.Add(this.previewImg);
+            this.bottomPanel.Controls.Add(this.startSharingScreenBtn);
+            this.bottomPanel.Controls.Add(this.logText);
+            this.bottomPanel.Controls.Add(this.clearLogLinkLabel);
+            this.bottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.bottomPanel.Location = new System.Drawing.Point(0, 220);
+            this.bottomPanel.Name = "bottomPanel";
+            this.bottomPanel.Size = new System.Drawing.Size(768, 212);
+            this.bottomPanel.TabIndex = 1;
             // 
             // previewLabel
             // 
             this.previewLabel.AutoSize = true;
-            this.previewLabel.Location = new System.Drawing.Point(545, 310);
+            this.previewLabel.Location = new System.Drawing.Point(545, 90);
             this.previewLabel.Name = "previewLabel";
             this.previewLabel.Size = new System.Drawing.Size(101, 24);
             this.previewLabel.TabIndex = 0;
@@ -734,7 +771,7 @@
             // 
             // previewImg
             // 
-            this.previewImg.Location = new System.Drawing.Point(435, 230);
+            this.previewImg.Location = new System.Drawing.Point(435, 10);
             this.previewImg.Margin = new System.Windows.Forms.Padding(0);
             this.previewImg.Name = "previewImg";
             this.previewImg.Size = new System.Drawing.Size(325, 190);
@@ -743,25 +780,37 @@
             this.previewImg.TabStop = false;
             this.previewImg.Click += new System.EventHandler(this.PreviewImg_Click);
             // 
-            // userCountLinkLabel
+            // startSharingScreenBtn
             // 
-            this.userCountLinkLabel.AutoSize = true;
-            this.userCountLinkLabel.Location = new System.Drawing.Point(10, 200);
-            this.userCountLinkLabel.Name = "userCountLinkLabel";
-            this.userCountLinkLabel.Size = new System.Drawing.Size(119, 12);
-            this.userCountLinkLabel.TabIndex = 13;
-            this.userCountLinkLabel.TabStop = true;
-            this.userCountLinkLabel.Text = "当前在线用户数量：0";
-            this.toolTip.SetToolTip(this.userCountLinkLabel, "点击显示用户在线历史界面");
-            this.userCountLinkLabel.Click += new System.EventHandler(this.UserCountLinkLabel_Click);
+            this.startSharingScreenBtn.Font = new System.Drawing.Font("宋体", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.startSharingScreenBtn.Location = new System.Drawing.Point(125, 10);
+            this.startSharingScreenBtn.Name = "startSharingScreenBtn";
+            this.startSharingScreenBtn.Size = new System.Drawing.Size(185, 40);
+            this.startSharingScreenBtn.TabIndex = 1;
+            this.startSharingScreenBtn.Text = "开始共享";
+            this.toolTip.SetToolTip(this.startSharingScreenBtn, "点击开始共享或结束共享");
+            this.startSharingScreenBtn.UseVisualStyleBackColor = true;
+            this.startSharingScreenBtn.Click += new System.EventHandler(this.StartSharingScreenBtn_Click);
+            // 
+            // logText
+            // 
+            this.logText.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.logText.BackColor = System.Drawing.SystemColors.Window;
+            this.logText.Location = new System.Drawing.Point(10, 60);
+            this.logText.Multiline = true;
+            this.logText.Name = "logText";
+            this.logText.ReadOnly = true;
+            this.logText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.logText.Size = new System.Drawing.Size(415, 140);
+            this.logText.TabIndex = 3;
             // 
             // clearLogLinkLabel
             // 
             this.clearLogLinkLabel.AutoSize = true;
-            this.clearLogLinkLabel.Location = new System.Drawing.Point(360, 260);
+            this.clearLogLinkLabel.Location = new System.Drawing.Point(360, 40);
             this.clearLogLinkLabel.Name = "clearLogLinkLabel";
             this.clearLogLinkLabel.Size = new System.Drawing.Size(53, 12);
-            this.clearLogLinkLabel.TabIndex = 14;
+            this.clearLogLinkLabel.TabIndex = 2;
             this.clearLogLinkLabel.TabStop = true;
             this.clearLogLinkLabel.Text = "清空日志";
             this.toolTip.SetToolTip(this.clearLogLinkLabel, "点击清空日志");
@@ -779,27 +828,9 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(768, 432);
-            this.Controls.Add(this.previewLabel);
-            this.Controls.Add(this.previewImg);
-            this.Controls.Add(this.shareScreenLabel);
-            this.Controls.Add(this.ipAddressComboBox);
-            this.Controls.Add(this.ipAddressLabel);
-            this.Controls.Add(this.ipPortNud);
-            this.Controls.Add(this.ipPortLabel);
-            this.Controls.Add(this.reloadConfigBtn);
-            this.Controls.Add(this.aboutBtn);
-            this.Controls.Add(this.shareLinkText);
-            this.Controls.Add(this.shareLinkLabel);
-            this.Controls.Add(this.copyBtn);
-            this.Controls.Add(this.openBtn);
-            this.Controls.Add(this.encryptionBox);
-            this.Controls.Add(this.coordinatesBox);
-            this.Controls.Add(this.scalingBox);
-            this.Controls.Add(this.videoBox);
-            this.Controls.Add(this.startSharingScreenBtn);
-            this.Controls.Add(this.logText);
-            this.Controls.Add(this.userCountLinkLabel);
-            this.Controls.Add(this.clearLogLinkLabel);
+            this.Controls.Add(this.topPanel);
+            this.Controls.Add(this.middlePanel);
+            this.Controls.Add(this.bottomPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = global::ScreenShare.Properties.Resources.icon;
             this.MaximizeBox = false;
@@ -808,7 +839,11 @@
             this.Text = "屏幕共享";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ScreenShare_FormClosing);
             this.SizeChanged += new System.EventHandler(this.ScreenShare_SizeChanged);
+            this.topPanel.ResumeLayout(false);
+            this.topPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ipPortNud)).EndInit();
+            this.middlePanel.ResumeLayout(false);
+            this.middlePanel.PerformLayout();
             this.encryptionBox.ResumeLayout(false);
             this.encryptionBox.PerformLayout();
             this.coordinatesBox.ResumeLayout(false);
@@ -826,15 +861,21 @@
             this.videoBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.videoFrameNud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.videoQualityNud)).EndInit();
+            this.bottomPanel.ResumeLayout(false);
+            this.bottomPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.previewImg)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
         /* 头部 */
+        /// <summary>
+        /// 头部Panel
+        /// </summary>
+        private System.Windows.Forms.Panel topPanel;
+
         /// <summary>
         /// 屏幕共享Label
         /// </summary>
@@ -879,6 +920,12 @@
         /// 用浏览器打开Button
         /// </summary>
         private System.Windows.Forms.Button openBtn;
+
+        /* 中部 */
+        /// <summary>
+        /// 中部Panel
+        /// </summary>
+        private System.Windows.Forms.Panel middlePanel;
 
         /* 密码验证GroupBox */
         /// <summary>
@@ -1012,19 +1059,25 @@
         /// </summary>
         private System.Windows.Forms.NumericUpDown videoQualityNud;
 
-        /* 开始分享按钮 */
+        /// <summary>
+        /// 当前在线用户数量LinkLabel
+        /// </summary>
+        private System.Windows.Forms.LinkLabel userCountLinkLabel;
+
+        /* 底部 */
+        /// <summary>
+        /// 底部Panel
+        /// </summary>
+        private System.Windows.Forms.Panel bottomPanel;
+
         /// <summary>
         /// 开始分享Button
         /// </summary>
         private System.Windows.Forms.Button startSharingScreenBtn;
-
-        /* 日志 */
         /// <summary>
         /// 日志TextBox
         /// </summary>
         private System.Windows.Forms.TextBox logText;
-
-        /* 预览 */
         /// <summary>
         /// 预览Label
         /// </summary>
@@ -1033,14 +1086,6 @@
         /// 预览图像PictureBox
         /// </summary>
         private System.Windows.Forms.PictureBox previewImg;
-
-        /* 当前在线用户数量 */
-        /// <summary>
-        /// 当前在线用户数量LinkLabel
-        /// </summary>
-        private System.Windows.Forms.LinkLabel userCountLinkLabel;
-
-        /* 清空日志 */
         /// <summary>
         /// 清空日志LinkLabel
         /// </summary>
@@ -1057,6 +1102,5 @@
         /// 通知NotifyIcon
         /// </summary>
         private System.Windows.Forms.NotifyIcon notifyIcon;
-
     }
 }

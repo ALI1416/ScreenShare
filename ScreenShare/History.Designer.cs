@@ -213,20 +213,71 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.DataGridView tableDataGridView;
-        private System.Windows.Forms.DataGridViewTextBoxColumn status;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ip;
-        private System.Windows.Forms.DataGridViewTextBoxColumn online;
-        private System.Windows.Forms.DataGridViewTextBoxColumn offline;
-        private System.Windows.Forms.DataGridViewTextBoxColumn interval;
-        private System.Windows.Forms.LinkLabel refreshLinkLabel;
-        private System.Windows.Forms.CheckBox onlyOnlineCheckBox;
-        private System.Windows.Forms.Label titleLabel;
+       
+        /* 头部 */
+        /// <summary>
+        /// 头部Panel
+        /// </summary>
         private System.Windows.Forms.Panel topPanel;
+
+        /// <summary>
+        /// 用户在线历史Label
+        /// </summary>
+        private System.Windows.Forms.Label titleLabel;
+        /// <summary>
+        /// 仅显示在线用户CheckBox
+        /// </summary>
+        private System.Windows.Forms.CheckBox onlyOnlineCheckBox;
+        /// <summary>
+        /// 刷新LinkLabel
+        /// </summary>
+        private System.Windows.Forms.LinkLabel refreshLinkLabel;
+
+        /* 底部 */
+        /// <summary>
+        /// 底部Panel
+        /// </summary>
         private System.Windows.Forms.Panel bottomPanel;
-        private System.Windows.Forms.Label countLabel;
+
+        /* 表格DataGridView */
+        /// <summary>
+        /// 表格DataGridView
+        /// </summary>
+        private System.Windows.Forms.DataGridView tableDataGridView;
+        /// <summary>
+        /// 表格字段`状态`DataGridViewTextBoxColumn
+        /// </summary>
+        private System.Windows.Forms.DataGridViewTextBoxColumn status;
+        /// <summary>
+        /// 表格字段`IP地址`DataGridViewTextBoxColumn
+        /// </summary>
+        private System.Windows.Forms.DataGridViewTextBoxColumn ip;
+        /// <summary>
+        /// 表格字段`上线时间`DataGridViewTextBoxColumn
+        /// </summary>
+        private System.Windows.Forms.DataGridViewTextBoxColumn online;
+        /// <summary>
+        /// 表格字段`下线时间`DataGridViewTextBoxColumn
+        /// </summary>
+        private System.Windows.Forms.DataGridViewTextBoxColumn offline;
+        /// <summary>
+        /// 表格字段`连接时长(分钟)`DataGridViewTextBoxColumn
+        /// </summary>
+        private System.Windows.Forms.DataGridViewTextBoxColumn interval;
+
+        /// <summary>
+        /// 当前在线用户数量Label
+        /// </summary>
         private System.Windows.Forms.Label onlineCountLabel;
+        /// <summary>
+        /// 累计访问用户数量Label
+        /// </summary>
+        private System.Windows.Forms.Label countLabel;
+
+        /* 提示 */
+        /// <summary>
+        /// 提示ToolTip
+        /// </summary>
         private System.Windows.Forms.ToolTip toolTip;
     }
 }

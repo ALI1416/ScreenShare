@@ -442,9 +442,9 @@ namespace ScreenShare
                     }
                 }, null);
             }
+            // 未知错误
             catch
             {
-                // 未知错误
                 SocketClientOffline(client);
                 return;
             }
@@ -456,7 +456,7 @@ namespace ScreenShare
         /// <param name="stream">MemoryStream</param>
         private void SocketSendMemoryStream(MemoryStream stream)
         {
-            string header = "\n--boundary\nContent-Type: image/png\nContent-Length: " + stream.Length + "\n\n";
+            string header = "\n--boundary\nContent-Type: image/jpeg\nContent-Length: " + stream.Length + "\n\n";
             byte[] data = new byte[header.Length + stream.Length + 1];
             Encoding.ASCII.GetBytes(header).CopyTo(data, 0);
             stream.ToArray().CopyTo(data, header.Length);
@@ -757,10 +757,13 @@ namespace ScreenShare
             // 全窗口显示
             if (enable)
             {
-                previewImg.Dock = DockStyle.Fill;
                 FormBorderStyle = FormBorderStyle.Sizable;
                 MaximizeBox = true;
                 startSharingScreenBtn.Enabled = false;
+                topPanel.Visible = false;
+                middlePanel.Visible = false;
+                bottomPanel.Dock = DockStyle.Fill;
+                previewImg.Dock = DockStyle.Fill;
                 if (isWorking)
                 {
                     previewLabel.Visible = false;
@@ -771,10 +774,13 @@ namespace ScreenShare
             {
                 Size = new Size(784, 471);
                 WindowState = FormWindowState.Normal;
-                previewImg.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
                 FormBorderStyle = FormBorderStyle.FixedDialog;
                 MaximizeBox = false;
                 startSharingScreenBtn.Enabled = true;
+                topPanel.Visible = true;
+                middlePanel.Visible = true;
+                bottomPanel.Dock = DockStyle.Bottom;
+                previewImg.Dock = DockStyle.None;
                 if (isWorking)
                 {
                     previewLabel.Visible = true;
