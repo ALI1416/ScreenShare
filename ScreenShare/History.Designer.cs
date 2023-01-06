@@ -110,7 +110,7 @@
             // interval
             // 
             this.interval.FillWeight = 150F;
-            this.interval.HeaderText = "连接时长(分钟)";
+            this.interval.HeaderText = "连接时长\n(分钟)";
             this.interval.Name = "interval";
             this.interval.ReadOnly = true;
             // 

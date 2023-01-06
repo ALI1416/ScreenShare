@@ -94,7 +94,7 @@
     <Compile Include="History.Designer.cs">
       <DependentUpon>History.cs</DependentUpon>
     </Compile>
-    <Compile Include="SocketHistory.cs" />
+    <Compile Include="Model\SocketClient.cs" />
     <Compile Include="Util\Utils.cs" />
     <Compile Include="Util\ImageUtils.cs" />
     <Compile Include="DrawScreen.cs">
@@ -111,8 +111,10 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\WebSocketUtils.cs" />
     <EmbeddedResource Include="History.resx">
       <DependentUpon>History.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>

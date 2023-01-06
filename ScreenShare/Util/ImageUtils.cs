@@ -4,13 +4,14 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Forms;
 
-namespace ScreenShare
+namespace ScreenShare.Util
 {
 
-    /********** 图像工具类 **********/
+    /// <summary>
+    /// 图像工具
+    /// </summary>
     internal class ImageUtils
     {
-
         /// <summary>
         /// 默认图像格式
         /// </summary>

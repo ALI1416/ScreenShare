@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScreenShare.Model;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace ScreenShare
@@ -9,14 +9,14 @@ namespace ScreenShare
     {
 
         /// <summary>
-        /// socket客户端历史
+        /// socket客户端
         /// </summary>
-        private Dictionary<int, SocketHistory> socketClientHistory;
+        private readonly List<SocketClient> socketClientList = new List<SocketClient>();
 
-        public History(Dictionary<int, SocketHistory> socketClientHistory)
+        public History(List<SocketClient> socketClientList)
         {
             InitializeComponent();
-            this.socketClientHistory = socketClientHistory;
+            this.socketClientList = socketClientList;
             Init(false);
         }
 
@@ -26,43 +26,42 @@ namespace ScreenShare
         private void Init(bool onlyOnline)
         {
             tableDataGridView.Rows.Clear();
-            var array = socketClientHistory.ToArray();
             var now = DateTime.Now;
             int online = 0;
-            foreach (var history in array)
+            var list = socketClientList.ToArray();
+            foreach (var socketClient in list)
             {
-                var value = history.Value;
                 if (onlyOnline)
                 {
-                    if (value.Offline == DateTime.MinValue)
+                    if (socketClient.Offline == DateTime.MinValue)
                     {
                         online++;
                         int index = tableDataGridView.Rows.Add();
                         tableDataGridView.Rows[index].Cells[0].Value = "在线";
-                        tableDataGridView.Rows[index].Cells[1].Value = value.Ip;
-                        tableDataGridView.Rows[index].Cells[2].Value = value.Online.ToString("HH:mm:ss.fff");
-                        tableDataGridView.Rows[index].Cells[4].Value = Convert.ToDouble(now.Subtract(value.Online).TotalMinutes).ToString("0.00");
+                        tableDataGridView.Rows[index].Cells[1].Value = socketClient.Ip;
+                        tableDataGridView.Rows[index].Cells[2].Value = socketClient.Online.ToString("HH:mm:ss.fff");
+                        tableDataGridView.Rows[index].Cells[4].Value = Convert.ToDouble(now.Subtract(socketClient.Online).TotalMinutes).ToString("0.00");
                     }
                 }
                 else
                 {
                     int index = tableDataGridView.Rows.Add();
-                    tableDataGridView.Rows[index].Cells[1].Value = value.Ip;
-                    tableDataGridView.Rows[index].Cells[2].Value = value.Online.ToString("HH:mm:ss.fff");
-                    if (value.Offline == DateTime.MinValue)
+                    tableDataGridView.Rows[index].Cells[1].Value = socketClient.Ip;
+                    tableDataGridView.Rows[index].Cells[2].Value = socketClient.Online.ToString("HH:mm:ss.fff");
+                    if (socketClient.Offline == DateTime.MinValue)
                     {
                         online++;
                         tableDataGridView.Rows[index].Cells[0].Value = "在线";
-                        tableDataGridView.Rows[index].Cells[4].Value = Convert.ToDouble(now.Subtract(value.Online).TotalMinutes).ToString("0.00");
+                        tableDataGridView.Rows[index].Cells[4].Value = Convert.ToDouble(now.Subtract(socketClient.Online).TotalMinutes).ToString("0.00");
                     }
                     else
                     {
-                        tableDataGridView.Rows[index].Cells[3].Value = value.Offline.ToString("HH:mm:ss.fff");
-                        tableDataGridView.Rows[index].Cells[4].Value = Convert.ToDouble(value.Offline.Subtract(value.Online).TotalMinutes).ToString("0.00");
+                        tableDataGridView.Rows[index].Cells[3].Value = socketClient.Offline.ToString("HH:mm:ss.fff");
+                        tableDataGridView.Rows[index].Cells[4].Value = Convert.ToDouble(socketClient.Offline.Subtract(socketClient.Online).TotalMinutes).ToString("0.00");
                     }
                 }
             }
-            countLabel.Text = "累计访问用户数量：" + array.Length;
+            countLabel.Text = "累计访问用户数量：" + list.Length;
             onlineCountLabel.Text = "当前在线用户数量：" + online;
         }
 

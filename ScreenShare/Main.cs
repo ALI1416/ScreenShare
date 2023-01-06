@@ -1,4 +1,6 @@
 ﻿using ScreenShare.Properties;
+using ScreenShare.Util;
+using ScreenShare.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -42,23 +45,7 @@ namespace ScreenShare
         /// <summary>
         /// socket客户端
         /// </summary>
-        private readonly List<Socket> socketClient = new List<Socket>();
-        /// <summary>
-        /// socket客户端历史
-        /// </summary>
-        private readonly Dictionary<int, SocketHistory> socketClientHistory = new Dictionary<int, SocketHistory>();
-        /// <summary>
-        /// socket接收数据缓冲区
-        /// </summary>
-        private readonly byte[] socketBuffer = new byte[1024];
-        /// <summary>
-        /// socket响应头
-        /// </summary>
-        private readonly static byte[] socketResponseHeader = Encoding.ASCII.GetBytes("HTTP/1.1 200 OK\nContent-Type: multipart/x-mixed-replace; boundary=--boundary\n");
-        /// <summary>
-        /// socket响应尾
-        /// </summary>
-        private readonly static byte[] socketResponseEnd = Encoding.ASCII.GetBytes("\n");
+        private static readonly List<SocketClient> socketClientList = new List<SocketClient>();
 
         #endregion
 
@@ -297,9 +284,10 @@ namespace ScreenShare
         {
             // 删除防火墙规则
             Utils.RemoveNetFw(((IPEndPoint)socketServer.LocalEndPoint).Port);
-            foreach (Socket client in socketClient.ToArray())
+            foreach (var socketClient in socketClientList.FindAll(e => e.Client != null))
             {
-                SocketClientOffline(client);
+                socketClient.Close();
+                UpdateSocketUi(socketClient.Ip, false);
             }
             socketServer.Close();
         }
@@ -320,15 +308,8 @@ namespace ScreenShare
             {
                 return;
             }
-            try
-            {
-                // 客户端上线
-                SocketClientOnline(socketServer.EndAccept(ar));
-            }
-            // 未知错误
-            catch
-            {
-            }
+            // 客户端上线
+            SocketClientOnline(socketServer.EndAccept(ar));
         }
 
         /// <summary>
@@ -338,55 +319,44 @@ namespace ScreenShare
         private void SocketClientOnline(Socket client)
         {
             // 已存在
-            if (socketClient.Contains(client))
+            if (socketClientList.Exists(e => e.Client == client))
             {
                 return;
             }
-            string ip;
+            SocketClient socketClient = null;
             try
             {
-                // 获取IP地址
-                ip = client.RemoteEndPoint.ToString();
+                socketClient = new SocketClient(client);
                 // 设置超时10秒
                 client.SendTimeout = 10000;
                 // 接收消息
-                client.BeginReceive(socketBuffer, 0, socketBuffer.Length, SocketFlags.None, SocketRecevice, client);
-                // 发送响应头
-                SocketSendData(client, socketResponseHeader);
+                client.BeginReceive(socketClient.Buffer, 0, socketClient.Buffer.Length, SocketFlags.None, SocketRecevice, socketClient);
+                socketClientList.Add(socketClient);
+                UpdateSocketUi(socketClient.Ip, true);
             }
             catch
             {
-                client.Close();
+                if (socketClient != null)
+                {
+                    socketClient.Close();
+                }
                 return;
             }
-            socketClient.Add(client);
-            socketClientHistory.Add(client.GetHashCode(), new SocketHistory(ip, DateTime.Now));
-            UpdateSocketUi(ip, true);
         }
 
         /// <summary>
         /// socket客户端下线
         /// </summary>
-        /// <param name="client">客户端</param>
-        private void SocketClientOffline(Socket client)
+        /// <param name="socketClient">SocketClient</param>
+        private void SocketClientOffline(SocketClient socketClient)
         {
             // 不存在
-            if (!socketClient.Contains(client))
+            if (!socketClientList.FindAll(e => e.Client != null).Contains(socketClient))
             {
                 return;
             }
-            client.Close();
-            socketClient.Remove(client);
-            // 获取该客户端
-            if (socketClientHistory.TryGetValue(client.GetHashCode(), out SocketHistory history))
-            {
-                // 没有下线的客户端才可以下线
-                if (history.Offline == DateTime.MinValue)
-                {
-                    history.Offline = DateTime.Now;
-                    UpdateSocketUi(history.Ip, false);
-                }
-            }
+            socketClient.Close();
+            UpdateSocketUi(socketClient.Ip, false);
         }
 
         /// <summary>
@@ -396,48 +366,82 @@ namespace ScreenShare
         private void SocketRecevice(IAsyncResult ar)
         {
             // 获取当前客户端
-            Socket client = ar.AsyncState as Socket;
+            SocketClient socketClient = ar.AsyncState as SocketClient;
             try
             {
                 // 获取接收数据长度
-                int length = client.EndReceive(ar);
+                int length = socketClient.Client.EndReceive(ar);
                 // 客户端主动断开连接时，会发送0字节消息
                 if (length == 0)
                 {
-                    SocketClientOffline(client);
+                    SocketClientOffline(socketClient);
                     return;
                 }
-                // 继续接收消息
-                client.BeginReceive(socketBuffer, 0, length, SocketFlags.None, SocketRecevice, client);
+                // 首次连接
+                if (socketClient.Buffer[0] == 71)
+                {
+                    // 解码消息
+                    string msg = Encoding.UTF8.GetString(socketClient.Buffer, 0, length);
+                    // 判断是否符合webSocket报文格式
+                    if (msg.Contains("Sec-WebSocket-Key"))
+                    {
+                        // 握手
+                        SocketSendRaw(socketClient, WebSocketUtils.HandShake(msg));
+                        // 继续接收消息
+                        socketClient.Client.BeginReceive(socketClient.Buffer, 0, length, SocketFlags.None, SocketRecevice, socketClient);
+                    }
+                    // 不符合格式，关闭连接
+                    else
+                    {
+                        SocketClientOffline(socketClient);
+                        return;
+                    }
+                }
+                else
+                {
+                    // 继续接收消息
+                    socketClient.Client.BeginReceive(socketClient.Buffer, 0, length, SocketFlags.None, SocketRecevice, socketClient);
+                    string data = WebSocketUtils.DecodeDataString(socketClient.Buffer, length);
+                    // 客户端关闭连接
+                    if (data == null)
+                    {
+                        SocketClientOffline(socketClient);
+                        return;
+                    }
+                    else
+                    {
+                        socketClient.Transmission = false;
+                    }
+                }
             }
             // 超时后失去连接、未知错误
             catch
             {
-                SocketClientOffline(client);
+                SocketClientOffline(socketClient);
                 return;
             }
         }
 
         /// <summary>
-        /// socket发送消息
+        /// socket发送原始消息
         /// </summary>
-        /// <param name="client">客户端</param>
+        /// <param name="socketClient">SocketClient</param>
         /// <param name="data">byte[]</param>
-        private void SocketSendData(Socket client, byte[] data)
+        private void SocketSendRaw(SocketClient socketClient, byte[] data)
         {
             try
             {
                 // 发送消息
-                client.BeginSend(data, 0, data.Length, SocketFlags.None, asyncResult =>
+                socketClient.Client.BeginSend(data, 0, data.Length, SocketFlags.None, asyncResult =>
                 {
                     try
                     {
-                        client.EndSend(asyncResult);
+                        socketClient.Client.EndSend(asyncResult);
                     }
                     // 已失去连接
                     catch
                     {
-                        SocketClientOffline(client);
+                        SocketClientOffline(socketClient);
                         return;
                     }
                 }, null);
@@ -445,7 +449,7 @@ namespace ScreenShare
             // 未知错误
             catch
             {
-                SocketClientOffline(client);
+                SocketClientOffline(socketClient);
                 return;
             }
         }
@@ -454,16 +458,16 @@ namespace ScreenShare
         /// socket发送MemoryStream
         /// </summary>
         /// <param name="stream">MemoryStream</param>
-        private void SocketSendMemoryStream(MemoryStream stream)
+        /// <param name="list">List SocketClient</param>
+        private void SocketSendMemoryStream(MemoryStream stream, List<SocketClient> list)
         {
-            string header = "\n--boundary\nContent-Type: image/jpeg\nContent-Length: " + stream.Length + "\n\n";
-            byte[] data = new byte[header.Length + stream.Length + 1];
-            Encoding.ASCII.GetBytes(header).CopyTo(data, 0);
-            stream.ToArray().CopyTo(data, header.Length);
-            socketResponseEnd.CopyTo(data, data.Length - 1);
-            foreach (Socket client in socketClient.ToArray())
+            if (list.Count != 0)
             {
-                SocketSendData(client, data);
+                var data = stream.ToArray();
+                foreach (var client in list)
+                {
+                    SocketSendRaw(client, WebSocketUtils.CodedData(data, false));
+                }
             }
         }
 
@@ -475,7 +479,7 @@ namespace ScreenShare
         private void UpdateSocketUi(string ip, bool online)
         {
             /* 更新在线数量 */
-            string count = "当前在线用户数量：" + socketClient.Count;
+            string count = "当前在线用户数量：" + socketClientList.FindAll(e => e.Client != null).Count;
             // 利用委托，防止`线程间操作无效`
             Action<string> action = (data) =>
             {
@@ -507,28 +511,36 @@ namespace ScreenShare
             bool isDisplayCursor = isDisplayCursorCb.Checked;
             Rectangle screen = new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value);
             Size video = new Size((int)videoWNud.Value, (int)videoHNud.Value);
-            // 正常
+            // 普通
             if (screen.Size == video && videoQuality == 100)
             {
+                // 开启共享
                 while (isWorking)
                 {
-                    try
+                    // 获取在线 并且 可发送数据的用户列表
+                    var list = socketClientList.FindAll(e => (e.Client != null && !e.Transmission));
+                    // 符合条件的用户 或 正在预览
+                    if (list.Count != 0 || !(previewImg.Dock == DockStyle.None || WindowState == FormWindowState.Minimized))
                     {
-                        // 捕获屏幕
-                        bitmap = ImageUtils.CaptureScreenArea(screen, isDisplayCursor);
-                        // 保存到内存流
-                        stream.SetLength(0);
-                        ImageUtils.Save(bitmap, stream);
-                        // 发送给socket客户端
-                        SocketSendMemoryStream(stream);
-                        // 运行时更新预览图
-                        UpdatePreviewImgWhileWorking(bitmap);
+                        try
+                        {
+                            // 捕获屏幕
+                            bitmap = ImageUtils.CaptureScreenArea(screen, isDisplayCursor);
+                            // 保存到内存流
+                            stream.SetLength(0);
+                            ImageUtils.Save(bitmap, stream);
+                            // 发送给socket客户端
+                            SocketSendMemoryStream(stream, list);
+                            // 运行时更新预览图
+                            UpdatePreviewImgWhileWorking(bitmap);
+                        }
+                        catch
+                        {
+                            // 捕获屏幕异常处理(bitmap已被释放掉)
+                            CaptureScreenExceptionHandle(new Bitmap(stream));
+                        }
                     }
-                    catch
-                    {
-                        // 捕获屏幕异常处理(bitmap已被释放掉)
-                        CaptureScreenExceptionHandle(new Bitmap(stream));
-                    }
+                    // 延时
                     await Task.Delay(delay);
                 }
                 // 结束共享时更新预览图(bitmap已被释放掉)
@@ -539,17 +551,21 @@ namespace ScreenShare
             {
                 while (isWorking)
                 {
-                    try
+                    var list = socketClientList.FindAll(e => (e.Client != null && !e.Transmission));
+                    if (list.Count != 0 || !(previewImg.Dock == DockStyle.None || WindowState == FormWindowState.Minimized))
                     {
-                        bitmap = ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video, true);
-                        stream.SetLength(0);
-                        ImageUtils.Save(bitmap, stream);
-                        SocketSendMemoryStream(stream);
-                        UpdatePreviewImgWhileWorking(bitmap);
-                    }
-                    catch
-                    {
-                        CaptureScreenExceptionHandle(new Bitmap(stream));
+                        try
+                        {
+                            bitmap = ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video, true);
+                            stream.SetLength(0);
+                            ImageUtils.Save(bitmap, stream);
+                            SocketSendMemoryStream(stream, list);
+                            UpdatePreviewImgWhileWorking(bitmap);
+                        }
+                        catch
+                        {
+                            CaptureScreenExceptionHandle(new Bitmap(stream));
+                        }
                     }
                     await Task.Delay(delay);
                 }
@@ -560,17 +576,21 @@ namespace ScreenShare
             {
                 while (isWorking)
                 {
-                    try
+                    var list = socketClientList.FindAll(e => (e.Client != null && !e.Transmission));
+                    if (list.Count != 0 || !(previewImg.Dock == DockStyle.None || WindowState == FormWindowState.Minimized))
                     {
-                        bitmap = ImageUtils.CaptureScreenArea(screen, isDisplayCursor);
-                        stream.SetLength(0);
-                        ImageUtils.QualitySave(bitmap, videoQuality, stream);
-                        SocketSendMemoryStream(stream);
-                        UpdatePreviewImgWhileWorking(bitmap);
-                    }
-                    catch
-                    {
-                        CaptureScreenExceptionHandle(new Bitmap(stream));
+                        try
+                        {
+                            bitmap = ImageUtils.CaptureScreenArea(screen, isDisplayCursor);
+                            stream.SetLength(0);
+                            ImageUtils.QualitySave(bitmap, videoQuality, stream);
+                            SocketSendMemoryStream(stream, list);
+                            UpdatePreviewImgWhileWorking(bitmap);
+                        }
+                        catch
+                        {
+                            CaptureScreenExceptionHandle(new Bitmap(stream));
+                        }
                     }
                     await Task.Delay(delay);
                 }
@@ -581,17 +601,21 @@ namespace ScreenShare
             {
                 while (isWorking)
                 {
-                    try
+                    var list = socketClientList.FindAll(e => (e.Client != null && !e.Transmission));
+                    if (list.Count != 0 || !(previewImg.Dock == DockStyle.None || WindowState == FormWindowState.Minimized))
                     {
-                        bitmap = ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video, true);
-                        stream.SetLength(0);
-                        ImageUtils.QualitySave(bitmap, videoQuality, stream);
-                        SocketSendMemoryStream(stream);
-                        UpdatePreviewImgWhileWorking(bitmap);
-                    }
-                    catch
-                    {
-                        CaptureScreenExceptionHandle(new Bitmap(stream));
+                        try
+                        {
+                            bitmap = ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video, true);
+                            stream.SetLength(0);
+                            ImageUtils.QualitySave(bitmap, videoQuality, stream);
+                            SocketSendMemoryStream(stream, list);
+                            UpdatePreviewImgWhileWorking(bitmap);
+                        }
+                        catch
+                        {
+                            CaptureScreenExceptionHandle(new Bitmap(stream));
+                        }
                     }
                     await Task.Delay(delay);
                 }
@@ -1163,7 +1187,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void UserCountLinkLabel_Click(object sender, EventArgs e)
         {
-            new History(socketClientHistory).ShowDialog();
+            new History(socketClientList).ShowDialog();
         }
 
         /// <summary>

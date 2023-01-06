@@ -7,13 +7,14 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Windows.Forms;
 
-namespace ScreenShare
+namespace ScreenShare.Util
 {
 
-    /********** 工具类 **********/
+    /// <summary>
+    /// 通用工具
+    /// </summary>
     internal class Utils
     {
-
         /// <summary>
         /// 获取所有的IP地址
         /// </summary>
