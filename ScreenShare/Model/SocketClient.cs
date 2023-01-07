@@ -33,6 +33,30 @@ namespace ScreenShare.Model
         /// 数据传输中
         /// </summary>
         public bool Transmission { set; get; }
+        /// <summary>
+        /// 上一次记录时间
+        /// </summary>
+        public DateTime LastRecordTime { set; get; }
+        /// <summary>
+        /// 上一次记录字节数
+        /// </summary>
+        public int LastRecordByte { set; get; }
+        /// <summary>
+        /// 帧总数
+        /// </summary>
+        public int FrameCount { set; get; }
+        /// <summary>
+        /// 字节总数
+        /// </summary>
+        public int ByteCount { set; get; }
+        /// <summary>
+        /// 平均每秒帧数x100
+        /// </summary>
+        public int FrameAvg { set; get; }
+        /// <summary>
+        /// 平均每秒字节数
+        /// </summary>
+        public int ByteAvg { set; get; }
 
         /// <summary>
         /// 新建客户端
@@ -44,6 +68,7 @@ namespace ScreenShare.Model
             Buffer = new byte[1024];
             Ip = client.RemoteEndPoint.ToString();
             Online = DateTime.Now;
+            LastRecordTime = DateTime.Now;
         }
 
         /// <summary>
@@ -57,6 +82,27 @@ namespace ScreenShare.Model
                 Client = null;
                 Buffer = null;
                 Offline = DateTime.Now;
+            }
+        }
+
+        /// <summary>
+        /// 记录日志
+        /// </summary>
+        /// <param name="length">字节长度</param>
+        public void Record(int length)
+        {
+            Transmission = true;
+            ByteCount += length;
+            LastRecordByte += length;
+            // 每5帧采样一次
+            if ((++FrameCount) % 5 == 0)
+            {
+                var now = DateTime.Now;
+                var second = now.Subtract(LastRecordTime).TotalSeconds;
+                FrameAvg = (int)(500 / second);
+                ByteAvg = (int)(LastRecordByte / second);
+                LastRecordTime = now;
+                LastRecordByte = 0;
             }
         }
 

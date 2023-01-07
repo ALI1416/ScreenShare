@@ -9,7 +9,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -39,9 +38,9 @@ namespace ScreenShare
         /// </summary>
         private HttpListener httpServer;
         /// <summary>
-        /// socket服务器
+        /// socket服务端
         /// </summary>
-        private Socket socketServer;
+        private SocketServer socketServer;
         /// <summary>
         /// socket客户端
         /// </summary>
@@ -217,7 +216,7 @@ namespace ScreenShare
                         // 无需密码或密码正确
                         if (apiGetVideoInfo == null)
                         {
-                            apiGetVideoInfo = "{\"width\":" + videoWNud.Value + ",\"height\":" + videoHNud.Value + ",\"frame\":" + videoFrameNud.Value + ",\"port\":" + ((IPEndPoint)socketServer.LocalEndPoint).Port + "}";
+                            apiGetVideoInfo = "{\"width\":" + videoWNud.Value + ",\"height\":" + videoHNud.Value + ",\"frame\":" + videoFrameNud.Value + ",\"port\":" + ((IPEndPoint)socketServer.Server.LocalEndPoint).Port + "}";
                         }
                         HttpResponseWrite(response, Encoding.UTF8.GetBytes(apiGetVideoInfo));
                         break;
@@ -258,15 +257,15 @@ namespace ScreenShare
             try
             {
                 // 新建socket服务器
-                socketServer = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                socketServer = new SocketServer();
                 // 指定URI
-                socketServer.Bind(new IPEndPoint(IPAddress.Parse(ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2), 0));
+                socketServer.Server.Bind(new IPEndPoint(IPAddress.Parse(ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2), 0));
                 // 设置监听数量
-                socketServer.Listen(10);
+                socketServer.Server.Listen(10);
                 // 异步监听客户端请求
-                socketServer.BeginAccept(SocketHandle, null);
+                socketServer.Server.BeginAccept(SocketHandle, null);
                 // 添加防火墙规则
-                Utils.AddNetFw("ScreenShare", ((IPEndPoint)socketServer.LocalEndPoint).Port);
+                Utils.AddNetFw("ScreenShare", ((IPEndPoint)socketServer.Server.LocalEndPoint).Port);
             }
             // 未知错误
             catch
@@ -283,11 +282,10 @@ namespace ScreenShare
         private void CloseSocketServer()
         {
             // 删除防火墙规则
-            Utils.RemoveNetFw(((IPEndPoint)socketServer.LocalEndPoint).Port);
+            Utils.RemoveNetFw(((IPEndPoint)socketServer.Server.LocalEndPoint).Port);
             foreach (var socketClient in socketClientList.FindAll(e => e.Client != null))
             {
-                socketClient.Close();
-                UpdateSocketUi(socketClient.Ip, false);
+                SocketClientOffline(socketClient);
             }
             socketServer.Close();
         }
@@ -301,7 +299,7 @@ namespace ScreenShare
             try
             {
                 // 继续异步监听客户端请求
-                socketServer.BeginAccept(SocketHandle, null);
+                socketServer.Server.BeginAccept(SocketHandle, null);
             }
             // 主动关闭socket服务器
             catch
@@ -309,7 +307,7 @@ namespace ScreenShare
                 return;
             }
             // 客户端上线
-            SocketClientOnline(socketServer.EndAccept(ar));
+            SocketClientOnline(socketServer.Server.EndAccept(ar));
         }
 
         /// <summary>
@@ -464,18 +462,20 @@ namespace ScreenShare
             if (list.Count != 0)
             {
                 var data = stream.ToArray();
-                foreach (var client in list)
+                foreach (var socketClient in list)
                 {
-                    SocketSendRaw(client, WebSocketUtils.CodedData(data, false));
+                    socketClient.Record(data.Length);
+                    SocketSendRaw(socketClient, WebSocketUtils.CodedData(data, false));
                 }
+                socketServer.Record(list.Count * data.Length);
             }
         }
 
         /// <summary>
         /// 更新socket UI
         /// </summary>
-        /// <param name="ip">ip</param>
-        /// <param name="online">上线和下线</param>
+        /// <param name="ip">IP地址</param>
+        /// <param name="online">上线或下线</param>
         private void UpdateSocketUi(string ip, bool online)
         {
             /* 更新在线数量 */
@@ -1187,7 +1187,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void UserCountLinkLabel_Click(object sender, EventArgs e)
         {
-            new History(socketClientList).ShowDialog();
+            new History(socketServer, socketClientList).ShowDialog();
         }
 
         /// <summary>

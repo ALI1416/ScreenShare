@@ -24,6 +24,7 @@
   </div>
 </div>
 <script>
+  let ws;
   let imgWidth;
   let imgHeight;
   let frame;
@@ -64,9 +65,7 @@
             if (port == 0) {
               alert("密码错误！");
             } else {
-              img.src = "http://" + window.location.hostname + ":" + port;
-              div.style.display = "none";
-              img.style.display = "block";
+              startWs(port);
             }
           }
         })
@@ -77,11 +76,31 @@
         })
   }
 
+    function startWs(port) {
+        ws = new WebSocket("ws://" + window.location.hostname + ":" + port + "/")
+        ws.onopen = function () {
+            div.style.display = "none";
+            img.style.display = "block";
+        }
+        ws.onmessage = function (e) {
+            ws.send("\0");
+            URL.revokeObjectURL(img.src);
+            img.src = URL.createObjectURL(new Blob([e.data], { type: 'image/jpeg' }));
+        }
+        ws.onclose = function () {
+            end();
+        }
+        ws.onerror = function () {
+            end();
+        }
+    }
+
   // 结束
   function end() {
     img.src = "";
     img.style.display = "none";
     div.style.display = "block";
+    ws.close();
   }
 
   // 窗口大小发生变化时
