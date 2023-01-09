@@ -49,6 +49,7 @@ namespace ScreenShare.Model
                 Server = null;
             }
         }
+
         /// <summary>
         /// 记录日志
         /// </summary>

@@ -10,8 +10,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using ScreenShare.Task;
 
 namespace ScreenShare
 {
@@ -46,6 +46,8 @@ namespace ScreenShare
         /// </summary>
         private static readonly List<SocketClient> socketClientList = new List<SocketClient>();
 
+        private static readonly byte[] httpCloseHeader = Encoding.UTF8.GetBytes("HTTP/1.0 200 OK\nConnection: close\n\n");
+
         #endregion
 
         #region 公共方法
@@ -56,8 +58,10 @@ namespace ScreenShare
         public ScreenShare()
         {
             InitializeComponent();
+            fpsLabel.Parent = previewImg;
             Init();
             Log("屏幕共享初始化完成！");
+            Tasks.Start(this);
         }
 
         /// <summary>
@@ -256,8 +260,16 @@ namespace ScreenShare
         {
             try
             {
+                // 记录上次`字节总数`
+                int byteCount = 0;
+                if (socketServer != null)
+                {
+                    byteCount = socketServer.ByteCount;
+                }
                 // 新建socket服务器
                 socketServer = new SocketServer();
+                // `字节总数`累加
+                socketServer.ByteCount += byteCount;
                 // 指定URI
                 socketServer.Server.Bind(new IPEndPoint(IPAddress.Parse(ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2), 0));
                 // 设置监听数量
@@ -380,17 +392,20 @@ namespace ScreenShare
                 {
                     // 解码消息
                     string msg = Encoding.UTF8.GetString(socketClient.Buffer, 0, length);
-                    // 判断是否符合webSocket报文格式
-                    if (msg.Contains("Sec-WebSocket-Key"))
+                    // 获取握手信息
+                    byte[] data = WebSocketUtils.HandShake(msg);
+                    if (data != null)
                     {
-                        // 握手
-                        SocketSendRaw(socketClient, WebSocketUtils.HandShake(msg));
+                        // 发送握手信息
+                        SocketSendRaw(socketClient, data);
                         // 继续接收消息
                         socketClient.Client.BeginReceive(socketClient.Buffer, 0, length, SocketFlags.None, SocketRecevice, socketClient);
                     }
-                    // 不符合格式，关闭连接
+                    // 无法握手
                     else
                     {
+                        // 关闭连接
+                        SocketSendRaw(socketClient, httpCloseHeader);
                         SocketClientOffline(socketClient);
                         return;
                     }
@@ -399,6 +414,7 @@ namespace ScreenShare
                 {
                     // 继续接收消息
                     socketClient.Client.BeginReceive(socketClient.Buffer, 0, length, SocketFlags.None, SocketRecevice, socketClient);
+                    // 解码消息
                     string data = WebSocketUtils.DecodeDataString(socketClient.Buffer, length);
                     // 客户端关闭连接
                     if (data == null)
@@ -455,19 +471,14 @@ namespace ScreenShare
         /// <summary>
         /// socket发送MemoryStream
         /// </summary>
-        /// <param name="stream">MemoryStream</param>
         /// <param name="list">List SocketClient</param>
-        private void SocketSendMemoryStream(MemoryStream stream, List<SocketClient> list)
+        /// <param name="data">byte[]</param>
+        private void SocketSendMemoryStream(List<SocketClient> list, byte[] data)
         {
-            if (list.Count != 0)
+            foreach (var socketClient in list)
             {
-                var data = stream.ToArray();
-                foreach (var socketClient in list)
-                {
-                    socketClient.Record(data.Length);
-                    SocketSendRaw(socketClient, WebSocketUtils.CodedData(data, false));
-                }
-                socketServer.Record(list.Count * data.Length);
+                socketClient.Record(data.Length);
+                SocketSendRaw(socketClient, WebSocketUtils.CodedData(data, false));
             }
         }
 
@@ -504,13 +515,18 @@ namespace ScreenShare
         /// </summary>
         private async void CaptureScreenTask()
         {
-            Bitmap bitmap;
-            MemoryStream stream = new MemoryStream();
+            // 获取参数
             int delay = videoFrameNud.Value == 0 ? 1 : (int)(1000 / videoFrameNud.Value);
             int videoQuality = (int)videoQualityNud.Value;
             bool isDisplayCursor = isDisplayCursorCb.Checked;
             Rectangle screen = new Rectangle((int)screenXNud.Value, (int)screenYNud.Value, (int)screenWNud.Value, (int)screenHNud.Value);
             Size video = new Size((int)videoWNud.Value, (int)videoHNud.Value);
+            // 初始化
+            Bitmap bitmap = ImageUtils.CaptureScreenArea(screen, isDisplayCursor);
+            MemoryStream stream = new MemoryStream();
+            stream.SetLength(0);
+            ImageUtils.Save(bitmap, stream);
+            UpdatePreviewImgWhileWorking(bitmap);
             // 普通
             if (screen.Size == video && videoQuality == 100)
             {
@@ -529,8 +545,18 @@ namespace ScreenShare
                             // 保存到内存流
                             stream.SetLength(0);
                             ImageUtils.Save(bitmap, stream);
-                            // 发送给socket客户端
-                            SocketSendMemoryStream(stream, list);
+                            if (list.Count != 0)
+                            {
+                                var data = stream.ToArray();
+                                // 发送给socket客户端
+                                SocketSendMemoryStream(list, data);
+                                // 记录服务端日志
+                                socketServer.Record(list.Count * data.Length);
+                            }
+                            else
+                            {
+                                socketServer.Record(0);
+                            }
                             // 运行时更新预览图
                             UpdatePreviewImgWhileWorking(bitmap);
                         }
@@ -541,7 +567,7 @@ namespace ScreenShare
                         }
                     }
                     // 延时
-                    await Task.Delay(delay);
+                    await System.Threading.Tasks.Task.Delay(delay);
                 }
                 // 结束共享时更新预览图(bitmap已被释放掉)
                 UpdatePreviewImg(new Bitmap(stream));
@@ -559,7 +585,16 @@ namespace ScreenShare
                             bitmap = ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video, true);
                             stream.SetLength(0);
                             ImageUtils.Save(bitmap, stream);
-                            SocketSendMemoryStream(stream, list);
+                            if (list.Count != 0)
+                            {
+                                var data = stream.ToArray();
+                                SocketSendMemoryStream(list, data);
+                                socketServer.Record(list.Count * data.Length);
+                            }
+                            else
+                            {
+                                socketServer.Record(0);
+                            }
                             UpdatePreviewImgWhileWorking(bitmap);
                         }
                         catch
@@ -567,7 +602,7 @@ namespace ScreenShare
                             CaptureScreenExceptionHandle(new Bitmap(stream));
                         }
                     }
-                    await Task.Delay(delay);
+                    await System.Threading.Tasks.Task.Delay(delay);
                 }
                 UpdatePreviewImg(new Bitmap(stream));
             }
@@ -584,7 +619,16 @@ namespace ScreenShare
                             bitmap = ImageUtils.CaptureScreenArea(screen, isDisplayCursor);
                             stream.SetLength(0);
                             ImageUtils.QualitySave(bitmap, videoQuality, stream);
-                            SocketSendMemoryStream(stream, list);
+                            if (list.Count != 0)
+                            {
+                                var data = stream.ToArray();
+                                SocketSendMemoryStream(list, data);
+                                socketServer.Record(list.Count * data.Length);
+                            }
+                            else
+                            {
+                                socketServer.Record(0);
+                            }
                             UpdatePreviewImgWhileWorking(bitmap);
                         }
                         catch
@@ -592,7 +636,7 @@ namespace ScreenShare
                             CaptureScreenExceptionHandle(new Bitmap(stream));
                         }
                     }
-                    await Task.Delay(delay);
+                    await System.Threading.Tasks.Task.Delay(delay);
                 }
                 UpdatePreviewImg(new Bitmap(stream));
             }
@@ -609,7 +653,16 @@ namespace ScreenShare
                             bitmap = ImageUtils.ZoomImage(ImageUtils.CaptureScreenArea(screen, isDisplayCursor), video, true);
                             stream.SetLength(0);
                             ImageUtils.QualitySave(bitmap, videoQuality, stream);
-                            SocketSendMemoryStream(stream, list);
+                            if (list.Count != 0)
+                            {
+                                var data = stream.ToArray();
+                                SocketSendMemoryStream(list, data);
+                                socketServer.Record(list.Count * data.Length);
+                            }
+                            else
+                            {
+                                socketServer.Record(0);
+                            }
                             UpdatePreviewImgWhileWorking(bitmap);
                         }
                         catch
@@ -617,7 +670,7 @@ namespace ScreenShare
                             CaptureScreenExceptionHandle(new Bitmap(stream));
                         }
                     }
-                    await Task.Delay(delay);
+                    await System.Threading.Tasks.Task.Delay(delay);
                 }
                 UpdatePreviewImg(new Bitmap(stream));
             }
@@ -884,6 +937,34 @@ namespace ScreenShare
             logText.Text += DateTime.Now.ToString("HH:mm:ss ") + text + "\r\n";
             logText.SelectionStart = logText.Text.Length;
             logText.ScrollToCaret();
+        }
+
+        /// <summary>
+        /// 自动刷新
+        /// </summary>
+        public void AutoRefresh()
+        {
+            string text;
+            if (socketServer == null)
+            {
+                text = "0.00 FPS";
+            }
+            else
+            {
+                if (DateTime.Now.Subtract(socketServer.LastRecordTime).TotalSeconds < 5)
+                {
+                    text = (socketServer.FrameAvg / 100f).ToString("0.00") + " FPS";
+                }
+                else
+                {
+                    text = "0.00 FPS";
+                }
+            }
+            Action<string> action = (data) =>
+            {
+                fpsLabel.Text = data;
+            };
+            Invoke(action, text);
         }
 
         #endregion
@@ -1187,7 +1268,11 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void UserCountLinkLabel_Click(object sender, EventArgs e)
         {
-            new History(socketServer, socketClientList).ShowDialog();
+            if (Tasks.history == null)
+            {
+                Tasks.history = new History(socketServer, socketClientList);
+            }
+            Tasks.history.ShowDialog();
         }
 
         /// <summary>

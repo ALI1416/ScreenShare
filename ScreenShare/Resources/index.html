@@ -7,14 +7,17 @@
   <title>屏幕共享</title>
 </head>
 <body style="overflow:hidden">
-<img
-    id="img"
-    src=""
-    alt="网络连接异常，请刷新页面重试！"
-    style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:none"
-    ondblclick="end()"
->
-<div id="div">
+<div id="startShare" style="display:none">
+  <img
+      id="img"
+      src=""
+      alt="网络连接异常，请刷新页面重试！"
+      style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)"
+      ondblclick="end()"
+  />
+  <span id="fps" style="position:absolute;top:10px;right:10px;color:red">0.00 FPS</span>
+</div>
+<div id="endShare">
   <h1>屏幕共享</h1>
   <h2 id="info"></h2>
   <div id="online" style="display:none">
@@ -29,8 +32,14 @@
   let imgHeight;
   let frame;
   let port;
+  let lastTime;
+  let frameCount;
+  let frameAvg;
+  let fpsInterval;
+  const startShare = document.getElementById("startShare");
   const img = document.getElementById("img");
-  const div = document.getElementById("div");
+  const fps = document.getElementById("fps");
+  const endShare = document.getElementById("endShare");
   const info = document.getElementById("info");
   const screen = document.getElementById("screen");
   const online = document.getElementById("online");
@@ -60,7 +69,7 @@
           frame = json.frame;
           port = json.port;
           online.style.display = "block";
-          info.innerHTML = "远端视频尺寸&ensp;<code>" + imgWidth + "x" + imgHeight + "px</code>&emsp;每秒帧数&ensp;<code>" + frame + "FPS</code>";
+          info.innerHTML = "远端视频尺寸&ensp;<code>" + imgWidth + "x" + imgHeight + "px</code>&emsp;每秒帧数&ensp;<code>" + frame + " FPS</code>";
           if (open) {
             if (port == 0) {
               alert("密码错误！");
@@ -76,31 +85,44 @@
         })
   }
 
-    function startWs(port) {
-        ws = new WebSocket("ws://" + window.location.hostname + ":" + port + "/")
-        ws.onopen = function () {
-            div.style.display = "none";
-            img.style.display = "block";
-        }
-        ws.onmessage = function (e) {
-            ws.send("\0");
-            URL.revokeObjectURL(img.src);
-            img.src = URL.createObjectURL(new Blob([e.data], { type: 'image/jpeg' }));
-        }
-        ws.onclose = function () {
-            end();
-        }
-        ws.onerror = function () {
-            end();
-        }
+  // 开启webSocket
+  function startWs(port) {
+    ws = new WebSocket("ws://" + window.location.hostname + ":" + port + "/")
+    ws.onopen = function () {
+      startShare.style.display = "block";
+      endShare.style.display = "none";
+      lastTime = new Date();
+      frameCount = 0;
+      fpsInterval = setInterval(() => {
+        fps.innerText = frameAvg
+      }, 5000);
     }
+    ws.onmessage = function (e) {
+      ws.send("\0");
+      URL.revokeObjectURL(img.src);
+      img.src = URL.createObjectURL(new Blob([e.data], {type: 'image/jpeg'}));
+      if ((++frameCount) % 5 == 0) {
+        let now = new Date();
+        frameAvg = (5000.0 / (now.getTime() - lastTime.getTime())).toFixed(2) + " FPS";
+        lastTime = now;
+      }
+    }
+    ws.onclose = function () {
+      end();
+    }
+    ws.onerror = function () {
+      end();
+    }
+  }
 
   // 结束
   function end() {
     img.src = "";
-    img.style.display = "none";
-    div.style.display = "block";
+    endShare.style.display = "block";
+    startShare.style.display = "none";
     ws.close();
+    clearInterval(fpsInterval);
+    fps.innerText = "0.00 FPS"
   }
 
   // 窗口大小发生变化时

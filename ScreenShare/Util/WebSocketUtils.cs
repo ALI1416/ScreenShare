@@ -18,21 +18,22 @@ namespace ScreenShare.Util
         /// <returns>byte[]</returns>
         public static byte[] HandShake(string msg)
         {
-            string key;
             var reader = new StringReader(msg);
             while (true)
             {
                 string line = reader.ReadLine();
-                if (line.Contains("Sec-WebSocket-Key"))
+                if (line == null)
                 {
-                    key = line.Substring(19);
-                    break;
+                    return null;
+                }
+                else if (line.Contains("Sec-WebSocket-Key"))
+                {
+                    byte[] secret = SHA1.Create().ComputeHash(Encoding.ASCII.GetBytes(line.Substring(19) + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"));
+                    string secretKey = Convert.ToBase64String(secret);
+                    string data = "HTTP/1.1 101 Switching Protocols\nUpgrade: websocket\nConnection: Upgrade\nSec-WebSocket-Accept: " + secretKey + "\n\n";
+                    return Encoding.UTF8.GetBytes(data);
                 }
             }
-            byte[] secret = SHA1.Create().ComputeHash(Encoding.ASCII.GetBytes(key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"));
-            string secretKey = Convert.ToBase64String(secret);
-            string data = "HTTP/1.1 101 Switching Protocols\nUpgrade: websocket\nConnection: Upgrade\nSec-WebSocket-Accept: " + secretKey + "\n\n";
-            return Encoding.UTF8.GetBytes(data);
         }
 
         /// <summary>

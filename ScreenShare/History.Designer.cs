@@ -125,9 +125,9 @@
             this.textLabel.AutoSize = true;
             this.textLabel.Location = new System.Drawing.Point(5, 5);
             this.textLabel.Name = "textLabel";
-            this.textLabel.Size = new System.Drawing.Size(599, 12);
+            this.textLabel.Size = new System.Drawing.Size(635, 12);
             this.textLabel.TabIndex = 0;
-            this.textLabel.Text = "当前在线用户数量：0        累计访问用户数量：0        当前帧率(帧/秒)：0        传输数据总量(Mb)：0";
+            this.textLabel.Text = "当前在线用户数量：0        累计访问用户数量：0        当前帧率(帧/秒)：0.00        传输数据总量(Mb)：0.00";
             // 
             // tableDataGridView
             // 

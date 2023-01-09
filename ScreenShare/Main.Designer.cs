@@ -76,6 +76,7 @@
             this.userCountLinkLabel = new System.Windows.Forms.LinkLabel();
             this.bottomPanel = new System.Windows.Forms.Panel();
             this.previewLabel = new System.Windows.Forms.Label();
+            this.fpsLabel = new System.Windows.Forms.Label();
             this.previewImg = new System.Windows.Forms.PictureBox();
             this.startSharingScreenBtn = new System.Windows.Forms.Button();
             this.logText = new System.Windows.Forms.TextBox();
@@ -747,6 +748,7 @@
             // bottomPanel
             // 
             this.bottomPanel.Controls.Add(this.previewLabel);
+            this.bottomPanel.Controls.Add(this.fpsLabel);
             this.bottomPanel.Controls.Add(this.previewImg);
             this.bottomPanel.Controls.Add(this.startSharingScreenBtn);
             this.bottomPanel.Controls.Add(this.logText);
@@ -768,6 +770,17 @@
             this.previewLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.previewLabel.Visible = false;
             this.previewLabel.Click += new System.EventHandler(this.PreviewLabel_Click);
+            // 
+            // fpsLabel
+            // 
+            this.fpsLabel.AutoSize = true;
+            this.fpsLabel.BackColor = System.Drawing.Color.Transparent;
+            this.fpsLabel.ForeColor = System.Drawing.Color.Red;
+            this.fpsLabel.Location = new System.Drawing.Point(10, 10);
+            this.fpsLabel.Name = "fpsLabel";
+            this.fpsLabel.Size = new System.Drawing.Size(59, 12);
+            this.fpsLabel.TabIndex = 4;
+            this.fpsLabel.Text = "0.00 FPS ";
             // 
             // previewImg
             // 
@@ -1078,6 +1091,10 @@
         /// 日志TextBox
         /// </summary>
         private System.Windows.Forms.TextBox logText;
+        /// <summary>
+        /// FPS Label
+        /// </summary>
+        private System.Windows.Forms.Label fpsLabel;
         /// <summary>
         /// 预览Label
         /// </summary>

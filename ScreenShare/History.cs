@@ -1,7 +1,6 @@
 ﻿using ScreenShare.Model;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace ScreenShare
@@ -24,13 +23,6 @@ namespace ScreenShare
             this.socketServer = socketServer;
             this.socketClientList = socketClientList;
             Init(false);
-            new Thread(t =>
-            {
-                AutoRefresh();
-            })
-            {
-                IsBackground = true
-            }.Start();
         }
 
         /// <summary>
@@ -84,20 +76,24 @@ namespace ScreenShare
                     }
                 }
             }
+            string text = "当前在线用户数量：" + online + "        累计访问用户数量：" + list.Length + "        当前帧率(帧/秒)：";
             if (socketServer == null)
             {
-                textLabel.Text = "当前在线用户数量：" + online
-                    + "        累计访问用户数量：" + list.Length
-                    + "        当前帧率(帧/秒)：0"
-                    + "        传输数据总量(Mb)：0";
+                text += "0.00        传输数据总量(Mb)：0.00";
             }
             else
             {
-                textLabel.Text = "当前在线用户数量：" + online
-                    + "        累计访问用户数量：" + list.Length
-                    + "        当前帧率(帧/秒)：" + (socketServer.FrameAvg / 100f).ToString("0.00")
-                    + "        传输数据总量(Mb)：" + (socketServer.ByteCount / 1048576f).ToString("0.00");
+                if (now.Subtract(socketServer.LastRecordTime).TotalSeconds < 5)
+                {
+                    text += (socketServer.FrameAvg / 100f).ToString("0.00");
+                }
+                else
+                {
+                    text += "0.00";
+                }
+                text += "        传输数据总量(Mb)：" + (socketServer.ByteCount / 1048576f).ToString("0.00");
             }
+            textLabel.Text = text;
         }
 
         /// <summary>
@@ -121,22 +117,17 @@ namespace ScreenShare
         }
 
         /// <summary>
-        /// 5秒自动刷新
+        /// 自动刷新
         /// </summary>
-        private void AutoRefresh()
+        public void AutoRefresh()
         {
-            Thread.Sleep(1000);
-            while (Visible)
+            if (Visible && autoRefreshCb.Checked)
             {
-                if (autoRefreshCb.Checked)
+                Action action = () =>
                 {
-                    Action action = () =>
-                    {
-                        Init(onlyOnlineCb.Checked);
-                    };
-                    Invoke(action);
-                }
-                Thread.Sleep(5000);
+                    Init(onlyOnlineCb.Checked);
+                };
+                Invoke(action);
             }
         }
 
