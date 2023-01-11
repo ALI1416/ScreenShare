@@ -83,7 +83,7 @@ namespace ScreenShare
             }
             else
             {
-                if (now.Subtract(socketServer.LastRecordTime).TotalSeconds < 5)
+                if (now.Subtract(socketServer.LastRecordTime).TotalSeconds < 10)
                 {
                     text += (socketServer.FrameAvg / 100f).ToString("0.00");
                 }

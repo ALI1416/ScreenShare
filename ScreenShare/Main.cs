@@ -12,6 +12,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Windows.Forms;
 using ScreenShare.Task;
+using System.Threading;
 
 namespace ScreenShare
 {
@@ -341,8 +342,6 @@ namespace ScreenShare
                 client.SendTimeout = 10000;
                 // 接收消息
                 client.BeginReceive(socketClient.Buffer, 0, socketClient.Buffer.Length, SocketFlags.None, SocketRecevice, socketClient);
-                socketClientList.Add(socketClient);
-                UpdateSocketUi(socketClient.Ip, true);
             }
             catch
             {
@@ -400,13 +399,15 @@ namespace ScreenShare
                         SocketSendRaw(socketClient, data);
                         // 继续接收消息
                         socketClient.Client.BeginReceive(socketClient.Buffer, 0, length, SocketFlags.None, SocketRecevice, socketClient);
+                        socketClientList.Add(socketClient);
+                        UpdateSocketUi(socketClient.Ip, true);
                     }
                     // 无法握手
                     else
                     {
                         // 关闭连接
                         SocketSendRaw(socketClient, httpCloseHeader);
-                        SocketClientOffline(socketClient);
+                        socketClient.Close();
                         return;
                     }
                 }
@@ -951,7 +952,7 @@ namespace ScreenShare
             }
             else
             {
-                if (DateTime.Now.Subtract(socketServer.LastRecordTime).TotalSeconds < 5)
+                if (DateTime.Now.Subtract(socketServer.LastRecordTime).TotalSeconds < 10)
                 {
                     text = (socketServer.FrameAvg / 100f).ToString("0.00") + " FPS";
                 }
@@ -1268,10 +1269,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void UserCountLinkLabel_Click(object sender, EventArgs e)
         {
-            if (Tasks.history == null)
-            {
-                Tasks.history = new History(socketServer, socketClientList);
-            }
+            Tasks.history = new History(socketServer, socketClientList);
             Tasks.history.ShowDialog();
         }
 
