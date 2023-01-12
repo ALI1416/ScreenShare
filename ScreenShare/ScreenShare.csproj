@@ -96,7 +96,7 @@
     </Compile>
     <Compile Include="Model\SocketClient.cs" />
     <Compile Include="Model\SocketServer.cs" />
-    <Compile Include="Task\Tasks.cs" />
+    <Compile Include="ScheduledTask\ScheduledTasks.cs" />
     <Compile Include="Util\Utils.cs" />
     <Compile Include="Util\ImageUtils.cs" />
     <Compile Include="DrawScreen.cs">

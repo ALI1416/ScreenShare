@@ -678,7 +678,7 @@
             // 
             this.videoFrameNud.Location = new System.Drawing.Point(70, 40);
             this.videoFrameNud.Maximum = new decimal(new int[] {
-            30,
+            1000,
             0,
             0,
             0});

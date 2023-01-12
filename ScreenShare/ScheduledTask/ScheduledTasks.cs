@@ -1,12 +1,12 @@
 ﻿using System.Threading;
 
-namespace ScreenShare.Task
+namespace ScreenShare.ScheduledTask
 {
 
     /// <summary>
     /// 定时任务
     /// </summary>
-    public class Tasks
+    public class ScheduledTasks
     {
 
         public static ScreenShare screenShare;
@@ -17,14 +17,14 @@ namespace ScreenShare.Task
         /// </summary>
         public static void Start(ScreenShare screenShare)
         {
-            Tasks.screenShare = screenShare;
-            new Tasks();
+            ScheduledTasks.screenShare = screenShare;
+            new ScheduledTasks();
         }
 
         /// <summary>
         /// 定时任务
         /// </summary>
-        private Tasks()
+        private ScheduledTasks()
         {
             new Thread(t =>
             {

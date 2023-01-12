@@ -11,8 +11,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Windows.Forms;
-using ScreenShare.Task;
-using System.Threading;
+using ScreenShare.ScheduledTask;
+using System.Threading.Tasks;
 
 namespace ScreenShare
 {
@@ -61,8 +61,8 @@ namespace ScreenShare
             InitializeComponent();
             fpsLabel.Parent = previewImg;
             Init();
+            ScheduledTasks.Start(this);
             Log("屏幕共享初始化完成！");
-            Tasks.Start(this);
         }
 
         /// <summary>
@@ -568,7 +568,7 @@ namespace ScreenShare
                         }
                     }
                     // 延时
-                    await System.Threading.Tasks.Task.Delay(delay);
+                    await Task.Delay(delay);
                 }
                 // 结束共享时更新预览图(bitmap已被释放掉)
                 UpdatePreviewImg(new Bitmap(stream));
@@ -603,7 +603,7 @@ namespace ScreenShare
                             CaptureScreenExceptionHandle(new Bitmap(stream));
                         }
                     }
-                    await System.Threading.Tasks.Task.Delay(delay);
+                    await Task.Delay(delay);
                 }
                 UpdatePreviewImg(new Bitmap(stream));
             }
@@ -637,7 +637,7 @@ namespace ScreenShare
                             CaptureScreenExceptionHandle(new Bitmap(stream));
                         }
                     }
-                    await System.Threading.Tasks.Task.Delay(delay);
+                    await Task.Delay(delay);
                 }
                 UpdatePreviewImg(new Bitmap(stream));
             }
@@ -671,7 +671,7 @@ namespace ScreenShare
                             CaptureScreenExceptionHandle(new Bitmap(stream));
                         }
                     }
-                    await System.Threading.Tasks.Task.Delay(delay);
+                    await Task.Delay(delay);
                 }
                 UpdatePreviewImg(new Bitmap(stream));
             }
@@ -1269,8 +1269,8 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void UserCountLinkLabel_Click(object sender, EventArgs e)
         {
-            Tasks.history = new History(socketServer, socketClientList);
-            Tasks.history.ShowDialog();
+            ScheduledTasks.history = new History(socketServer, socketClientList);
+            ScheduledTasks.history.ShowDialog();
         }
 
         /// <summary>
