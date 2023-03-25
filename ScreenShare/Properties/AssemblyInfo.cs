@@ -11,9 +11,9 @@ using System.Runtime.InteropServices;
 // 合法商标
 [assembly: AssemblyTrademark("404z.cn")]
 // 文件版本&产品版本
-[assembly: AssemblyFileVersion("2.2.0.5")]
+[assembly: AssemblyFileVersion("2.3.1.7")]
 // 不显示
-[assembly: AssemblyVersion("2.2.0.5")]
+[assembly: AssemblyVersion("2.3.1.7")]
 [assembly: AssemblyDescription("局域网屏幕共享")]
 [assembly: AssemblyConfiguration("retail")]
 [assembly: AssemblyCompany("ALI1416")]
