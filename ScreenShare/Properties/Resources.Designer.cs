@@ -61,15 +61,6 @@ namespace ScreenShare.Properties {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
-        /// </summary>
-        internal static string about {
-            get {
-                return ResourceManager.GetString("about", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
         internal static System.Drawing.Bitmap cursor {

@@ -1,8 +1,8 @@
-﻿using NetFwTypeLib;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Windows.Forms;
@@ -15,20 +15,21 @@ namespace ScreenShare.Util
     /// </summary>
     internal class Utils
     {
+
         /// <summary>
         /// 获取所有的IP地址
         /// </summary>
-        /// <returns>List&lt;Tuple&lt;名称, IP地址&gt;&gt;</returns>
-        public static List<Tuple<string, string>> GetAllIPv4Address()
+        /// <returns>List&lt;Tuple&lt;IP地址名称, IP地址IPAddress&gt;&gt;</returns>
+        public static List<Tuple<string, IPAddress>> GetAllIPv4Address()
         {
-            var ipList = new List<Tuple<string, string>>();
+            var ipList = new List<Tuple<string, IPAddress>>();
             foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
             {
                 foreach (var ua in ni.GetIPProperties().UnicastAddresses)
                 {
                     if (ua.Address.AddressFamily == AddressFamily.InterNetwork)
                     {
-                        ipList.Add(Tuple.Create(ni.Name, ua.Address.ToString()));
+                        ipList.Add(Tuple.Create(ni.Name, ua.Address));
                     }
                 }
             }
@@ -45,7 +46,7 @@ namespace ScreenShare.Util
         /// 总共返回n+1个Tuple
         /// </para>
         /// </summary>
-        /// <returns>List&lt;Tuple&lt;名称, 屏幕Rectangle&gt;&gt;</returns>
+        /// <returns>List&lt;Tuple&lt;屏幕名称, 屏幕Rectangle&gt;&gt;</returns>
         public static List<Tuple<string, Rectangle>> GetAllScreen()
         {
             var screenList = new List<Tuple<string, Rectangle>>();
@@ -76,33 +77,6 @@ namespace ScreenShare.Util
                 screenList.Insert(0, Tuple.Create("0(全)", new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin)));
             }
             return screenList;
-        }
-
-        /// <summary>
-        /// 添加防火墙规则
-        /// </summary>
-        /// <param name="name">名称</param>
-        /// <param name="port">端口号</param>
-        public static void AddNetFw(string name, int port)
-        {
-            INetFwMgr netFwMgr = (INetFwMgr)Activator.CreateInstance(Type.GetTypeFromProgID("HNetCfg.FwMgr"));
-            INetFwOpenPort openPort = (INetFwOpenPort)Activator.CreateInstance(Type.GetTypeFromProgID("HNetCfg.FwOpenPort"));
-            openPort.Name = name;
-            openPort.Port = port;
-            openPort.Protocol = NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP;
-            openPort.Scope = NET_FW_SCOPE_.NET_FW_SCOPE_ALL;
-            openPort.Enabled = true;
-            netFwMgr.LocalPolicy.CurrentProfile.GloballyOpenPorts.Add(openPort);
-        }
-
-        /// <summary>
-        /// 删除防火墙规则
-        /// </summary>
-        /// <param name="port">端口号</param>
-        public static void RemoveNetFw(int port)
-        {
-            INetFwMgr netFwMgr = (INetFwMgr)Activator.CreateInstance(Type.GetTypeFromProgID("HNetCfg.FwMgr"));
-            netFwMgr.LocalPolicy.CurrentProfile.GloballyOpenPorts.Remove(port, NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP);
         }
 
     }

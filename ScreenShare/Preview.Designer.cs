@@ -1,6 +1,6 @@
 ﻿namespace ScreenShare
 {
-    partial class About
+    partial class Preview
     {
         /// <summary>
         /// Required designer variable.
@@ -28,39 +28,39 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.webBrowser = new System.Windows.Forms.WebBrowser();
+            this.img = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.img)).BeginInit();
             this.SuspendLayout();
             // 
-            // webBrowser
+            // img
             // 
-            this.webBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.webBrowser.Location = new System.Drawing.Point(0, 0);
-            this.webBrowser.MinimumSize = new System.Drawing.Size(20, 20);
-            this.webBrowser.Name = "webBrowser";
-            this.webBrowser.Size = new System.Drawing.Size(650, 432);
-            this.webBrowser.TabIndex = 0;
-            this.webBrowser.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this.WebBrowser_Navigating);
+            this.img.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.img.Location = new System.Drawing.Point(0, 0);
+            this.img.Name = "img";
+            this.img.Size = new System.Drawing.Size(768, 432);
+            this.img.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.img.TabIndex = 0;
+            this.img.TabStop = false;
             // 
-            // About
+            // Preview
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(650, 432);
-            this.Controls.Add(this.webBrowser);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.ClientSize = new System.Drawing.Size(768, 432);
+            this.Controls.Add(this.img);
             this.Icon = global::ScreenShare.Properties.Resources.icon;
-            this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "About";
+            this.Name = "Preview";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "关于";
+            this.Text = "预览";
+            ((System.ComponentModel.ISupportInitialize)(this.img)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.WebBrowser webBrowser;
+        private System.Windows.Forms.PictureBox img;
     }
 }

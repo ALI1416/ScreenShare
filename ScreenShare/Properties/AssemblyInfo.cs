@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-// 描述&文件说明
+// 名称&描述&文件说明&防火墙-名称
 [assembly: AssemblyTitle("屏幕共享")]
 // 产品名称
 [assembly: AssemblyProduct("屏幕共享")]
@@ -10,13 +10,14 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("https://github.com/ALI1416/ScreenShare")]
 // 合法商标
 [assembly: AssemblyTrademark("404z.cn")]
+// 防火墙-发布者
+[assembly: AssemblyCompany("404z.cn")]
 // 文件版本&产品版本
-[assembly: AssemblyFileVersion("2.3.1.7")]
+[assembly: AssemblyFileVersion("2.3.2.8")]
 // 不显示
-[assembly: AssemblyVersion("2.3.1.7")]
+[assembly: AssemblyVersion("2.3.2.8")]
 [assembly: AssemblyDescription("局域网屏幕共享")]
 [assembly: AssemblyConfiguration("retail")]
-[assembly: AssemblyCompany("ALI1416")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("zh-CN")]
 [assembly: ComVisible(false)]

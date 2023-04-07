@@ -36,7 +36,7 @@
             this.ipPortNud = new System.Windows.Forms.NumericUpDown();
             this.ipPortLabel = new System.Windows.Forms.Label();
             this.reloadConfigBtn = new System.Windows.Forms.Button();
-            this.aboutBtn = new System.Windows.Forms.Button();
+            this.configBtn = new System.Windows.Forms.Button();
             this.shareLinkText = new System.Windows.Forms.TextBox();
             this.shareLinkLabel = new System.Windows.Forms.Label();
             this.copyBtn = new System.Windows.Forms.Button();
@@ -110,12 +110,12 @@
             this.topPanel.Controls.Add(this.ipAddressLabel);
             this.topPanel.Controls.Add(this.ipPortNud);
             this.topPanel.Controls.Add(this.ipPortLabel);
-            this.topPanel.Controls.Add(this.reloadConfigBtn);
-            this.topPanel.Controls.Add(this.aboutBtn);
             this.topPanel.Controls.Add(this.shareLinkText);
             this.topPanel.Controls.Add(this.shareLinkLabel);
             this.topPanel.Controls.Add(this.copyBtn);
+            this.topPanel.Controls.Add(this.reloadConfigBtn);
             this.topPanel.Controls.Add(this.openBtn);
+            this.topPanel.Controls.Add(this.configBtn);
             this.topPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.topPanel.Location = new System.Drawing.Point(0, 0);
             this.topPanel.Name = "topPanel";
@@ -189,23 +189,23 @@
             // 
             this.reloadConfigBtn.Location = new System.Drawing.Point(565, 50);
             this.reloadConfigBtn.Name = "reloadConfigBtn";
-            this.reloadConfigBtn.Size = new System.Drawing.Size(90, 23);
-            this.reloadConfigBtn.TabIndex = 3;
+            this.reloadConfigBtn.Size = new System.Drawing.Size(100, 23);
+            this.reloadConfigBtn.TabIndex = 5;
             this.reloadConfigBtn.Text = "重新加载配置";
             this.toolTip.SetToolTip(this.reloadConfigBtn, "点击重新加载配置");
             this.reloadConfigBtn.UseVisualStyleBackColor = true;
             this.reloadConfigBtn.Click += new System.EventHandler(this.ReloadConfigBtn_Click);
             // 
-            // aboutBtn
+            // configBtn
             // 
-            this.aboutBtn.Location = new System.Drawing.Point(705, 50);
-            this.aboutBtn.Name = "aboutBtn";
-            this.aboutBtn.Size = new System.Drawing.Size(55, 53);
-            this.aboutBtn.TabIndex = 4;
-            this.aboutBtn.Text = "关于";
-            this.toolTip.SetToolTip(this.aboutBtn, "点击显示关于界面");
-            this.aboutBtn.UseVisualStyleBackColor = true;
-            this.aboutBtn.Click += new System.EventHandler(this.AboutBtn_Click);
+            this.configBtn.Location = new System.Drawing.Point(670, 50);
+            this.configBtn.Name = "configBtn";
+            this.configBtn.Size = new System.Drawing.Size(90, 53);
+            this.configBtn.TabIndex = 7;
+            this.configBtn.Text = "配置\r\n(开发中)";
+            this.toolTip.SetToolTip(this.configBtn, "点击显示配置界面");
+            this.configBtn.UseVisualStyleBackColor = true;
+            this.configBtn.Click += new System.EventHandler(this.ConfigBtn_Click);
             // 
             // shareLinkText
             // 
@@ -214,7 +214,7 @@
             this.shareLinkText.Name = "shareLinkText";
             this.shareLinkText.ReadOnly = true;
             this.shareLinkText.Size = new System.Drawing.Size(440, 21);
-            this.shareLinkText.TabIndex = 5;
+            this.shareLinkText.TabIndex = 3;
             // 
             // shareLinkLabel
             // 
@@ -230,7 +230,7 @@
             this.copyBtn.Location = new System.Drawing.Point(515, 80);
             this.copyBtn.Name = "copyBtn";
             this.copyBtn.Size = new System.Drawing.Size(45, 23);
-            this.copyBtn.TabIndex = 6;
+            this.copyBtn.TabIndex = 4;
             this.copyBtn.Text = "复制";
             this.toolTip.SetToolTip(this.copyBtn, "点击可以复制分享地址。");
             this.copyBtn.UseVisualStyleBackColor = true;
@@ -240,8 +240,8 @@
             // 
             this.openBtn.Location = new System.Drawing.Point(565, 80);
             this.openBtn.Name = "openBtn";
-            this.openBtn.Size = new System.Drawing.Size(90, 23);
-            this.openBtn.TabIndex = 7;
+            this.openBtn.Size = new System.Drawing.Size(100, 23);
+            this.openBtn.TabIndex = 6;
             this.openBtn.Text = "用浏览器打开";
             this.openBtn.UseVisualStyleBackColor = true;
             this.openBtn.Click += new System.EventHandler(this.OpenBtn_Click);
@@ -910,14 +910,6 @@
         /// </summary>
         private System.Windows.Forms.NumericUpDown ipPortNud;
         /// <summary>
-        /// 重新加载配置Button
-        /// </summary>
-        private System.Windows.Forms.Button reloadConfigBtn;
-        /// <summary>
-        /// 关于Button
-        /// </summary>
-        private System.Windows.Forms.Button aboutBtn;
-        /// <summary>
         /// 分享地址Label
         /// </summary>
         private System.Windows.Forms.Label shareLinkLabel;
@@ -933,6 +925,14 @@
         /// 用浏览器打开Button
         /// </summary>
         private System.Windows.Forms.Button openBtn;
+        /// <summary>
+        /// 重新加载配置Button
+        /// </summary>
+        private System.Windows.Forms.Button reloadConfigBtn;
+        /// <summary>
+        /// 配置Button
+        /// </summary>
+        private System.Windows.Forms.Button configBtn;
 
         /* 中部 */
         /// <summary>
