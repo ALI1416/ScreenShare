@@ -15,6 +15,7 @@ using System.Windows.Forms;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.Web;
+using System.Collections.Specialized;
 
 namespace ScreenShare
 {
@@ -51,8 +52,8 @@ namespace ScreenShare
 
         private static readonly string httpHtmlHeader = "HTTP/1.0 200 OK\nContent-Type: text/html;charset=utf-8\nConnection: close\n\n";
         private static readonly string httpJsonHeader = "HTTP/1.0 200 OK\nContent-Type: application/json;charset=utf-8\nConnection: close\n\n";
-        private static readonly byte[] httpIconHeaderBytes = Encoding.UTF8.GetBytes("HTTP/1.0 200 OK\nContent-Type: image/x-icon\nConnection: close\n\n");
         private static readonly byte[] httpCloseHeaderBytes = Encoding.UTF8.GetBytes("HTTP/1.0 200 OK\nConnection: close\n\n");
+        private static byte[] httpIconHeaderBytes;
 
         private Preview preview;
 
@@ -66,13 +67,23 @@ namespace ScreenShare
         public ScreenShare()
         {
             InitializeComponent();
-            fpsLabel.Parent = previewImg;
             Init();
+            // 图标
+            byte[] bytes = Encoding.UTF8.GetBytes("HTTP/1.0 200 OK\nContent-Type: image/x-icon\nConnection: close\n\n");
+            MemoryStream faviconStream = new MemoryStream();
+            Resources.favicon.Save(faviconStream);
+            httpIconHeaderBytes = new byte[bytes.Length + faviconStream.Length];
+            bytes.CopyTo(httpIconHeaderBytes, 0);
+            faviconStream.ToArray().CopyTo(httpIconHeaderBytes, bytes.Length);
+            // FPS
+            fpsLabel.Parent = previewImg;
+            // 定时任务
             ScheduledTasks.Start(this);
+            // 日志
             Version version = Assembly.GetExecutingAssembly().GetName().Version;
             Log("欢迎使用屏幕共享软件！");
             Log("当前版本 " + version.Major + "." + version.Minor + "." + version.Build);
-            Log("软件地址 https://github.com/ALI1416/ScreenShare");
+            Log("帮助与反馈地址 https://github.com/ALI1416/ScreenShare");
             Log("备用地址 https://gitee.com/ALI1416/ScreenShare");
             Log("初始化完成！");
         }
@@ -250,10 +261,10 @@ namespace ScreenShare
         {
             string[] pathAndQuery = HttpUtility.UrlDecode(request.Substring(4, request.IndexOf('\r') - 13)).Split('?');
             string path = pathAndQuery[0];
-            string query = null;
+            NameValueCollection param = null;
             if (pathAndQuery.Length > 1)
             {
-                query = pathAndQuery[1];
+                param = HttpUtility.ParseQueryString(pathAndQuery[1]);
             }
             byte[] data;
             switch (path)
@@ -267,30 +278,31 @@ namespace ScreenShare
                 // 图标
                 case "/favicon.ico":
                     {
-                        MemoryStream faviconStream = new MemoryStream();
-                        Resources.favicon.Save(faviconStream);
-                        data = new byte[httpIconHeaderBytes.Length + faviconStream.Length];
-                        httpIconHeaderBytes.CopyTo(data, 0);
-                        faviconStream.ToArray().CopyTo(data, httpIconHeaderBytes.Length);
+                        data = httpIconHeaderBytes;
                         break;
                     }
                 // API:获取视频信息
                 case "/api/getVideoInfo":
                     {
-                        string apiGetVideoInfo = null;
+                        string apiGetVideoInfo = "{\"width\":" + videoWNud.Value + ",\"height\":" + videoHNud.Value + ",\"frame\":" + videoFrameNud.Value + ",\"port\":";
                         // 开启加密
                         if (isEncryptionCb.Checked)
                         {
                             // 密码未输入或密码错误
-                            if (query != ("code=" + pwdText.Text))
+                            if (param == null || (param["code"] != pwdText.Text))
                             {
-                                apiGetVideoInfo = "{\"width\":" + videoWNud.Value + ",\"height\":" + videoHNud.Value + ",\"frame\":" + videoFrameNud.Value + ",\"port\":0}";
+                                apiGetVideoInfo += "0}";
+                            }
+                            // 密码正确
+                            else
+                            {
+                                apiGetVideoInfo += ((IPEndPoint)socketServer.Server.LocalEndPoint).Port + "}";
                             }
                         }
-                        // 无需密码或密码正确
-                        if (apiGetVideoInfo == null)
+                        // 未开启加密
+                        else
                         {
-                            apiGetVideoInfo = "{\"width\":" + videoWNud.Value + ",\"height\":" + videoHNud.Value + ",\"frame\":" + videoFrameNud.Value + ",\"port\":" + ((IPEndPoint)socketServer.Server.LocalEndPoint).Port + "}";
+                            apiGetVideoInfo += ((IPEndPoint)socketServer.Server.LocalEndPoint).Port + "}";
                         }
                         data = Encoding.UTF8.GetBytes(httpJsonHeader + apiGetVideoInfo);
                         break;
@@ -902,6 +914,7 @@ namespace ScreenShare
                 = videoFrameNud.Enabled
                 = videoQualityNud.Enabled
                 = reloadConfigBtn.Enabled
+                = configBtn.Enabled
                 = captureScreenCoordinatesBtn.Enabled
                 = !enable;
             if (enable)
@@ -1028,6 +1041,27 @@ namespace ScreenShare
         }
 
         /// <summary>
+        /// 点击复制按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CopyBtn_Click(object sender, EventArgs e)
+        {
+            shareLinkText.Focus();
+            shareLinkText.SelectAll();
+            try
+            {
+                Clipboard.SetText(shareLinkText.Text);
+                Log("分享地址已复制。");
+            }
+            catch
+            {
+                Log("复制失败！请手动复制。");
+                MessageBox.Show("复制失败！请手动复制。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
         /// 点击重新加载配置按钮
         /// </summary>
         /// <param name="sender"></param>
@@ -1038,7 +1072,17 @@ namespace ScreenShare
         }
 
         /// <summary>
-        /// 点击配置按钮
+        /// 点击用浏览器打开按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OpenBtn_Click(object sender, EventArgs e)
+        {
+            Process.Start(shareLinkText.Text);
+        }
+
+        /// <summary>
+        /// 点击系统配置按钮
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -1048,32 +1092,13 @@ namespace ScreenShare
         }
 
         /// <summary>
-        /// 点击复制按钮
+        /// 点击网站二维码按钮
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void CopyBtn_Click(object sender, EventArgs e)
+        private void QrBtn_Click(object sender, EventArgs e)
         {
-            try
-            {
-                Clipboard.SetText(shareLinkText.Text);
-                Log("分享链接已复制。");
-            }
-            catch
-            {
-                Log("复制失败！请手动复制。");
-                MessageBox.Show("复制失败！请手动复制。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        /// <summary>
-        /// 点击用浏览器打开按钮
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OpenBtn_Click(object sender, EventArgs e)
-        {
-            Process.Start(shareLinkText.Text);
+            new Qr().ShowDialog();
         }
 
         /// <summary>

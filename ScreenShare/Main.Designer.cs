@@ -35,12 +35,13 @@
             this.ipAddressLabel = new System.Windows.Forms.Label();
             this.ipPortNud = new System.Windows.Forms.NumericUpDown();
             this.ipPortLabel = new System.Windows.Forms.Label();
-            this.reloadConfigBtn = new System.Windows.Forms.Button();
-            this.configBtn = new System.Windows.Forms.Button();
             this.shareLinkText = new System.Windows.Forms.TextBox();
             this.shareLinkLabel = new System.Windows.Forms.Label();
             this.copyBtn = new System.Windows.Forms.Button();
+            this.reloadConfigBtn = new System.Windows.Forms.Button();
             this.openBtn = new System.Windows.Forms.Button();
+            this.configBtn = new System.Windows.Forms.Button();
+            this.qrBtn = new System.Windows.Forms.Button();
             this.middlePanel = new System.Windows.Forms.Panel();
             this.encryptionBox = new System.Windows.Forms.GroupBox();
             this.isEncryptionCb = new System.Windows.Forms.CheckBox();
@@ -116,6 +117,7 @@
             this.topPanel.Controls.Add(this.reloadConfigBtn);
             this.topPanel.Controls.Add(this.openBtn);
             this.topPanel.Controls.Add(this.configBtn);
+            this.topPanel.Controls.Add(this.qrBtn);
             this.topPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.topPanel.Location = new System.Drawing.Point(0, 0);
             this.topPanel.Name = "topPanel";
@@ -185,36 +187,16 @@
             this.ipPortLabel.TabIndex = 0;
             this.ipPortLabel.Text = "端口号：";
             // 
-            // reloadConfigBtn
-            // 
-            this.reloadConfigBtn.Location = new System.Drawing.Point(565, 50);
-            this.reloadConfigBtn.Name = "reloadConfigBtn";
-            this.reloadConfigBtn.Size = new System.Drawing.Size(100, 23);
-            this.reloadConfigBtn.TabIndex = 5;
-            this.reloadConfigBtn.Text = "重新加载配置";
-            this.toolTip.SetToolTip(this.reloadConfigBtn, "点击重新加载配置");
-            this.reloadConfigBtn.UseVisualStyleBackColor = true;
-            this.reloadConfigBtn.Click += new System.EventHandler(this.ReloadConfigBtn_Click);
-            // 
-            // configBtn
-            // 
-            this.configBtn.Location = new System.Drawing.Point(670, 50);
-            this.configBtn.Name = "configBtn";
-            this.configBtn.Size = new System.Drawing.Size(90, 53);
-            this.configBtn.TabIndex = 7;
-            this.configBtn.Text = "配置\r\n(开发中)";
-            this.toolTip.SetToolTip(this.configBtn, "点击显示配置界面");
-            this.configBtn.UseVisualStyleBackColor = true;
-            this.configBtn.Click += new System.EventHandler(this.ConfigBtn_Click);
-            // 
             // shareLinkText
             // 
             this.shareLinkText.BackColor = System.Drawing.SystemColors.Window;
             this.shareLinkText.Location = new System.Drawing.Point(70, 80);
+            this.shareLinkText.Multiline = true;
             this.shareLinkText.Name = "shareLinkText";
             this.shareLinkText.ReadOnly = true;
             this.shareLinkText.Size = new System.Drawing.Size(440, 21);
             this.shareLinkText.TabIndex = 3;
+            this.toolTip.SetToolTip(this.shareLinkText, "分享地址");
             // 
             // shareLinkLabel
             // 
@@ -232,9 +214,20 @@
             this.copyBtn.Size = new System.Drawing.Size(45, 23);
             this.copyBtn.TabIndex = 4;
             this.copyBtn.Text = "复制";
-            this.toolTip.SetToolTip(this.copyBtn, "点击可以复制分享地址。");
+            this.toolTip.SetToolTip(this.copyBtn, "点击复制分享地址");
             this.copyBtn.UseVisualStyleBackColor = true;
             this.copyBtn.Click += new System.EventHandler(this.CopyBtn_Click);
+            // 
+            // reloadConfigBtn
+            // 
+            this.reloadConfigBtn.Location = new System.Drawing.Point(565, 50);
+            this.reloadConfigBtn.Name = "reloadConfigBtn";
+            this.reloadConfigBtn.Size = new System.Drawing.Size(100, 23);
+            this.reloadConfigBtn.TabIndex = 5;
+            this.reloadConfigBtn.Text = "重新加载配置";
+            this.toolTip.SetToolTip(this.reloadConfigBtn, "点击重新加载配置");
+            this.reloadConfigBtn.UseVisualStyleBackColor = true;
+            this.reloadConfigBtn.Click += new System.EventHandler(this.ReloadConfigBtn_Click);
             // 
             // openBtn
             // 
@@ -243,8 +236,31 @@
             this.openBtn.Size = new System.Drawing.Size(100, 23);
             this.openBtn.TabIndex = 6;
             this.openBtn.Text = "用浏览器打开";
+            this.toolTip.SetToolTip(this.openBtn, "点击用浏览器打开网站");
             this.openBtn.UseVisualStyleBackColor = true;
             this.openBtn.Click += new System.EventHandler(this.OpenBtn_Click);
+            // 
+            // configBtn
+            // 
+            this.configBtn.Location = new System.Drawing.Point(670, 50);
+            this.configBtn.Name = "configBtn";
+            this.configBtn.Size = new System.Drawing.Size(90, 23);
+            this.configBtn.TabIndex = 7;
+            this.configBtn.Text = "系统配置";
+            this.toolTip.SetToolTip(this.configBtn, "点击显示系统配置界面");
+            this.configBtn.UseVisualStyleBackColor = true;
+            this.configBtn.Click += new System.EventHandler(this.ConfigBtn_Click);
+            // 
+            // qrBtn
+            // 
+            this.qrBtn.Location = new System.Drawing.Point(670, 80);
+            this.qrBtn.Name = "qrBtn";
+            this.qrBtn.Size = new System.Drawing.Size(90, 23);
+            this.qrBtn.TabIndex = 8;
+            this.qrBtn.Text = "网站二维码";
+            this.toolTip.SetToolTip(this.qrBtn, "点击显示网站二维码界面");
+            this.qrBtn.UseVisualStyleBackColor = true;
+            this.qrBtn.Click += new System.EventHandler(this.QrBtn_Click);
             // 
             // middlePanel
             // 
@@ -685,7 +701,7 @@
             this.videoFrameNud.Name = "videoFrameNud";
             this.videoFrameNud.Size = new System.Drawing.Size(50, 21);
             this.videoFrameNud.TabIndex = 2;
-            this.toolTip.SetToolTip(this.videoFrameNud, "每秒刷新次数，数字越大越流畅；为0时以最快速度刷新。\r\n");
+            this.toolTip.SetToolTip(this.videoFrameNud, "每秒刷新次数，数字越大越流畅；为0时以最快速度刷新");
             this.videoFrameNud.Value = new decimal(new int[] {
             5,
             0,
@@ -930,9 +946,13 @@
         /// </summary>
         private System.Windows.Forms.Button reloadConfigBtn;
         /// <summary>
-        /// 配置Button
+        /// 系统配置Button
         /// </summary>
         private System.Windows.Forms.Button configBtn;
+        /// <summary>
+        /// 网站二维码Button
+        /// </summary>
+        private System.Windows.Forms.Button qrBtn;
 
         /* 中部 */
         /// <summary>

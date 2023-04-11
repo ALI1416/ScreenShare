@@ -97,6 +97,12 @@
     <Compile Include="Preview.Designer.cs">
       <DependentUpon>Preview.cs</DependentUpon>
     </Compile>
+    <Compile Include="Qr.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Qr.Designer.cs">
+      <DependentUpon>Qr.cs</DependentUpon>
+    </Compile>
     <Compile Include="ScheduledTask\ScheduledTasks.cs" />
     <Compile Include="Util\Utils.cs" />
     <Compile Include="Util\ImageUtils.cs" />
