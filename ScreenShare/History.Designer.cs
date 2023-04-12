@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.topPanel = new System.Windows.Forms.Panel();
             this.autoRefreshCb = new System.Windows.Forms.CheckBox();
             this.onlyOnlineCb = new System.Windows.Forms.CheckBox();
@@ -39,7 +39,6 @@
             this.bottomPanel = new System.Windows.Forms.Panel();
             this.textLabel = new System.Windows.Forms.Label();
             this.tableDataGridView = new System.Windows.Forms.DataGridView();
-            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.status = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ip = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.online = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -48,6 +47,7 @@
             this.frameAvg = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.byteAvg = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.byteCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.topPanel.SuspendLayout();
             this.bottomPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tableDataGridView)).BeginInit();
@@ -70,11 +70,12 @@
             this.autoRefreshCb.AutoSize = true;
             this.autoRefreshCb.Checked = true;
             this.autoRefreshCb.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.autoRefreshCb.Location = new System.Drawing.Point(610, 30);
+            this.autoRefreshCb.Location = new System.Drawing.Point(630, 30);
             this.autoRefreshCb.Name = "autoRefreshCb";
-            this.autoRefreshCb.Size = new System.Drawing.Size(90, 16);
+            this.autoRefreshCb.Size = new System.Drawing.Size(72, 16);
             this.autoRefreshCb.TabIndex = 2;
-            this.autoRefreshCb.Text = "5秒自动刷新";
+            this.autoRefreshCb.Text = "自动刷新";
+            this.toolTip.SetToolTip(this.autoRefreshCb, "是否自动刷新");
             this.autoRefreshCb.UseVisualStyleBackColor = true;
             // 
             // onlyOnlineCb
@@ -85,7 +86,7 @@
             this.onlyOnlineCb.Size = new System.Drawing.Size(108, 16);
             this.onlyOnlineCb.TabIndex = 1;
             this.onlyOnlineCb.Text = "仅显示在线用户";
-            this.toolTip.SetToolTip(this.onlyOnlineCb, "仅显示在线用户");
+            this.toolTip.SetToolTip(this.onlyOnlineCb, "是否仅显示在线用户");
             this.onlyOnlineCb.UseVisualStyleBackColor = true;
             this.onlyOnlineCb.CheckStateChanged += new System.EventHandler(this.OnlyOnlineCheckBox_CheckStateChanged);
             // 
@@ -98,7 +99,7 @@
             this.refreshLinkLabel.TabIndex = 3;
             this.refreshLinkLabel.TabStop = true;
             this.refreshLinkLabel.Text = "手动刷新";
-            this.toolTip.SetToolTip(this.refreshLinkLabel, "点击刷新");
+            this.toolTip.SetToolTip(this.refreshLinkLabel, "点击手动刷新");
             this.refreshLinkLabel.Click += new System.EventHandler(this.RefreshLinkLabel_Click);
             // 
             // titleLabel
@@ -135,14 +136,14 @@
             this.tableDataGridView.AllowUserToDeleteRows = false;
             this.tableDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.tableDataGridView.BackgroundColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.tableDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.tableDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.tableDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.tableDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.status,
@@ -163,8 +164,8 @@
             // 
             // status
             // 
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.status.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.status.DefaultCellStyle = dataGridViewCellStyle2;
             this.status.FillWeight = 64F;
             this.status.HeaderText = "状态";
             this.status.Name = "status";

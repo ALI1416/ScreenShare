@@ -10,8 +10,9 @@ namespace ScreenShare.Util
     /// <summary>
     /// 图像工具
     /// </summary>
-    internal class ImageUtils
+    public class ImageUtils
     {
+
         /// <summary>
         /// 默认图像格式
         /// </summary>

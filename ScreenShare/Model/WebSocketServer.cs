@@ -4,9 +4,9 @@ using System.Net.Sockets;
 namespace ScreenShare.Model
 {
     /// <summary>
-    /// socket服务端
+    /// webSocket服务端
     /// </summary>
-    public class SocketServer
+    public class WebSocketServer
     {
         /// <summary>
         /// 服务端
@@ -32,7 +32,7 @@ namespace ScreenShare.Model
         /// <summary>
         /// 创建服务端
         /// </summary>
-        public SocketServer()
+        public WebSocketServer()
         {
             Server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             LastRecordTime = DateTime.Now;

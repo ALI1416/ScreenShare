@@ -9,53 +9,36 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 using System.Reflection;
-using System.Web;
 using System.Collections.Specialized;
+using ScreenShare.BLL;
 
 namespace ScreenShare
 {
 
+    /// <summary>
+    /// 主界面
+    /// </summary>
     public partial class ScreenShare : Form
     {
 
         #region 参数
 
         /// <summary>
-        /// 已启动
+        /// html头字符串
         /// </summary>
-        private bool isWorking = false;
-        /// <summary>
-        /// IP地址列表
-        /// </summary>
-        private List<Tuple<string, IPAddress>> ipList;
-        /// <summary>
-        /// 屏幕信息列表
-        /// </summary>
-        private List<Tuple<string, Rectangle>> screenList;
-        /// <summary>
-        /// http服务器
-        /// </summary>
-        private HttpServer httpServer;
-        /// <summary>
-        /// socket服务端
-        /// </summary>
-        private SocketServer socketServer;
-        /// <summary>
-        /// socket客户端
-        /// </summary>
-        private readonly List<SocketClient> socketClientList = new List<SocketClient>();
-
         private static readonly string httpHtmlHeader = "HTTP/1.0 200 OK\nContent-Type: text/html;charset=utf-8\nConnection: close\n\n";
+        /// <summary>
+        /// json头字符串
+        /// </summary>
         private static readonly string httpJsonHeader = "HTTP/1.0 200 OK\nContent-Type: application/json;charset=utf-8\nConnection: close\n\n";
-        private static readonly byte[] httpCloseHeaderBytes = Encoding.UTF8.GetBytes("HTTP/1.0 200 OK\nConnection: close\n\n");
+        /// <summary>
+        /// 图标头byte[]
+        /// </summary>
         private static byte[] httpIconHeaderBytes;
-
-        private Preview preview;
 
         #endregion
 
@@ -77,8 +60,6 @@ namespace ScreenShare
             faviconStream.ToArray().CopyTo(httpIconHeaderBytes, bytes.Length);
             // FPS
             fpsLabel.Parent = previewImg;
-            // 定时任务
-            ScheduledTasks.Start(this);
             // 日志
             Version version = Assembly.GetExecutingAssembly().GetName().Version;
             Log("欢迎使用屏幕共享软件！");
@@ -93,22 +74,24 @@ namespace ScreenShare
         /// </summary>
         public void Start()
         {
-            // 启动http服务器
-            if (!StartHttpServer())
+            // 启动http服务
+            StatusManager.HttpService = new HttpService();
+            if (!StatusManager.HttpService.Start(new IPEndPoint(StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2, (int)ipPortNud.Value), HttpRequestHandle))
             {
-                Log("http服务器启动失败！请尝试更改IP地址或端口号。");
-                MessageBox.Show("http服务器启动失败！请尝试更改IP地址或端口号。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Log("http服务启动失败！请尝试更改IP地址或端口号。");
+                MessageBox.Show("http服务启动失败！请尝试更改IP地址或端口号。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            // 启动socket服务器
-            if (!StartSocketServer())
+            // 启动webSocket服务
+            StatusManager.WebSocketService = new WebSocketService();
+            if (!StatusManager.WebSocketService.Start(new IPEndPoint(StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2, 0), WebSocketClientStatusHandle))
             {
-                CloseHttpServer();
-                Log("socket服务器启动失败！请尝试重启程序或联系开发者。");
-                MessageBox.Show("socket服务器启动失败！请尝试重启程序或联系开发者。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                StatusManager.HttpService.Close();
+                Log("webSocket服务启动失败！请尝试重启程序或联系开发者。");
+                MessageBox.Show("webSocket服务启动失败！请尝试重启程序或联系开发者。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            isWorking = true;
+            StatusManager.IsStarted = true;
             // 开启屏幕捕获任务
             CaptureScreenTask();
             // 设置UI状态为启用
@@ -124,13 +107,13 @@ namespace ScreenShare
         /// </summary>
         public void Stop()
         {
-            isWorking = false;
+            StatusManager.IsStarted = false;
             // 设置UI状态为停用
             SetUiStatus(false);
             // 关闭http服务器
-            CloseHttpServer();
-            // 关闭socket服务器
-            CloseSocketServer();
+            StatusManager.HttpService.Close();
+            // 关闭webSocket服务器
+            StatusManager.WebSocketService.Close();
             // 手动gc
             GC.Collect();
             Log("屏幕共享已停止。");
@@ -138,134 +121,16 @@ namespace ScreenShare
 
         #endregion
 
-        #region http服务器
-
-        /// <summary>
-        /// 启动http服务器
-        /// </summary>
-        /// <returns>是否启动成功</returns>
-        private bool StartHttpServer()
-        {
-            try
-            {
-                // 新建http服务器
-                httpServer = new HttpServer();
-                // 指定IP地址和端口号
-                httpServer.Server.Bind(new IPEndPoint(ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2, (int)ipPortNud.Value));
-                // 设置监听数量
-                httpServer.Server.Listen(10);
-                // 异步监听客户端请求
-                httpServer.Server.BeginAccept(HttpHandle, null);
-            }
-            // 端口号冲突、未知错误
-            catch
-            {
-                httpServer.Close();
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// 关闭http服务器
-        /// </summary>
-        private void CloseHttpServer()
-        {
-            httpServer.Close();
-        }
-
-        /// <summary>
-        /// http处理
-        /// </summary>
-        /// <param name="ar">IAsyncResult</param>
-        private void HttpHandle(IAsyncResult ar)
-        {
-            try
-            {
-                // 继续异步监听客户端请求
-                httpServer.Server.BeginAccept(HttpHandle, null);
-            }
-            // 主动关闭http服务器
-            catch
-            {
-                return;
-            }
-            // 客户端上线
-            HttpClientOnline(httpServer.Server.EndAccept(ar));
-        }
-
-        /// <summary>
-        /// http客户端上线
-        /// </summary>
-        /// <param name="client">客户端</param>
-        private void HttpClientOnline(Socket client)
-        {
-            HttpClient httpClient = null;
-            try
-            {
-                httpClient = new HttpClient(client);
-                // 设置超时10秒
-                client.SendTimeout = 10000;
-                // 接收消息
-                client.BeginReceive(httpClient.Buffer, 0, httpClient.Buffer.Length, SocketFlags.None, HttpRecevice, httpClient);
-            }
-            catch
-            {
-                if (httpClient != null)
-                {
-                    httpClient.Close();
-                }
-                return;
-            }
-        }
-
-        /// <summary>
-        /// http接收消息
-        /// </summary>
-        /// <param name="ar">IAsyncResult</param>
-        private void HttpRecevice(IAsyncResult ar)
-        {
-            // 获取当前客户端
-            HttpClient httpClient = ar.AsyncState as HttpClient;
-            try
-            {
-                // 获取接收数据长度
-                int length = httpClient.Client.EndReceive(ar);
-                // 客户端主动断开连接时，会发送0字节消息
-                if (length == 0)
-                {
-                    httpClient.Close();
-                    return;
-                }
-                // 解码消息
-                string msg = Encoding.UTF8.GetString(httpClient.Buffer, 0, length);
-                // httpRequest处理
-                HttpRequestHandle(httpClient, msg);
-                // 关闭连接
-                httpClient.Close();
-            }
-            // 超时后失去连接、未知错误
-            catch
-            {
-                httpClient.Close();
-                return;
-            }
-        }
+        #region http服务处理
 
         /// <summary>
         /// httpRequest处理
         /// </summary>
-        /// <param name="httpClient">HttpClient</param>
-        /// <param name="request">request字符串</param>
-        private void HttpRequestHandle(HttpClient httpClient, string request)
+        /// <param name="path">路径</param>
+        /// <param name="param">参数</param>
+        /// <returns>返回值</returns>
+        private byte[] HttpRequestHandle(string path, NameValueCollection param)
         {
-            string[] pathAndQuery = HttpUtility.UrlDecode(request.Substring(4, request.IndexOf('\r') - 13)).Split('?');
-            string path = pathAndQuery[0];
-            NameValueCollection param = null;
-            if (pathAndQuery.Length > 1)
-            {
-                param = HttpUtility.ParseQueryString(pathAndQuery[1]);
-            }
             byte[] data;
             switch (path)
             {
@@ -296,280 +161,34 @@ namespace ScreenShare
                             // 密码正确
                             else
                             {
-                                apiGetVideoInfo += ((IPEndPoint)socketServer.Server.LocalEndPoint).Port + "}";
+                                apiGetVideoInfo += ((IPEndPoint)StatusManager.WebSocketService.ServerIpAndPort()).Port + "}";
                             }
                         }
                         // 未开启加密
                         else
                         {
-                            apiGetVideoInfo += ((IPEndPoint)socketServer.Server.LocalEndPoint).Port + "}";
+                            apiGetVideoInfo += ((IPEndPoint)StatusManager.WebSocketService.ServerIpAndPort()).Port + "}";
                         }
                         data = Encoding.UTF8.GetBytes(httpJsonHeader + apiGetVideoInfo);
                         break;
                     }
             }
-            HttpSend(httpClient, data);
-        }
-
-        /// <summary>
-        /// http发送消息
-        /// </summary>
-        /// <param name="httpClient">HttpClient</param>
-        /// <param name="data">byte[]</param>
-        private void HttpSend(HttpClient httpClient, byte[] data)
-        {
-            try
-            {
-                // 发送消息
-                httpClient.Client.BeginSend(data, 0, data.Length, SocketFlags.None, null, null);
-            }
-            // 未知错误
-            catch
-            {
-                httpClient.Close();
-                return;
-            }
+            return data;
         }
 
         #endregion
 
-        #region socket服务器
+        #region webSocket服务处理
 
         /// <summary>
-        /// 启动socket服务器
-        /// <returns>是否启动成功</returns>
-        /// </summary>
-        private bool StartSocketServer()
-        {
-            try
-            {
-                // 记录上次`字节总数`
-                int byteCount = 0;
-                if (socketServer != null)
-                {
-                    byteCount = socketServer.ByteCount;
-                }
-                // 新建socket服务器
-                socketServer = new SocketServer();
-                // `字节总数`累加
-                socketServer.ByteCount += byteCount;
-                // 指定IP地址和随机端口号
-                socketServer.Server.Bind(new IPEndPoint(ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2, 0));
-                // 设置监听数量
-                socketServer.Server.Listen(10);
-                // 异步监听客户端请求
-                socketServer.Server.BeginAccept(SocketHandle, null);
-            }
-            // 未知错误
-            catch
-            {
-                socketServer.Close();
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// 关闭socket服务器
-        /// </summary>
-        private void CloseSocketServer()
-        {
-            foreach (var socketClient in socketClientList.FindAll(e => e.Client != null))
-            {
-                SocketClientOffline(socketClient);
-            }
-            socketServer.Close();
-        }
-
-        /// <summary>
-        /// socket处理
-        /// </summary>
-        /// <param name="ar">IAsyncResult</param>
-        private void SocketHandle(IAsyncResult ar)
-        {
-            try
-            {
-                // 继续异步监听客户端请求
-                socketServer.Server.BeginAccept(SocketHandle, null);
-            }
-            // 主动关闭socket服务器
-            catch
-            {
-                return;
-            }
-            // 客户端上线
-            SocketClientOnline(socketServer.Server.EndAccept(ar));
-        }
-
-        /// <summary>
-        /// socket客户端上线
-        /// </summary>
-        /// <param name="client">客户端</param>
-        private void SocketClientOnline(Socket client)
-        {
-            // 已存在
-            if (socketClientList.Exists(e => e.Client == client))
-            {
-                return;
-            }
-            SocketClient socketClient = null;
-            try
-            {
-                socketClient = new SocketClient(client);
-                // 设置超时10秒
-                client.SendTimeout = 10000;
-                // 接收消息
-                client.BeginReceive(socketClient.Buffer, 0, socketClient.Buffer.Length, SocketFlags.None, SocketRecevice, socketClient);
-            }
-            catch
-            {
-                if (socketClient != null)
-                {
-                    socketClient.Close();
-                }
-                return;
-            }
-        }
-
-        /// <summary>
-        /// socket客户端下线
-        /// </summary>
-        /// <param name="socketClient">SocketClient</param>
-        private void SocketClientOffline(SocketClient socketClient)
-        {
-            // 不存在
-            if (!socketClientList.FindAll(e => e.Client != null).Contains(socketClient))
-            {
-                return;
-            }
-            socketClient.Close();
-            UpdateSocketUi(socketClient.Ip, false);
-        }
-
-        /// <summary>
-        /// 接收socket消息
-        /// </summary>
-        /// <param name="ar">IAsyncResult</param>
-        private void SocketRecevice(IAsyncResult ar)
-        {
-            // 获取当前客户端
-            SocketClient socketClient = ar.AsyncState as SocketClient;
-            try
-            {
-                // 获取接收数据长度
-                int length = socketClient.Client.EndReceive(ar);
-                // 客户端主动断开连接时，会发送0字节消息
-                if (length == 0)
-                {
-                    SocketClientOffline(socketClient);
-                    return;
-                }
-                // 首次连接
-                if (socketClient.Buffer[0] == 71)
-                {
-                    // 解码消息
-                    string msg = Encoding.UTF8.GetString(socketClient.Buffer, 0, length);
-                    // 获取握手信息
-                    byte[] data = WebSocketUtils.HandShake(msg);
-                    if (data != null)
-                    {
-                        // 发送握手信息
-                        SocketSendRaw(socketClient, data);
-                        // 继续接收消息
-                        socketClient.Client.BeginReceive(socketClient.Buffer, 0, length, SocketFlags.None, SocketRecevice, socketClient);
-                        socketClientList.Add(socketClient);
-                        UpdateSocketUi(socketClient.Ip, true);
-                    }
-                    // 无法握手
-                    else
-                    {
-                        // 关闭连接
-                        SocketSendRaw(socketClient, httpCloseHeaderBytes);
-                        socketClient.Close();
-                        return;
-                    }
-                }
-                else
-                {
-                    // 继续接收消息
-                    socketClient.Client.BeginReceive(socketClient.Buffer, 0, length, SocketFlags.None, SocketRecevice, socketClient);
-                    // 解码消息
-                    string data = WebSocketUtils.DecodeDataString(socketClient.Buffer, length);
-                    // 客户端关闭连接
-                    if (data == null)
-                    {
-                        SocketClientOffline(socketClient);
-                        return;
-                    }
-                    else
-                    {
-                        socketClient.Transmission = false;
-                    }
-                }
-            }
-            // 超时后失去连接、未知错误
-            catch
-            {
-                SocketClientOffline(socketClient);
-                return;
-            }
-        }
-
-        /// <summary>
-        /// socket发送原始消息
-        /// </summary>
-        /// <param name="socketClient">SocketClient</param>
-        /// <param name="data">byte[]</param>
-        private void SocketSendRaw(SocketClient socketClient, byte[] data)
-        {
-            try
-            {
-                // 发送消息
-                socketClient.Client.BeginSend(data, 0, data.Length, SocketFlags.None, asyncResult =>
-                {
-                    try
-                    {
-                        socketClient.Client.EndSend(asyncResult);
-                    }
-                    // 已失去连接
-                    catch
-                    {
-                        SocketClientOffline(socketClient);
-                        return;
-                    }
-                }, null);
-            }
-            // 未知错误
-            catch
-            {
-                SocketClientOffline(socketClient);
-                return;
-            }
-        }
-
-        /// <summary>
-        /// socket发送MemoryStream
-        /// </summary>
-        /// <param name="list">List SocketClient</param>
-        /// <param name="data">byte[]</param>
-        private void SocketSendMemoryStream(List<SocketClient> list, byte[] data)
-        {
-            foreach (var socketClient in list)
-            {
-                socketClient.Record(data.Length);
-                SocketSendRaw(socketClient, WebSocketUtils.CodedData(data, false));
-            }
-        }
-
-        /// <summary>
-        /// 更新socket UI
+        /// webSocket客户端状态处理
         /// </summary>
         /// <param name="ip">IP地址</param>
         /// <param name="online">上线或下线</param>
-        private void UpdateSocketUi(string ip, bool online)
+        private void WebSocketClientStatusHandle(string ip, bool online)
         {
             /* 更新在线数量 */
-            string count = "当前在线用户数量：" + socketClientList.FindAll(e => e.Client != null).Count;
+            string count = "当前在线用户数量：" + StatusManager.WebSocketService.WebSocketClientList.FindAll(e => e.Client != null).Count;
             // 利用委托，防止`线程间操作无效`
             Action<string> action = (data) =>
             {
@@ -610,12 +229,12 @@ namespace ScreenShare
             if (screen.Size == video && videoQuality == 100)
             {
                 // 开启共享
-                while (isWorking)
+                while (StatusManager.IsStarted)
                 {
                     // 获取在线 并且 可发送数据的用户列表
-                    var list = socketClientList.FindAll(e => (e.Client != null && !e.Transmission));
+                    var list = StatusManager.WebSocketService.WebSocketClientList.FindAll(e => (e.Client != null && !e.Transmission));
                     // 符合条件的用户 或 正在预览
-                    if (list.Count != 0 || !(previewImg.Dock == DockStyle.None || WindowState == FormWindowState.Minimized))
+                    if (list.Count != 0 || (FormManager.Preview != null && FormManager.Preview.Visible))
                     {
                         try
                         {
@@ -628,13 +247,13 @@ namespace ScreenShare
                             {
                                 var data = stream.ToArray();
                                 // 发送给socket客户端
-                                SocketSendMemoryStream(list, data);
+                                StatusManager.WebSocketService.SendDataByClient(list, data);
                                 // 记录服务端日志
-                                socketServer.Record(list.Count * data.Length);
+                                StatusManager.WebSocketService.ServerRecord(list.Count * data.Length);
                             }
                             else
                             {
-                                socketServer.Record(0);
+                                StatusManager.WebSocketService.ServerRecord(0);
                             }
                             // 运行时更新预览图
                             UpdatePreviewImgWhileWorking(bitmap);
@@ -654,10 +273,10 @@ namespace ScreenShare
             // 缩放
             else if (screen.Size != video && videoQualityNud.Value == 100)
             {
-                while (isWorking)
+                while (StatusManager.IsStarted)
                 {
-                    var list = socketClientList.FindAll(e => (e.Client != null && !e.Transmission));
-                    if (list.Count != 0 || !(previewImg.Dock == DockStyle.None || WindowState == FormWindowState.Minimized))
+                    var list = StatusManager.WebSocketService.WebSocketClientList.FindAll(e => (e.Client != null && !e.Transmission));
+                    if (list.Count != 0 || (FormManager.Preview != null && FormManager.Preview.Visible))
                     {
                         try
                         {
@@ -667,12 +286,12 @@ namespace ScreenShare
                             if (list.Count != 0)
                             {
                                 var data = stream.ToArray();
-                                SocketSendMemoryStream(list, data);
-                                socketServer.Record(list.Count * data.Length);
+                                StatusManager.WebSocketService.SendDataByClient(list, data);
+                                StatusManager.WebSocketService.ServerRecord(list.Count * data.Length);
                             }
                             else
                             {
-                                socketServer.Record(0);
+                                StatusManager.WebSocketService.ServerRecord(0);
                             }
                             UpdatePreviewImgWhileWorking(bitmap);
                         }
@@ -688,10 +307,10 @@ namespace ScreenShare
             // 压缩
             else if (screen.Size == video && videoQuality != 100)
             {
-                while (isWorking)
+                while (StatusManager.IsStarted)
                 {
-                    var list = socketClientList.FindAll(e => (e.Client != null && !e.Transmission));
-                    if (list.Count != 0 || !(previewImg.Dock == DockStyle.None || WindowState == FormWindowState.Minimized))
+                    var list = StatusManager.WebSocketService.WebSocketClientList.FindAll(e => (e.Client != null && !e.Transmission));
+                    if (list.Count != 0 || (FormManager.Preview != null && FormManager.Preview.Visible))
                     {
                         try
                         {
@@ -701,12 +320,12 @@ namespace ScreenShare
                             if (list.Count != 0)
                             {
                                 var data = stream.ToArray();
-                                SocketSendMemoryStream(list, data);
-                                socketServer.Record(list.Count * data.Length);
+                                StatusManager.WebSocketService.SendDataByClient(list, data);
+                                StatusManager.WebSocketService.ServerRecord(list.Count * data.Length);
                             }
                             else
                             {
-                                socketServer.Record(0);
+                                StatusManager.WebSocketService.ServerRecord(0);
                             }
                             UpdatePreviewImgWhileWorking(bitmap);
                         }
@@ -722,10 +341,10 @@ namespace ScreenShare
             // 缩放+压缩
             else
             {
-                while (isWorking)
+                while (StatusManager.IsStarted)
                 {
-                    var list = socketClientList.FindAll(e => (e.Client != null && !e.Transmission));
-                    if (list.Count != 0 || !(previewImg.Dock == DockStyle.None || WindowState == FormWindowState.Minimized))
+                    var list = StatusManager.WebSocketService.WebSocketClientList.FindAll(e => (e.Client != null && !e.Transmission));
+                    if (list.Count != 0 || (FormManager.Preview != null && FormManager.Preview.Visible))
                     {
                         try
                         {
@@ -735,12 +354,12 @@ namespace ScreenShare
                             if (list.Count != 0)
                             {
                                 var data = stream.ToArray();
-                                SocketSendMemoryStream(list, data);
-                                socketServer.Record(list.Count * data.Length);
+                                StatusManager.WebSocketService.SendDataByClient(list, data);
+                                StatusManager.WebSocketService.ServerRecord(list.Count * data.Length);
                             }
                             else
                             {
-                                socketServer.Record(0);
+                                StatusManager.WebSocketService.ServerRecord(0);
                             }
                             UpdatePreviewImgWhileWorking(bitmap);
                         }
@@ -781,11 +400,12 @@ namespace ScreenShare
         /// </summary>
         private void Init()
         {
+            StatusManager.IsStarted = false;
             /* 头部 */
             // IP地址
-            ipList = Utils.GetAllIPv4Address();
+            StatusManager.IpList = Utils.GetAllIPv4Address();
             ipAddressComboBox.Items.Clear();
-            foreach (var ip in ipList)
+            foreach (var ip in StatusManager.IpList)
             {
                 ipAddressComboBox.Items.Add(ip.Item2 + " - " + ip.Item1);
             }
@@ -793,7 +413,7 @@ namespace ScreenShare
             // 端口号
             ipPortNud.Value = 7070;
             // 分享地址
-            shareLinkText.Text = "http://" + ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value + "/";
+            shareLinkText.Text = "http://" + StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value + "/";
 
             /* 加密传输 */
             // 开启加密
@@ -805,13 +425,13 @@ namespace ScreenShare
             // 全屏
             isFullScreenCb.Checked = true;
             // 显示器
-            screenList = Utils.GetAllScreen();
+            StatusManager.ScreenList = Utils.GetAllScreen();
             screenComboBox.Items.Clear();
-            foreach (var screen in screenList)
+            foreach (var screen in StatusManager.ScreenList)
             {
                 screenComboBox.Items.Add(screen.Item1 + "[" + screen.Item2.Width + "x" + screen.Item2.Height + "]");
             }
-            if (screenList.Count == 1)
+            if (StatusManager.ScreenList.Count == 1)
             {
                 screenComboBox.SelectedIndex = 0;
             }
@@ -819,7 +439,7 @@ namespace ScreenShare
             {
                 screenComboBox.SelectedIndex = 1;
             }
-            Rectangle selectedScreen = screenList.ElementAt(screenComboBox.SelectedIndex).Item2;
+            Rectangle selectedScreen = StatusManager.ScreenList.ElementAt(screenComboBox.SelectedIndex).Item2;
             // X
             screenXNud.Minimum = selectedScreen.Left;
             screenXNud.Maximum = selectedScreen.Right - 2;
@@ -863,9 +483,9 @@ namespace ScreenShare
         /// <param name="bitmap">Bitmap</param>
         private void UpdatePreviewImgWhileWorking(Bitmap bitmap)
         {
-            if (preview != null)
+            if (FormManager.Preview != null && FormManager.Preview.Visible)
             {
-                preview.UpdateImg(bitmap);
+                FormManager.Preview.UpdateImg(bitmap);
             }
         }
 
@@ -976,27 +596,10 @@ namespace ScreenShare
         /// </summary>
         public void AutoRefresh()
         {
-            string text;
-            if (socketServer == null)
+            if (Visible)
             {
-                text = "0.00 FPS";
+                ScheduledTasks.FpsAutoRefresh(this, fpsLabel);
             }
-            else
-            {
-                if (DateTime.Now.Subtract(socketServer.LastRecordTime).TotalSeconds < 10)
-                {
-                    text = (socketServer.FrameAvg / 100f).ToString("0.00") + " FPS";
-                }
-                else
-                {
-                    text = "0.00 FPS";
-                }
-            }
-            Action<string> action = (data) =>
-            {
-                fpsLabel.Text = data;
-            };
-            Invoke(action, text);
         }
 
         #endregion
@@ -1010,7 +613,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void StartSharingScreenBtn_Click(object sender, EventArgs e)
         {
-            if (isWorking)
+            if (StatusManager.IsStarted)
             {
                 Stop();
             }
@@ -1027,7 +630,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void IpAddressComboBox_SelectedValueChanged(object sender, EventArgs e)
         {
-            shareLinkText.Text = "http://" + ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value + "/";
+            shareLinkText.Text = "http://" + StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value + "/";
         }
 
         /// <summary>
@@ -1037,7 +640,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void IpPortNud_ValueChanged(object sender, EventArgs e)
         {
-            shareLinkText.Text = "http://" + ipList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value + "/";
+            shareLinkText.Text = "http://" + StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value + "/";
         }
 
         /// <summary>
@@ -1088,7 +691,11 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void ConfigBtn_Click(object sender, EventArgs e)
         {
-            new Config().ShowDialog();
+            if (FormManager.Config == null)
+            {
+                FormManager.Config = new Config();
+            }
+            FormManager.Config.ShowDialog();
         }
 
         /// <summary>
@@ -1098,7 +705,11 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void QrBtn_Click(object sender, EventArgs e)
         {
-            new Qr().ShowDialog();
+            if (FormManager.Qr == null)
+            {
+                FormManager.Qr = new Qr();
+            }
+            FormManager.Qr.ShowDialog();
         }
 
         /// <summary>
@@ -1122,7 +733,7 @@ namespace ScreenShare
             screenXNud.Enabled = screenYNud.Enabled = screenWNud.Enabled = screenHNud.Enabled = !isChecked;
             if (isChecked)
             {
-                Rectangle selectedScreen = screenList.ElementAt(screenComboBox.SelectedIndex).Item2;
+                Rectangle selectedScreen = StatusManager.ScreenList.ElementAt(screenComboBox.SelectedIndex).Item2;
                 screenXNud.Value = selectedScreen.X;
                 screenYNud.Value = selectedScreen.Y;
                 screenWNud.Value = selectedScreen.Width;
@@ -1137,7 +748,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void ScreenComboBox_SelectedValueChanged(object sender, EventArgs e)
         {
-            Rectangle selectedScreen = screenList.ElementAt(screenComboBox.SelectedIndex).Item2;
+            Rectangle selectedScreen = StatusManager.ScreenList.ElementAt(screenComboBox.SelectedIndex).Item2;
             screenXNud.Minimum = selectedScreen.Left;
             screenXNud.Maximum = selectedScreen.Right - 1;
             screenXNud.Value = selectedScreen.X;
@@ -1157,7 +768,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void ScreenXNud_ValueChanged(object sender, EventArgs e)
         {
-            screenWNud.Maximum = screenList.ElementAt(screenComboBox.SelectedIndex).Item2.Right - screenXNud.Value;
+            screenWNud.Maximum = StatusManager.ScreenList.ElementAt(screenComboBox.SelectedIndex).Item2.Right - screenXNud.Value;
             // TODO 屏幕的XY宽高同时发生改变可能会渲染多次预览图
             UpdatePreviewImgWithCaptureScreen();
         }
@@ -1169,7 +780,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void ScreenYNud_ValueChanged(object sender, EventArgs e)
         {
-            screenHNud.Maximum = screenList.ElementAt(screenComboBox.SelectedIndex).Item2.Bottom - screenYNud.Value;
+            screenHNud.Maximum = StatusManager.ScreenList.ElementAt(screenComboBox.SelectedIndex).Item2.Bottom - screenYNud.Value;
             UpdatePreviewImgWithCaptureScreen();
         }
 
@@ -1202,7 +813,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void CaptureScreenCoordinatesBtn_Click(object sender, EventArgs e)
         {
-            DrawScreen drawScreen = new DrawScreen(screenList.ElementAt(screenComboBox.SelectedIndex).Item2);
+            DrawScreen drawScreen = new DrawScreen(StatusManager.ScreenList.ElementAt(screenComboBox.SelectedIndex).Item2);
             if (drawScreen.ShowDialog() == DialogResult.OK)
             {
                 Rectangle rect = drawScreen.rect;
@@ -1252,11 +863,15 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void PreviewImg_Click(object sender, EventArgs e)
         {
-            if (preview == null)
+            if (FormManager.Preview == null)
             {
-                preview = new Preview();
+                FormManager.Preview = new Preview();
             }
-            preview.ShowDialog();
+            if (!StatusManager.IsStarted)
+            {
+                FormManager.Preview.UpdateImg(previewImg.Image);
+            }
+            FormManager.Preview.ShowDialog();
         }
 
         /// <summary>
@@ -1266,7 +881,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void PreviewLabel_Click(object sender, EventArgs e)
         {
-            PreviewImg_Click(null, null);
+            PreviewImg_Click(sender, e);
         }
 
         /// <summary>
@@ -1286,8 +901,8 @@ namespace ScreenShare
                     previewImg.Image = null;
                 }
             }
-            // 还原窗口：如果未在运行、未显示预览图
-            else if (!isWorking && previewImg.Image == null)
+            // 还原窗口：未在运行
+            else if (!StatusManager.IsStarted)
             {
                 // 更新预览图
                 UpdatePreviewImgWithCaptureScreen();
@@ -1301,8 +916,11 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void UserCountLinkLabel_Click(object sender, EventArgs e)
         {
-            ScheduledTasks.history = new History(socketServer, socketClientList);
-            ScheduledTasks.history.ShowDialog();
+            if (FormManager.History == null)
+            {
+                FormManager.History = new History();
+            }
+            FormManager.History.ShowDialog();
         }
 
         /// <summary>
@@ -1322,8 +940,8 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void ScreenShare_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // 如果正在运行，则托盘
-            if (isWorking)
+            // 如果正在运行：托盘
+            if (StatusManager.IsStarted)
             {
                 if (previewImg.Image != null)
                 {

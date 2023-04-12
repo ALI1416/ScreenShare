@@ -4,6 +4,10 @@ using System.Windows.Forms;
 
 namespace ScreenShare
 {
+
+    /// <summary>
+    /// 选取屏幕
+    /// </summary>
     public partial class DrawScreen : Form
     {
 

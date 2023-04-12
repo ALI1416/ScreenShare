@@ -7,7 +7,7 @@ namespace ScreenShare.Model
     /// <summary>
     /// socket客户端
     /// </summary>
-    public class SocketClient
+    public class WebSocketClient
     {
         /// <summary>
         /// 客户端
@@ -62,7 +62,7 @@ namespace ScreenShare.Model
         /// 新建客户端
         /// </summary>
         /// <param name="client">Socket</param>
-        public SocketClient(Socket client)
+        public WebSocketClient(Socket client)
         {
             Client = client;
             Buffer = new byte[1024];

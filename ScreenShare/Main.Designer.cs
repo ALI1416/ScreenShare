@@ -778,12 +778,11 @@
             // previewLabel
             // 
             this.previewLabel.AutoSize = true;
-            this.previewLabel.Location = new System.Drawing.Point(545, 90);
+            this.previewLabel.Location = new System.Drawing.Point(555, 100);
             this.previewLabel.Name = "previewLabel";
-            this.previewLabel.Size = new System.Drawing.Size(101, 24);
+            this.previewLabel.Size = new System.Drawing.Size(77, 12);
             this.previewLabel.TabIndex = 0;
-            this.previewLabel.Text = "点击此处预览\r\n再次点击退出预览";
-            this.previewLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.previewLabel.Text = "点击此处预览";
             this.previewLabel.Visible = false;
             this.previewLabel.Click += new System.EventHandler(this.PreviewLabel_Click);
             // 

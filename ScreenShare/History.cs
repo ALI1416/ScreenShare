@@ -1,27 +1,22 @@
 ﻿using ScreenShare.Model;
 using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace ScreenShare
 {
+
+    /// <summary>
+    /// 用户在线历史
+    /// </summary>
     public partial class History : Form
     {
 
         /// <summary>
-        /// socket服务端
+        /// 构造函数
         /// </summary>
-        private readonly SocketServer socketServer;
-        /// <summary>
-        /// socket客户端
-        /// </summary>
-        private readonly List<SocketClient> socketClientList = new List<SocketClient>();
-
-        public History(SocketServer socketServer, List<SocketClient> socketClientList)
+        public History()
         {
             InitializeComponent();
-            this.socketServer = socketServer;
-            this.socketClientList = socketClientList;
             Init(false);
         }
 
@@ -33,7 +28,7 @@ namespace ScreenShare
             tableDataGridView.Rows.Clear();
             var now = DateTime.Now;
             int online = 0;
-            var list = socketClientList.ToArray();
+            var list = StatusManager.WebSocketService.WebSocketClientList.ToArray();
             foreach (var socketClient in list)
             {
                 // 仅显示在线
@@ -77,21 +72,21 @@ namespace ScreenShare
                 }
             }
             string text = "当前在线用户数量：" + online + "        累计访问用户数量：" + list.Length + "        当前帧率(帧/秒)：";
-            if (socketServer == null)
+            if (StatusManager.WebSocketService.Server() == null)
             {
                 text += "0.00        传输数据总量(Mb)：0.00";
             }
             else
             {
-                if (now.Subtract(socketServer.LastRecordTime).TotalSeconds < 10)
+                if (now.Subtract(StatusManager.WebSocketService.Server().LastRecordTime).TotalSeconds < 10)
                 {
-                    text += (socketServer.FrameAvg / 100f).ToString("0.00");
+                    text += (StatusManager.WebSocketService.Server().FrameAvg / 100f).ToString("0.00");
                 }
                 else
                 {
                     text += "0.00";
                 }
-                text += "        传输数据总量(Mb)：" + (socketServer.ByteCount / 1048576f).ToString("0.00");
+                text += "        传输数据总量(Mb)：" + (StatusManager.WebSocketService.Server().ByteCount / 1048576f).ToString("0.00");
             }
             textLabel.Text = text;
         }

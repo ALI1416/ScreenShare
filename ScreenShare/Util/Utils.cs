@@ -13,7 +13,7 @@ namespace ScreenShare.Util
     /// <summary>
     /// 通用工具
     /// </summary>
-    internal class Utils
+    public class Utils
     {
 
         /// <summary>
