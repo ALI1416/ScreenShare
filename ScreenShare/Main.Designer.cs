@@ -822,7 +822,6 @@
             // 
             // logText
             // 
-            this.logText.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.logText.BackColor = System.Drawing.SystemColors.Window;
             this.logText.Location = new System.Drawing.Point(10, 60);
             this.logText.Multiline = true;
@@ -866,7 +865,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "屏幕共享";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ScreenShare_FormClosing);
-            this.SizeChanged += new System.EventHandler(this.ScreenShare_SizeChanged);
             this.topPanel.ResumeLayout(false);
             this.topPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ipPortNud)).EndInit();

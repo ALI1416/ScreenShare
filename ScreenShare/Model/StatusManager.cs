@@ -29,7 +29,7 @@ namespace ScreenShare.Model
         /// </summary>
         public static HttpService HttpService { get; set; }
         /// <summary>
-        /// socket服务
+        /// webSocket服务
         /// </summary>
         public static WebSocketService WebSocketService { get; set; }
 

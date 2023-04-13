@@ -42,7 +42,7 @@
             this.Name = "Config";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "系统配置";
+            this.Text = "系统配置(开发中)";
             this.ResumeLayout(false);
         }
 

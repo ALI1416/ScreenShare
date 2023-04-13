@@ -3,12 +3,10 @@ using ScreenShare.Model;
 using ScreenShare.Util;
 using ScreenShare.ScheduledTask;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading.Tasks;
@@ -24,23 +22,6 @@ namespace ScreenShare
     /// </summary>
     public partial class ScreenShare : Form
     {
-
-        #region 参数
-
-        /// <summary>
-        /// html头字符串
-        /// </summary>
-        private static readonly string httpHtmlHeader = "HTTP/1.0 200 OK\nContent-Type: text/html;charset=utf-8\nConnection: close\n\n";
-        /// <summary>
-        /// json头字符串
-        /// </summary>
-        private static readonly string httpJsonHeader = "HTTP/1.0 200 OK\nContent-Type: application/json;charset=utf-8\nConnection: close\n\n";
-        /// <summary>
-        /// 图标头byte[]
-        /// </summary>
-        private static byte[] httpIconHeaderBytes;
-
-        #endregion
 
         #region 公共方法
 
@@ -65,7 +46,6 @@ namespace ScreenShare
             Log("欢迎使用屏幕共享软件！");
             Log("当前版本 " + version.Major + "." + version.Minor + "." + version.Build);
             Log("帮助与反馈地址 https://github.com/ALI1416/ScreenShare");
-            Log("备用地址 https://gitee.com/ALI1416/ScreenShare");
             Log("初始化完成！");
         }
 
@@ -75,16 +55,22 @@ namespace ScreenShare
         public void Start()
         {
             // 启动http服务
-            StatusManager.HttpService = new HttpService();
-            if (!StatusManager.HttpService.Start(new IPEndPoint(StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2, (int)ipPortNud.Value), HttpRequestHandle))
+            if (StatusManager.HttpService == null)
+            {
+                StatusManager.HttpService = new HttpService();
+            }
+            if (!StatusManager.HttpService.Start(StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2, (int)ipPortNud.Value, HttpRequestHandle))
             {
                 Log("http服务启动失败！请尝试更改IP地址或端口号。");
                 MessageBox.Show("http服务启动失败！请尝试更改IP地址或端口号。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             // 启动webSocket服务
-            StatusManager.WebSocketService = new WebSocketService();
-            if (!StatusManager.WebSocketService.Start(new IPEndPoint(StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2, 0), WebSocketClientStatusHandle))
+            if (StatusManager.WebSocketService == null)
+            {
+                StatusManager.WebSocketService = new WebSocketService();
+            }
+            if (!StatusManager.WebSocketService.Start(StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2, 0, WebSocketClientStatusHandle))
             {
                 StatusManager.HttpService.Close();
                 Log("webSocket服务启动失败！请尝试重启程序或联系开发者。");
@@ -110,13 +96,24 @@ namespace ScreenShare
             StatusManager.IsStarted = false;
             // 设置UI状态为停用
             SetUiStatus(false);
-            // 关闭http服务器
+            // 关闭http服务
             StatusManager.HttpService.Close();
-            // 关闭webSocket服务器
+            // 关闭webSocket服务
             StatusManager.WebSocketService.Close();
             // 手动gc
             GC.Collect();
             Log("屏幕共享已停止。");
+        }
+
+        /// <summary>
+        /// 自动刷新
+        /// </summary>
+        public void AutoRefresh()
+        {
+            if (Visible)
+            {
+                ScheduledTasks.FpsAutoRefresh(this, fpsLabel, (FormManager.Preview != null && FormManager.Preview.Visible) || (StatusManager.WebSocketService != null && StatusManager.WebSocketService.ClientOnlineCount() != 0));
+            }
         }
 
         #endregion
@@ -124,7 +121,20 @@ namespace ScreenShare
         #region http服务处理
 
         /// <summary>
-        /// httpRequest处理
+        /// html头字符串
+        /// </summary>
+        private static readonly string httpHtmlHeader = "HTTP/1.0 200 OK\nContent-Type: text/html;charset=utf-8\nConnection: close\n\n";
+        /// <summary>
+        /// json头字符串
+        /// </summary>
+        private static readonly string httpJsonHeader = "HTTP/1.0 200 OK\nContent-Type: application/json;charset=utf-8\nConnection: close\n\n";
+        /// <summary>
+        /// 图标头byte[]
+        /// </summary>
+        private static byte[] httpIconHeaderBytes;
+
+        /// <summary>
+        /// http请求消息处理函数
         /// </summary>
         /// <param name="path">路径</param>
         /// <param name="param">参数</param>
@@ -161,13 +171,13 @@ namespace ScreenShare
                             // 密码正确
                             else
                             {
-                                apiGetVideoInfo += ((IPEndPoint)StatusManager.WebSocketService.ServerIpAndPort()).Port + "}";
+                                apiGetVideoInfo += StatusManager.WebSocketService.ServerPort() + "}";
                             }
                         }
                         // 未开启加密
                         else
                         {
-                            apiGetVideoInfo += ((IPEndPoint)StatusManager.WebSocketService.ServerIpAndPort()).Port + "}";
+                            apiGetVideoInfo += StatusManager.WebSocketService.ServerPort() + "}";
                         }
                         data = Encoding.UTF8.GetBytes(httpJsonHeader + apiGetVideoInfo);
                         break;
@@ -181,14 +191,14 @@ namespace ScreenShare
         #region webSocket服务处理
 
         /// <summary>
-        /// webSocket客户端状态处理
+        /// webSocket客户端状态处理函数
         /// </summary>
         /// <param name="ip">IP地址</param>
         /// <param name="online">上线或下线</param>
         private void WebSocketClientStatusHandle(string ip, bool online)
         {
             /* 更新在线数量 */
-            string count = "当前在线用户数量：" + StatusManager.WebSocketService.WebSocketClientList.FindAll(e => e.Client != null).Count;
+            string count = "当前在线用户数量：" + StatusManager.WebSocketService.ClientOnlineCount();
             // 利用委托，防止`线程间操作无效`
             Action<string> action = (data) =>
             {
@@ -231,8 +241,8 @@ namespace ScreenShare
                 // 开启共享
                 while (StatusManager.IsStarted)
                 {
-                    // 获取在线 并且 可发送数据的用户列表
-                    var list = StatusManager.WebSocketService.WebSocketClientList.FindAll(e => (e.Client != null && !e.Transmission));
+                    // 获取`在线`并且`可发送数据`的用户列表
+                    var list = StatusManager.WebSocketService.ClientOnlineAndNotTransmission();
                     // 符合条件的用户 或 正在预览
                     if (list.Count != 0 || (FormManager.Preview != null && FormManager.Preview.Visible))
                     {
@@ -246,9 +256,9 @@ namespace ScreenShare
                             if (list.Count != 0)
                             {
                                 var data = stream.ToArray();
-                                // 发送给socket客户端
-                                StatusManager.WebSocketService.SendDataByClient(list, data);
-                                // 记录服务端日志
+                                // 发送给webSocket客户端
+                                StatusManager.WebSocketService.SendDataByClientList(list, data);
+                                // 记录webSocket服务端日志
                                 StatusManager.WebSocketService.ServerRecord(list.Count * data.Length);
                             }
                             else
@@ -275,7 +285,7 @@ namespace ScreenShare
             {
                 while (StatusManager.IsStarted)
                 {
-                    var list = StatusManager.WebSocketService.WebSocketClientList.FindAll(e => (e.Client != null && !e.Transmission));
+                    var list = StatusManager.WebSocketService.ClientOnlineAndNotTransmission();
                     if (list.Count != 0 || (FormManager.Preview != null && FormManager.Preview.Visible))
                     {
                         try
@@ -286,7 +296,7 @@ namespace ScreenShare
                             if (list.Count != 0)
                             {
                                 var data = stream.ToArray();
-                                StatusManager.WebSocketService.SendDataByClient(list, data);
+                                StatusManager.WebSocketService.SendDataByClientList(list, data);
                                 StatusManager.WebSocketService.ServerRecord(list.Count * data.Length);
                             }
                             else
@@ -309,7 +319,7 @@ namespace ScreenShare
             {
                 while (StatusManager.IsStarted)
                 {
-                    var list = StatusManager.WebSocketService.WebSocketClientList.FindAll(e => (e.Client != null && !e.Transmission));
+                    var list = StatusManager.WebSocketService.ClientOnlineAndNotTransmission();
                     if (list.Count != 0 || (FormManager.Preview != null && FormManager.Preview.Visible))
                     {
                         try
@@ -320,7 +330,7 @@ namespace ScreenShare
                             if (list.Count != 0)
                             {
                                 var data = stream.ToArray();
-                                StatusManager.WebSocketService.SendDataByClient(list, data);
+                                StatusManager.WebSocketService.SendDataByClientList(list, data);
                                 StatusManager.WebSocketService.ServerRecord(list.Count * data.Length);
                             }
                             else
@@ -343,7 +353,7 @@ namespace ScreenShare
             {
                 while (StatusManager.IsStarted)
                 {
-                    var list = StatusManager.WebSocketService.WebSocketClientList.FindAll(e => (e.Client != null && !e.Transmission));
+                    var list = StatusManager.WebSocketService.ClientOnlineAndNotTransmission();
                     if (list.Count != 0 || (FormManager.Preview != null && FormManager.Preview.Visible))
                     {
                         try
@@ -354,7 +364,7 @@ namespace ScreenShare
                             if (list.Count != 0)
                             {
                                 var data = stream.ToArray();
-                                StatusManager.WebSocketService.SendDataByClient(list, data);
+                                StatusManager.WebSocketService.SendDataByClientList(list, data);
                                 StatusManager.WebSocketService.ServerRecord(list.Count * data.Length);
                             }
                             else
@@ -487,6 +497,10 @@ namespace ScreenShare
             {
                 FormManager.Preview.UpdateImg(bitmap);
             }
+            else
+            {
+                bitmap.Dispose();
+            }
         }
 
         /// <summary>
@@ -589,17 +603,6 @@ namespace ScreenShare
             logText.Text += DateTime.Now.ToString("HH:mm:ss ") + text + "\r\n";
             logText.SelectionStart = logText.Text.Length;
             logText.ScrollToCaret();
-        }
-
-        /// <summary>
-        /// 自动刷新
-        /// </summary>
-        public void AutoRefresh()
-        {
-            if (Visible)
-            {
-                ScheduledTasks.FpsAutoRefresh(this, fpsLabel);
-            }
         }
 
         #endregion
@@ -869,7 +872,7 @@ namespace ScreenShare
             }
             if (!StatusManager.IsStarted)
             {
-                FormManager.Preview.UpdateImg(previewImg.Image);
+                FormManager.Preview.UpdateImg(new Bitmap(previewImg.Image));
             }
             FormManager.Preview.ShowDialog();
         }
@@ -882,31 +885,6 @@ namespace ScreenShare
         private void PreviewLabel_Click(object sender, EventArgs e)
         {
             PreviewImg_Click(sender, e);
-        }
-
-        /// <summary>
-        /// 窗口大小改变后
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ScreenShare_SizeChanged(object sender, EventArgs e)
-        {
-            // 最小化窗口
-            if (WindowState == FormWindowState.Minimized)
-            {
-                // 释放预览图
-                if (previewImg.Image != null)
-                {
-                    previewImg.Image.Dispose();
-                    previewImg.Image = null;
-                }
-            }
-            // 还原窗口：未在运行
-            else if (!StatusManager.IsStarted)
-            {
-                // 更新预览图
-                UpdatePreviewImgWithCaptureScreen();
-            }
         }
 
         /// <summary>

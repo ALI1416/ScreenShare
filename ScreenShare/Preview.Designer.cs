@@ -68,6 +68,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "预览";
             this.Activated += new System.EventHandler(this.Preview_Activated);
+            this.Deactivate += new System.EventHandler(this.Preview_Deactivate);
             ((System.ComponentModel.ISupportInitialize)(this.img)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

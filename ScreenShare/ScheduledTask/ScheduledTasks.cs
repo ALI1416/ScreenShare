@@ -46,23 +46,17 @@ namespace ScreenShare.ScheduledTask
         /// </summary>
         /// <param name="control">Control</param>
         /// <param name="fpsLabel">Label</param>
-        public static void FpsAutoRefresh(Control control, Label fpsLabel)
+        /// <param name="notZero">是否显示非0</param>
+        public static void FpsAutoRefresh(Control control, Label fpsLabel, bool notZero)
         {
             string text;
-            if (StatusManager.WebSocketService.Server() == null)
+            if (notZero && StatusManager.IsStarted)
             {
-                text = "0.00 FPS";
+                text = (StatusManager.WebSocketService.Server().FrameAvg / 100f).ToString("0.00") + " FPS";
             }
             else
             {
-                if (control != null && control.Visible)
-                {
-                    text = (StatusManager.WebSocketService.Server().FrameAvg / 100f).ToString("0.00") + " FPS";
-                }
-                else
-                {
-                    text = "0.00 FPS";
-                }
+                text = "0.00 FPS";
             }
             Action<string> action = (data) =>
             {

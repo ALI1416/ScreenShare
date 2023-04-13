@@ -36,22 +36,13 @@ namespace ScreenShare
         }
 
         /// <summary>
-        /// 更新预览图
-        /// </summary>
-        /// <param name="image">Image</param>
-        public void UpdateImg(Image image)
-        {
-            img.Image = image;
-        }
-
-        /// <summary>
         /// 自动刷新
         /// </summary>
         public void AutoRefresh()
         {
             if (Visible)
             {
-                ScheduledTasks.FpsAutoRefresh(this, fpsLabel);
+                ScheduledTasks.FpsAutoRefresh(this, fpsLabel, true);
             }
         }
 
@@ -63,6 +54,20 @@ namespace ScreenShare
         private void Preview_Activated(object sender, System.EventArgs e)
         {
             fpsLabel.Text = "0.00 FPS";
+        }
+
+        /// <summary>
+        /// 关闭窗口后
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Preview_Deactivate(object sender, System.EventArgs e)
+        {
+            if (img.Image != null)
+            {
+                img.Image.Dispose();
+                img.Image = null;
+            }
         }
 
     }

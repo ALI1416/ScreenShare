@@ -28,7 +28,11 @@ namespace ScreenShare
             tableDataGridView.Rows.Clear();
             var now = DateTime.Now;
             int online = 0;
-            var list = StatusManager.WebSocketService.WebSocketClientList.ToArray();
+            if (StatusManager.WebSocketService == null)
+            {
+                return;
+            }
+            var list = StatusManager.WebSocketService.ClientList();
             foreach (var socketClient in list)
             {
                 // 仅显示在线
