@@ -53,7 +53,7 @@
             this.Name = "Qr";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "网站二维码";
+            this.Text = "网站二维码(开发中)";
             ((System.ComponentModel.ISupportInitialize)(this.img)).EndInit();
             this.ResumeLayout(false);
 

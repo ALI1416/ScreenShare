@@ -45,7 +45,7 @@ namespace ScreenShare
             Version version = Assembly.GetExecutingAssembly().GetName().Version;
             Log("欢迎使用屏幕共享软件！");
             Log("当前版本 " + version.Major + "." + version.Minor + "." + version.Build);
-            Log("帮助与反馈地址 https://github.com/ALI1416/ScreenShare");
+            Log("帮助与反馈 https://github.com/ALI1416/ScreenShare");
             Log("初始化完成！");
         }
 

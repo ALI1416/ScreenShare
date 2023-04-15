@@ -67,8 +67,8 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "预览";
-            this.Activated += new System.EventHandler(this.Preview_Activated);
-            this.Deactivate += new System.EventHandler(this.Preview_Deactivate);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Preview_FormClosed);
+            this.Load += new System.EventHandler(this.Preview_Load);
             ((System.ComponentModel.ISupportInitialize)(this.img)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

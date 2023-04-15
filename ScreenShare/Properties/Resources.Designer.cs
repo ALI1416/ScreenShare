@@ -9,7 +9,6 @@
 //------------------------------------------------------------------------------
 
 namespace ScreenShare.Properties {
-    using System;
     
     
     /// <summary>

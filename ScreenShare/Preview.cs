@@ -51,7 +51,7 @@ namespace ScreenShare
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Preview_Activated(object sender, System.EventArgs e)
+        private void Preview_Load(object sender, System.EventArgs e)
         {
             fpsLabel.Text = "0.00 FPS";
         }
@@ -61,7 +61,7 @@ namespace ScreenShare
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Preview_Deactivate(object sender, System.EventArgs e)
+        private void Preview_FormClosed(object sender, FormClosedEventArgs e)
         {
             if (img.Image != null)
             {
