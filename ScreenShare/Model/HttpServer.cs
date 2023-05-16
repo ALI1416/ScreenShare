@@ -8,6 +8,7 @@ namespace ScreenShare.Model
     /// </summary>
     public class HttpServer
     {
+
         /// <summary>
         /// 服务端
         /// </summary>

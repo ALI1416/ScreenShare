@@ -13,13 +13,13 @@ namespace ScreenShare.Util
     {
 
         /// <summary>
-        /// 握手
+        /// 获取握手响应消息
         /// </summary>
-        /// <param name="msg">握手消息</param>
-        /// <returns>byte[]</returns>
+        /// <param name="msg">握手请求消息</param>
+        /// <returns>握手响应消息(无法握手返回null)</returns>
         public static byte[] HandShake(string msg)
         {
-            var reader = new StringReader(msg);
+            StringReader reader = new StringReader(msg);
             while (true)
             {
                 string line = reader.ReadLine();
@@ -38,11 +38,11 @@ namespace ScreenShare.Util
         }
 
         /// <summary>
-        /// 解码数据获取字符串
+        /// 解码消息 并转为字符串
         /// </summary>
-        /// <param name="msg">数据(不处理超过1帧的数据)</param>
-        /// <param name="length">数据长度</param>
-        /// <returns>字符串(返回null表示关闭连接)</returns>
+        /// <param name="msg">消息(不处理超过1帧的消息)</param>
+        /// <param name="length">消息长度</param>
+        /// <returns>解码后的字符串(返回null表示客户端请求关闭连接)</returns>
         public static string DecodeDataString(byte[] msg, int length)
         {
             byte[] data = DecodeData(msg, length);
@@ -57,11 +57,11 @@ namespace ScreenShare.Util
         }
 
         /// <summary>
-        /// 解码数据
+        /// 解码消息
         /// </summary>
-        /// <param name="msg">数据(不处理超过1帧的数据)</param>
-        /// <param name="length">数据长度</param>
-        /// <returns>byte[](返回null表示关闭连接)</returns>
+        /// <param name="msg">消息(不处理超过1帧的消息)</param>
+        /// <param name="length">消息长度</param>
+        /// <returns>解码后的消息(返回null表示客户端请求关闭连接)</returns>
         public static byte[] DecodeData(byte[] msg, int length)
         {
             // 长度太短、有后续帧、不包含mask
@@ -104,26 +104,26 @@ namespace ScreenShare.Util
         }
 
         /// <summary>
-        /// 编码数据
+        /// 编码消息
         /// </summary>
-        /// <param name="msg">数据</param>
-        /// <param name="text">是否为文本数据</param>
-        /// <returns>byte[]</returns>
-        public static byte[] CodedData(byte[] msg, bool text)
+        /// <param name="msg">消息</param>
+        /// <param name="isText">是否为文本消息</param>
+        /// <returns>编码后的消息</returns>
+        public static byte[] CodedData(byte[] msg, bool isText)
         {
             byte[] data;
             int length = msg.Length;
             if (length < 126)
             {
                 data = new byte[length + 2];
-                data[0] = (byte)(text ? 0x81 : 0x82);
+                data[0] = (byte)(isText ? 0x81 : 0x82);
                 data[1] = (byte)length;
                 msg.CopyTo(data, 2);
             }
             else if (length < 0xFFFF)
             {
                 data = new byte[length + 4];
-                data[0] = (byte)(text ? 0x81 : 0x82);
+                data[0] = (byte)(isText ? 0x81 : 0x82);
                 data[1] = 126;
                 data[2] = (byte)(length >> 8 & 0xFF);
                 data[3] = (byte)(length & 0xFF);
@@ -132,7 +132,7 @@ namespace ScreenShare.Util
             else
             {
                 data = new byte[length + 10];
-                data[0] = (byte)(text ? 0x81 : 0x82);
+                data[0] = (byte)(isText ? 0x81 : 0x82);
                 data[1] = 127;
                 data[2] = 0;
                 data[3] = 0;

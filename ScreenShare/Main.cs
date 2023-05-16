@@ -12,7 +12,7 @@ using System.Windows.Forms;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.Collections.Specialized;
-using ScreenShare.BLL;
+using ScreenShare.Service;
 
 namespace ScreenShare
 {
@@ -33,12 +33,9 @@ namespace ScreenShare
             InitializeComponent();
             Init();
             // 图标
-            byte[] bytes = Encoding.UTF8.GetBytes("HTTP/1.0 200 OK\nContent-Type: image/x-icon\nConnection: close\n\n");
-            MemoryStream faviconStream = new MemoryStream();
-            Resources.favicon.Save(faviconStream);
-            httpIconHeaderBytes = new byte[bytes.Length + faviconStream.Length];
-            bytes.CopyTo(httpIconHeaderBytes, 0);
-            faviconStream.ToArray().CopyTo(httpIconHeaderBytes, bytes.Length);
+            MemoryStream stream = new MemoryStream();
+            Resources.favicon.Save(stream);
+            httpIconHeaderBytes = HttpService.GetBytes(HttpService.icoHeaderBytes, stream);
             // FPS
             fpsLabel.Parent = previewImg;
             // 日志
@@ -59,7 +56,7 @@ namespace ScreenShare
             {
                 StatusManager.HttpService = new HttpService();
             }
-            if (!StatusManager.HttpService.Start(StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2, (int)ipPortNud.Value, HttpRequestHandle))
+            if (!StatusManager.HttpService.Start(StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2, (int)ipPortNud.Value, HttpResponseCallback))
             {
                 Log("http服务启动失败！请尝试更改IP地址或端口号。");
                 MessageBox.Show("http服务启动失败！请尝试更改IP地址或端口号。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -70,7 +67,7 @@ namespace ScreenShare
             {
                 StatusManager.WebSocketService = new WebSocketService();
             }
-            if (!StatusManager.WebSocketService.Start(StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2, 0, WebSocketClientStatusHandle))
+            if (!StatusManager.WebSocketService.Start(StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2, 0, WebSocketClientCallback))
             {
                 StatusManager.HttpService.Close();
                 Log("webSocket服务启动失败！请尝试重启程序或联系开发者。");
@@ -116,30 +113,31 @@ namespace ScreenShare
             }
         }
 
+        /// <summary>
+        /// 获取分享地址
+        /// </summary>
+        /// <returns>分享地址</returns>
+        public string ShareLinkText()
+        {
+            return shareLinkText.Text;
+        }
+
         #endregion
 
         #region http服务处理
 
         /// <summary>
-        /// html头字符串
-        /// </summary>
-        private static readonly string httpHtmlHeader = "HTTP/1.0 200 OK\nContent-Type: text/html;charset=utf-8\nConnection: close\n\n";
-        /// <summary>
-        /// json头字符串
-        /// </summary>
-        private static readonly string httpJsonHeader = "HTTP/1.0 200 OK\nContent-Type: application/json;charset=utf-8\nConnection: close\n\n";
-        /// <summary>
-        /// 图标头byte[]
+        /// 图标byte[]
         /// </summary>
         private static byte[] httpIconHeaderBytes;
 
         /// <summary>
-        /// http请求消息处理函数
+        /// http响应回调函数
         /// </summary>
         /// <param name="path">路径</param>
         /// <param name="param">参数</param>
         /// <returns>返回值</returns>
-        private byte[] HttpRequestHandle(string path, NameValueCollection param)
+        private byte[] HttpResponseCallback(string path, NameValueCollection param)
         {
             byte[] data;
             switch (path)
@@ -147,7 +145,7 @@ namespace ScreenShare
                 // 网页
                 default:
                     {
-                        data = Encoding.UTF8.GetBytes(httpHtmlHeader + Resources.index);
+                        data = Encoding.UTF8.GetBytes(HttpService.htmlHeader + Resources.index);
                         break;
                     }
                 // 图标
@@ -179,7 +177,7 @@ namespace ScreenShare
                         {
                             apiGetVideoInfo += StatusManager.WebSocketService.ServerPort() + "}";
                         }
-                        data = Encoding.UTF8.GetBytes(httpJsonHeader + apiGetVideoInfo);
+                        data = Encoding.UTF8.GetBytes(HttpService.jsonHeader + apiGetVideoInfo);
                         break;
                     }
             }
@@ -191,11 +189,11 @@ namespace ScreenShare
         #region webSocket服务处理
 
         /// <summary>
-        /// webSocket客户端状态处理函数
+        /// webSocket客户端上下线回调函数
         /// </summary>
-        /// <param name="ip">IP地址</param>
+        /// <param name="client">客户端</param>
         /// <param name="online">上线或下线</param>
-        private void WebSocketClientStatusHandle(string ip, bool online)
+        private void WebSocketClientCallback(WebSocketClient client, bool online)
         {
             /* 更新在线数量 */
             string count = "当前在线用户数量：" + StatusManager.WebSocketService.ClientOnlineCount();
@@ -206,7 +204,7 @@ namespace ScreenShare
             };
             Invoke(action, count);
             /* 日志 */
-            string log = "客户端 " + ip + (online ? " 已上线。" : " 已下线。");
+            string log = "客户端 " + client.Ip + (online ? " 已上线。" : " 已下线。");
             Action<string> action2 = (data) =>
             {
                 Log(data);
@@ -258,12 +256,12 @@ namespace ScreenShare
                                 var data = stream.ToArray();
                                 // 发送给webSocket客户端
                                 StatusManager.WebSocketService.SendDataByClientList(list, data);
-                                // 记录webSocket服务端日志
-                                StatusManager.WebSocketService.ServerRecord(list.Count * data.Length);
+                                // 记录webSocket服务端访问记录
+                                StatusManager.WebSocketService.Server.RecordAccess(list.Count * data.Length);
                             }
                             else
                             {
-                                StatusManager.WebSocketService.ServerRecord(0);
+                                StatusManager.WebSocketService.Server.RecordAccess(0);
                             }
                             // 运行时更新预览图
                             UpdatePreviewImgWhileWorking(bitmap);
@@ -297,11 +295,11 @@ namespace ScreenShare
                             {
                                 var data = stream.ToArray();
                                 StatusManager.WebSocketService.SendDataByClientList(list, data);
-                                StatusManager.WebSocketService.ServerRecord(list.Count * data.Length);
+                                StatusManager.WebSocketService.Server.RecordAccess(list.Count * data.Length);
                             }
                             else
                             {
-                                StatusManager.WebSocketService.ServerRecord(0);
+                                StatusManager.WebSocketService.Server.RecordAccess(0);
                             }
                             UpdatePreviewImgWhileWorking(bitmap);
                         }
@@ -331,11 +329,11 @@ namespace ScreenShare
                             {
                                 var data = stream.ToArray();
                                 StatusManager.WebSocketService.SendDataByClientList(list, data);
-                                StatusManager.WebSocketService.ServerRecord(list.Count * data.Length);
+                                StatusManager.WebSocketService.Server.RecordAccess(list.Count * data.Length);
                             }
                             else
                             {
-                                StatusManager.WebSocketService.ServerRecord(0);
+                                StatusManager.WebSocketService.Server.RecordAccess(0);
                             }
                             UpdatePreviewImgWhileWorking(bitmap);
                         }
@@ -365,11 +363,11 @@ namespace ScreenShare
                             {
                                 var data = stream.ToArray();
                                 StatusManager.WebSocketService.SendDataByClientList(list, data);
-                                StatusManager.WebSocketService.ServerRecord(list.Count * data.Length);
+                                StatusManager.WebSocketService.Server.RecordAccess(list.Count * data.Length);
                             }
                             else
                             {
-                                StatusManager.WebSocketService.ServerRecord(0);
+                                StatusManager.WebSocketService.Server.RecordAccess(0);
                             }
                             UpdatePreviewImgWhileWorking(bitmap);
                         }

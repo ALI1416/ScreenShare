@@ -67,7 +67,7 @@ namespace ScreenShare
                         tableDataGridView.Rows[index].Cells[5].Value = (socketClient.FrameAvg / 100f).ToString("0.00");
                         tableDataGridView.Rows[index].Cells[6].Value = (socketClient.ByteAvg / 1024f).ToString("0.00");
                     }
-                    // 下线
+                    // 离线
                     else
                     {
                         tableDataGridView.Rows[index].Cells[3].Value = socketClient.Offline.ToString("HH:mm:ss.fff");
@@ -76,21 +76,21 @@ namespace ScreenShare
                 }
             }
             string text = "当前在线用户数量：" + online + "        累计访问用户数量：" + list.Length + "        当前帧率(帧/秒)：";
-            if (StatusManager.WebSocketService.Server() == null)
+            if (StatusManager.WebSocketService.Server == null)
             {
                 text += "0.00        传输数据总量(Mb)：0.00";
             }
             else
             {
-                if (now.Subtract(StatusManager.WebSocketService.Server().LastRecordTime).TotalSeconds < 10)
+                if (now.Subtract(StatusManager.WebSocketService.Server.LastRecordTime).TotalSeconds < 10)
                 {
-                    text += (StatusManager.WebSocketService.Server().FrameAvg / 100f).ToString("0.00");
+                    text += (StatusManager.WebSocketService.Server.FrameAvg / 100f).ToString("0.00");
                 }
                 else
                 {
                     text += "0.00";
                 }
-                text += "        传输数据总量(Mb)：" + (StatusManager.WebSocketService.Server().ByteCount / 1048576f).ToString("0.00");
+                text += "        传输数据总量(Mb)：" + (StatusManager.WebSocketService.Server.ByteCount / 1048576f).ToString("0.00");
             }
             textLabel.Text = text;
         }

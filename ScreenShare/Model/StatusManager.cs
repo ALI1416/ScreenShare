@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Net;
 using System;
-using ScreenShare.BLL;
+using ScreenShare.Service;
 
 namespace ScreenShare.Model
 {
@@ -12,6 +12,7 @@ namespace ScreenShare.Model
     /// </summary>
     public class StatusManager
     {
+
         /// <summary>
         /// 屏幕共享已启动
         /// </summary>

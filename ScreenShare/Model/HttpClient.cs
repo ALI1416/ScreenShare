@@ -8,6 +8,12 @@ namespace ScreenShare.Model
     /// </summary>
     public class HttpClient
     {
+
+        /// <summary>
+        /// 接收数据缓冲区长度，超出将响应失败
+        /// </summary>
+        public static readonly int MAX_BUFFER_LENGTH = 4096;
+
         /// <summary>
         /// 客户端
         /// </summary>
@@ -20,12 +26,12 @@ namespace ScreenShare.Model
         /// <summary>
         /// 创建客户端
         /// </summary>
-        /// <param name="client">Socket</param>
+        /// <param name="socket">Socket</param>
         /// 
-        public HttpClient(Socket client)
+        public HttpClient(Socket socket)
         {
-            Client = client;
-            Buffer = new byte[1024];
+            Client = socket;
+            Buffer = new byte[MAX_BUFFER_LENGTH];
         }
 
         /// <summary>

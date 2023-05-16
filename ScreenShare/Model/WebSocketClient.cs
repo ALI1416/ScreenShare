@@ -5,10 +5,16 @@ namespace ScreenShare.Model
 {
 
     /// <summary>
-    /// socket客户端
+    /// webSocket客户端
     /// </summary>
     public class WebSocketClient
     {
+
+        /// <summary>
+        /// 接收数据缓冲区长度，超出部分将丢弃
+        /// </summary>
+        public static readonly int MAX_BUFFER_LENGTH = 4096;
+
         /// <summary>
         /// 客户端
         /// </summary>
@@ -18,6 +24,9 @@ namespace ScreenShare.Model
         /// </summary>
         public byte[] Buffer { set; get; }
         /// <summary>
+        /// 数据接收长度
+        /// </summary>
+        private int length;
         /// IP地址
         /// </summary>
         public string Ip { set; get; }
@@ -59,16 +68,25 @@ namespace ScreenShare.Model
         public int ByteAvg { set; get; }
 
         /// <summary>
-        /// 新建客户端
+        /// 数据接收长度
         /// </summary>
-        /// <param name="client">Socket</param>
-        public WebSocketClient(Socket client)
+        public int Length
         {
-            Client = client;
-            Buffer = new byte[1024];
-            Ip = client.RemoteEndPoint.ToString();
+            set { length = value; }
+            get { return length > MAX_BUFFER_LENGTH ? MAX_BUFFER_LENGTH : length; }
+        }
+
+        /// <summary>
+        /// 创建客户端
+        /// </summary>
+        /// <param name="socket">Socket</param>
+        public WebSocketClient(Socket socket)
+        {
+            Client = socket;
+            Buffer = new byte[MAX_BUFFER_LENGTH];
+            Length = 0;
+            Ip = socket.RemoteEndPoint.ToString();
             Online = DateTime.Now;
-            LastRecordTime = DateTime.Now;
         }
 
         /// <summary>
@@ -86,12 +104,11 @@ namespace ScreenShare.Model
         }
 
         /// <summary>
-        /// 记录日志
+        /// 记录访问
         /// </summary>
         /// <param name="length">字节长度</param>
-        public void Record(int length)
+        public void RecordAccess(int length)
         {
-            Transmission = true;
             ByteCount += length;
             LastRecordByte += length;
             // 每5帧采样一次

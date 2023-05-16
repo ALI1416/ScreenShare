@@ -52,7 +52,7 @@ namespace ScreenShare.ScheduledTask
             string text;
             if (notZero && StatusManager.IsStarted)
             {
-                text = (StatusManager.WebSocketService.Server().FrameAvg / 100f).ToString("0.00") + " FPS";
+                text = (StatusManager.WebSocketService.Server.FrameAvg / 100f).ToString("0.00") + " FPS";
             }
             else
             {

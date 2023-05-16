@@ -38,6 +38,7 @@
             this.img.Location = new System.Drawing.Point(0, 0);
             this.img.Name = "img";
             this.img.Size = new System.Drawing.Size(768, 432);
+            this.img.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.img.TabIndex = 0;
             this.img.TabStop = false;
             // 
@@ -53,7 +54,9 @@
             this.Name = "Qr";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "网站二维码(开发中)";
+            this.Text = "网站二维码";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Qr_FormClosed);
+            this.Load += new System.EventHandler(this.Qr_Load);
             ((System.ComponentModel.ISupportInitialize)(this.img)).EndInit();
             this.ResumeLayout(false);
 
