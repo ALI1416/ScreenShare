@@ -20,13 +20,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 6.0.x
+      - name: Setup MSBuild.exe
+        uses: microsoft/setup-msbuild@v1.3.1
 
-      - name: Restore dependencies
-        run: dotnet restore ScreenShare
+      - name: Restore the application
+        run: msbuild ScreenShare /t:Restore
 
-      - name: Build
-        run: dotnet build --no-restore ScreenShare
+      - name: Create the app package
+        run: msbuild ScreenShare -t:rebuild
