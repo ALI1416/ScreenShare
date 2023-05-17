@@ -5,6 +5,8 @@
 [![Release](https://img.shields.io/github/v/release/ali1416/ScreenShare?label=Release)](https://github.com/ALI1416/ScreenShare/releases)
 [![Repo Size](https://img.shields.io/github/repo-size/ali1416/ScreenShare?label=Repo%20Size&color=success)](https://github.com/ALI1416/ScreenShare/archive/refs/heads/master.zip)
 
+[![DotNet CI](https://github.com/ALI1416/ScreenShare/actions/workflows/ci.yml/badge.svg)](https://github.com/ALI1416/ScreenShare/actions/workflows/ci.yml)
+
 [![Latest Download](https://img.shields.io/badge/Latest%20Version-Click%20Download-&color=success)](https://github.com/ALI1416/ScreenShare/releases/latest/download/ScreenShare.zip)
 
 ## 主要功能
