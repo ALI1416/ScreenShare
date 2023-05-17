@@ -254,10 +254,10 @@ namespace ScreenShare
                             if (list.Count != 0)
                             {
                                 var data = stream.ToArray();
-                                // 发送给webSocket客户端
-                                StatusManager.WebSocketService.SendDataByClientList(list, data);
                                 // 记录webSocket服务端访问记录
                                 StatusManager.WebSocketService.Server.RecordAccess(list.Count * data.Length);
+                                // 发送给webSocket客户端
+                                StatusManager.WebSocketService.SendDataByClientList(list, data);
                             }
                             else
                             {
@@ -294,8 +294,8 @@ namespace ScreenShare
                             if (list.Count != 0)
                             {
                                 var data = stream.ToArray();
-                                StatusManager.WebSocketService.SendDataByClientList(list, data);
                                 StatusManager.WebSocketService.Server.RecordAccess(list.Count * data.Length);
+                                StatusManager.WebSocketService.SendDataByClientList(list, data);
                             }
                             else
                             {
@@ -328,8 +328,8 @@ namespace ScreenShare
                             if (list.Count != 0)
                             {
                                 var data = stream.ToArray();
-                                StatusManager.WebSocketService.SendDataByClientList(list, data);
                                 StatusManager.WebSocketService.Server.RecordAccess(list.Count * data.Length);
+                                StatusManager.WebSocketService.SendDataByClientList(list, data);
                             }
                             else
                             {
@@ -362,8 +362,8 @@ namespace ScreenShare
                             if (list.Count != 0)
                             {
                                 var data = stream.ToArray();
-                                StatusManager.WebSocketService.SendDataByClientList(list, data);
                                 StatusManager.WebSocketService.Server.RecordAccess(list.Count * data.Length);
+                                StatusManager.WebSocketService.SendDataByClientList(list, data);
                             }
                             else
                             {

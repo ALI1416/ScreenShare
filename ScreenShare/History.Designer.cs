@@ -204,7 +204,7 @@
             // 
             // byteAvg
             // 
-            this.byteAvg.HeaderText = "传输速度\n(Kb/秒)";
+            this.byteAvg.HeaderText = "传输速度\n(Mb/秒)";
             this.byteAvg.Name = "byteAvg";
             this.byteAvg.ReadOnly = true;
             // 

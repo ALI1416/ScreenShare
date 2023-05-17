@@ -5,11 +5,9 @@
 [![Release](https://img.shields.io/github/v/release/ali1416/ScreenShare?label=Release)](https://github.com/ALI1416/ScreenShare/releases)
 [![Repo Size](https://img.shields.io/github/repo-size/ali1416/ScreenShare?label=Repo%20Size&color=success)](https://github.com/ALI1416/ScreenShare/archive/refs/heads/master.zip)
 
-[![Latest Download](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-%E7%82%B9%E5%87%BB%E4%B8%8B%E8%BD%BD-&color=success)](https://github.com/ALI1416/ScreenShare/releases/latest/download/ScreenShare.zip)
+[![Latest Download](https://img.shields.io/badge/Latest%20Version-Click%20Download-&color=success)](https://github.com/ALI1416/ScreenShare/releases/latest/download/ScreenShare.zip)
 
 ## 主要功能
-
-v2.5.0 新增功能：1. 显示网站二维码；系统优化：1. 优化代码可读性；修复漏洞：1. `http客户端`和`webSocket客户端`接收用户消息时可能会导致的缓冲区溢出
 
 - [x] 密码验证
 - [x] 支持多显示器
@@ -47,14 +45,13 @@ v2.5.0 新增功能：1. 显示网站二维码；系统优化：1. 优化代码�
 - [xChivalrouSx/CaptureScreen](https://github.com/xChivalrouSx/CaptureScreen)
 - [MrKonstantinSh/OpenScreen](https://github.com/MrKonstantinSh/OpenScreen)
 
-## 交流
+## 交流与赞助
 
-- [x] QQ：`1416978277`
-- [x] 微信：`1416978277`
-- [x] 支付宝：`1416978277@qq.com`
+- [x] `QQ` : `1416978277`
+- [x] `微信` : `1416978277`
+- [x] `支付宝` : `1416978277@qq.com`
+- [x] `电子邮箱` : `1416978277@qq.com`
 
 ![交流](https://cdn.jsdelivr.net/gh/ALI1416/ALI1416/image/contact.png)
-
-## 赞助
 
 ![赞助](https://cdn.jsdelivr.net/gh/ALI1416/ALI1416/image/donate.png)

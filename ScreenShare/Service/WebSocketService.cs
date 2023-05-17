@@ -315,6 +315,8 @@ namespace ScreenShare.Service
             byte[] msg = WebSocketUtils.CodedData(data, false);
             foreach (WebSocketClient client in list)
             {
+                client.Transmission = true;
+                client.RecordAccess(data.Length);
                 SendRaw(client, msg);
             }
         }

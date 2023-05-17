@@ -48,7 +48,7 @@ namespace ScreenShare
                         tableDataGridView.Rows[index].Cells[2].Value = socketClient.Online.ToString("HH:mm:ss.fff");
                         tableDataGridView.Rows[index].Cells[4].Value = Convert.ToDouble(now.Subtract(socketClient.Online).TotalMinutes).ToString("0.00");
                         tableDataGridView.Rows[index].Cells[5].Value = (socketClient.FrameAvg / 100f).ToString("0.00");
-                        tableDataGridView.Rows[index].Cells[6].Value = (socketClient.ByteAvg / 1024f).ToString("0.00");
+                        tableDataGridView.Rows[index].Cells[6].Value = (socketClient.ByteAvg / 1048576f).ToString("0.00");
                         tableDataGridView.Rows[index].Cells[7].Value = (socketClient.ByteCount / 1048576f).ToString("0.00");
                     }
                 }
@@ -65,7 +65,7 @@ namespace ScreenShare
                         tableDataGridView.Rows[index].Cells[0].Value = "在线";
                         tableDataGridView.Rows[index].Cells[4].Value = Convert.ToDouble(now.Subtract(socketClient.Online).TotalMinutes).ToString("0.00");
                         tableDataGridView.Rows[index].Cells[5].Value = (socketClient.FrameAvg / 100f).ToString("0.00");
-                        tableDataGridView.Rows[index].Cells[6].Value = (socketClient.ByteAvg / 1024f).ToString("0.00");
+                        tableDataGridView.Rows[index].Cells[6].Value = (socketClient.ByteAvg / 1048576f).ToString("0.00");
                     }
                     // 离线
                     else
