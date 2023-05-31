@@ -1,4 +1,4 @@
-﻿using ScreenShare.Properties;
+using ScreenShare.Properties;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;

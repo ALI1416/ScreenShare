@@ -1,4 +1,4 @@
-﻿using ScreenShare.Properties;
+using ScreenShare.Properties;
 using ScreenShare.Model;
 using ScreenShare.Util;
 using ScreenShare.ScheduledTask;

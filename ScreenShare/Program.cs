@@ -1,4 +1,4 @@
-﻿using ScreenShare.Model;
+using ScreenShare.Model;
 using ScreenShare.ScheduledTask;
 using System;
 using System.Windows.Forms;
