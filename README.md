@@ -1,9 +1,9 @@
 # Local Network Screen Share 局域网屏幕共享
 
-[![License](https://img.shields.io/github/license/ali1416/ScreenShare?label=License)](https://www.apache.org/licenses/LICENSE-2.0.txt)
-[![Tag](https://img.shields.io/github/v/tag/ali1416/ScreenShare?label=Tag)](https://github.com/ALI1416/ScreenShare/tags)
-[![Release](https://img.shields.io/github/v/release/ali1416/ScreenShare?label=Release)](https://github.com/ALI1416/ScreenShare/releases)
-[![Repo Size](https://img.shields.io/github/repo-size/ali1416/ScreenShare?label=Repo%20Size&color=success)](https://github.com/ALI1416/ScreenShare/archive/refs/heads/master.zip)
+[![License](https://img.shields.io/github/license/ALI1416/ScreenShare?label=License)](https://www.apache.org/licenses/LICENSE-2.0.txt)
+[![Tag](https://img.shields.io/github/v/tag/ALI1416/ScreenShare?label=Tag)](https://github.com/ALI1416/ScreenShare/tags)
+[![Release](https://img.shields.io/github/v/release/ALI1416/ScreenShare?label=Release)](https://github.com/ALI1416/ScreenShare/releases)
+[![Repo Size](https://img.shields.io/github/repo-size/ALI1416/ScreenShare?label=Repo%20Size&color=success)](https://github.com/ALI1416/ScreenShare/archive/refs/heads/master.zip)
 
 [![DotNet CI](https://github.com/ALI1416/ScreenShare/actions/workflows/ci.yml/badge.svg)](https://github.com/ALI1416/ScreenShare/actions/workflows/ci.yml)
 
