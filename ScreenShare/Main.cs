@@ -914,7 +914,7 @@ namespace ScreenShare
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ScreenShare_FormClosing(object sender, FormClosingEventArgs e)
+        private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
             // 如果正在运行：托盘
             if (StatusManager.IsStarted)

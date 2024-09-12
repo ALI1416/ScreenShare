@@ -850,7 +850,7 @@ namespace ScreenShare
             this.notifyIcon.Text = "屏幕共享";
             this.notifyIcon.Click += new System.EventHandler(this.NotifyIcon_Click);
             // 
-            // ScreenShare
+            // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -861,10 +861,10 @@ namespace ScreenShare
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = global::ScreenShare.Properties.Resources.icon;
             this.MaximizeBox = false;
-            this.Name = "ScreenShare";
+            this.Name = "Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "屏幕共享";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ScreenShare_FormClosing);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
             this.topPanel.ResumeLayout(false);
             this.topPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ipPortNud)).EndInit();
