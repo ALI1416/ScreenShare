@@ -2,13 +2,13 @@ name: DotNet CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
     paths-ignore:
-      - '**.md'
+      - "**.md"
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
     paths-ignore:
-      - '**.md'
+      - "**.md"
   workflow_dispatch:
 
 jobs:
@@ -16,12 +16,14 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup MSBuild.exe
-        uses: microsoft/setup-msbuild@v1.3.1
+        uses: microsoft/setup-msbuild@v2
+        with:
+          msbuild-architecture: x64
 
       - name: Restore the application
         run: msbuild ScreenShare /t:Restore
