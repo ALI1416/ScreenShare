@@ -29,4 +29,4 @@ jobs:
         run: msbuild ScreenShare /t:Restore
 
       - name: Create the app package
-        run: msbuild ScreenShare -t:rebuild
+        run: msbuild ScreenShare -t:rebuild -property:Configuration=Release,Platform=x64
