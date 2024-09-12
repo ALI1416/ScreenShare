@@ -1,6 +1,6 @@
 namespace ScreenShare
 {
-    partial class ScreenShare
+    partial class Main
     {
         /// <summary>
         /// 必需的设计器变量。

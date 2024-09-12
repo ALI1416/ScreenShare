@@ -9,21 +9,20 @@ namespace ScreenShare
     /// <summary>
     /// 应用程序的主入口点
     /// </summary>
-    static class Program
+    public static class Program
     {
 
         /// <summary>
         /// 应用程序的主入口点
         /// </summary>
         [STAThread]
-        static void Main()
+        public static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             new ScheduledTasks();
-            ScreenShare screenShare = new ScreenShare();
-            FormManager.ScreenShare = screenShare;
-            Application.Run(screenShare);
+            FormManager.Main = new Main();
+            Application.Run(FormManager.Main);
         }
 
     }

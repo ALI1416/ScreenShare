@@ -10,7 +10,7 @@ namespace ScreenShare.Model
         /// <summary>
         /// 主界面
         /// </summary>
-        public static ScreenShare ScreenShare { get; set; }
+        public static Main Main { get; set; }
         /// <summary>
         /// 系统配置
         /// </summary>

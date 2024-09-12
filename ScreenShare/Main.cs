@@ -20,7 +20,7 @@ namespace ScreenShare
     /// <summary>
     /// 主界面
     /// </summary>
-    public partial class ScreenShare : Form
+    public partial class Main : Form
     {
 
         #region 公共方法
@@ -28,7 +28,7 @@ namespace ScreenShare
         /// <summary>
         /// 主程序
         /// </summary>
-        public ScreenShare()
+        public Main()
         {
             InitializeComponent();
             Init();

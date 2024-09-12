@@ -22,9 +22,9 @@ namespace ScreenShare.ScheduledTask
                 while (true)
                 {
                     Thread.Sleep(5000);
-                    if (FormManager.ScreenShare != null)
+                    if (FormManager.Main != null)
                     {
-                        FormManager.ScreenShare.AutoRefresh();
+                        FormManager.Main.AutoRefresh();
                     }
                     if (FormManager.History != null)
                     {
