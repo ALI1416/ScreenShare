@@ -551,7 +551,7 @@ namespace ScreenShare
                 = !enable;
             if (enable)
             {
-                startSharingScreenBtn.Text = "停止共享";
+                startBtn.Text = "停止共享";
                 pwdText.Enabled
                     = screenXNud.Enabled
                     = screenYNud.Enabled
@@ -564,7 +564,7 @@ namespace ScreenShare
             }
             else
             {
-                startSharingScreenBtn.Text = "开始共享";
+                startBtn.Text = "开始共享";
                 if (isEncryptionCb.Checked)
                 {
                     pwdText.Enabled

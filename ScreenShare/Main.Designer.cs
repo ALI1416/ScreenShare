@@ -30,7 +30,7 @@ namespace ScreenShare
         {
             this.components = new System.ComponentModel.Container();
             this.topPanel = new System.Windows.Forms.Panel();
-            this.shareScreenLabel = new System.Windows.Forms.Label();
+            this.titleLabel = new System.Windows.Forms.Label();
             this.ipAddressComboBox = new System.Windows.Forms.ComboBox();
             this.ipAddressLabel = new System.Windows.Forms.Label();
             this.ipPortNud = new System.Windows.Forms.NumericUpDown();
@@ -60,7 +60,7 @@ namespace ScreenShare
             this.screenHNud = new System.Windows.Forms.NumericUpDown();
             this.screenHLabel = new System.Windows.Forms.Label();
             this.captureScreenCoordinatesBtn = new System.Windows.Forms.Button();
-            this.scalingBox = new System.Windows.Forms.GroupBox();
+            this.videoOptionBox = new System.Windows.Forms.GroupBox();
             this.isLockAspectRatioCb = new System.Windows.Forms.CheckBox();
             this.scalingNud = new System.Windows.Forms.NumericUpDown();
             this.scalingLabel = new System.Windows.Forms.Label();
@@ -68,7 +68,7 @@ namespace ScreenShare
             this.videoWLabel = new System.Windows.Forms.Label();
             this.videoHNud = new System.Windows.Forms.NumericUpDown();
             this.videoHLabel = new System.Windows.Forms.Label();
-            this.videoBox = new System.Windows.Forms.GroupBox();
+            this.videoSetBox = new System.Windows.Forms.GroupBox();
             this.isDisplayCursorCb = new System.Windows.Forms.CheckBox();
             this.videoFrameNud = new System.Windows.Forms.NumericUpDown();
             this.videoFrameLabel = new System.Windows.Forms.Label();
@@ -76,10 +76,10 @@ namespace ScreenShare
             this.videoQualityLabel = new System.Windows.Forms.Label();
             this.userCountLinkLabel = new System.Windows.Forms.LinkLabel();
             this.bottomPanel = new System.Windows.Forms.Panel();
-            this.previewLabel = new System.Windows.Forms.Label();
             this.fpsLabel = new System.Windows.Forms.Label();
+            this.previewLabel = new System.Windows.Forms.Label();
             this.previewImg = new System.Windows.Forms.PictureBox();
-            this.startSharingScreenBtn = new System.Windows.Forms.Button();
+            this.startBtn = new System.Windows.Forms.Button();
             this.logText = new System.Windows.Forms.TextBox();
             this.clearLogLinkLabel = new System.Windows.Forms.LinkLabel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
@@ -93,11 +93,11 @@ namespace ScreenShare
             ((System.ComponentModel.ISupportInitialize)(this.screenYNud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.screenWNud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.screenHNud)).BeginInit();
-            this.scalingBox.SuspendLayout();
+            this.videoOptionBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.scalingNud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.videoWNud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.videoHNud)).BeginInit();
-            this.videoBox.SuspendLayout();
+            this.videoSetBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.videoFrameNud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.videoQualityNud)).BeginInit();
             this.bottomPanel.SuspendLayout();
@@ -106,7 +106,7 @@ namespace ScreenShare
             // 
             // topPanel
             // 
-            this.topPanel.Controls.Add(this.shareScreenLabel);
+            this.topPanel.Controls.Add(this.titleLabel);
             this.topPanel.Controls.Add(this.ipAddressComboBox);
             this.topPanel.Controls.Add(this.ipAddressLabel);
             this.topPanel.Controls.Add(this.ipPortNud);
@@ -124,15 +124,15 @@ namespace ScreenShare
             this.topPanel.Size = new System.Drawing.Size(768, 110);
             this.topPanel.TabIndex = 2;
             // 
-            // shareScreenLabel
+            // titleLabel
             // 
-            this.shareScreenLabel.AutoSize = true;
-            this.shareScreenLabel.Font = new System.Drawing.Font("宋体", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.shareScreenLabel.Location = new System.Drawing.Point(322, 10);
-            this.shareScreenLabel.Name = "shareScreenLabel";
-            this.shareScreenLabel.Size = new System.Drawing.Size(124, 27);
-            this.shareScreenLabel.TabIndex = 0;
-            this.shareScreenLabel.Text = "屏幕共享";
+            this.titleLabel.AutoSize = true;
+            this.titleLabel.Font = new System.Drawing.Font("宋体", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.titleLabel.Location = new System.Drawing.Point(322, 10);
+            this.titleLabel.Name = "titleLabel";
+            this.titleLabel.Size = new System.Drawing.Size(124, 27);
+            this.titleLabel.TabIndex = 0;
+            this.titleLabel.Text = "屏幕共享";
             // 
             // ipAddressComboBox
             // 
@@ -142,7 +142,6 @@ namespace ScreenShare
             this.ipAddressComboBox.Name = "ipAddressComboBox";
             this.ipAddressComboBox.Size = new System.Drawing.Size(350, 20);
             this.ipAddressComboBox.TabIndex = 1;
-            this.toolTip.SetToolTip(this.ipAddressComboBox, "请选择分享IP地址");
             this.ipAddressComboBox.SelectedValueChanged += new System.EventHandler(this.IpAddressComboBox_SelectedValueChanged);
             // 
             // ipAddressLabel
@@ -170,7 +169,6 @@ namespace ScreenShare
             this.ipPortNud.Name = "ipPortNud";
             this.ipPortNud.Size = new System.Drawing.Size(80, 21);
             this.ipPortNud.TabIndex = 2;
-            this.toolTip.SetToolTip(this.ipPortNud, "请输入IP地址对应的端口号");
             this.ipPortNud.Value = new decimal(new int[] {
             7070,
             0,
@@ -196,7 +194,6 @@ namespace ScreenShare
             this.shareLinkText.ReadOnly = true;
             this.shareLinkText.Size = new System.Drawing.Size(440, 21);
             this.shareLinkText.TabIndex = 3;
-            this.toolTip.SetToolTip(this.shareLinkText, "分享地址");
             // 
             // shareLinkLabel
             // 
@@ -214,7 +211,6 @@ namespace ScreenShare
             this.copyBtn.Size = new System.Drawing.Size(45, 23);
             this.copyBtn.TabIndex = 4;
             this.copyBtn.Text = "复制";
-            this.toolTip.SetToolTip(this.copyBtn, "点击复制分享地址");
             this.copyBtn.UseVisualStyleBackColor = true;
             this.copyBtn.Click += new System.EventHandler(this.CopyBtn_Click);
             // 
@@ -225,7 +221,6 @@ namespace ScreenShare
             this.reloadConfigBtn.Size = new System.Drawing.Size(100, 23);
             this.reloadConfigBtn.TabIndex = 5;
             this.reloadConfigBtn.Text = "重新加载配置";
-            this.toolTip.SetToolTip(this.reloadConfigBtn, "点击重新加载配置");
             this.reloadConfigBtn.UseVisualStyleBackColor = true;
             this.reloadConfigBtn.Click += new System.EventHandler(this.ReloadConfigBtn_Click);
             // 
@@ -236,7 +231,6 @@ namespace ScreenShare
             this.openBtn.Size = new System.Drawing.Size(100, 23);
             this.openBtn.TabIndex = 6;
             this.openBtn.Text = "用浏览器打开";
-            this.toolTip.SetToolTip(this.openBtn, "点击用浏览器打开网站");
             this.openBtn.UseVisualStyleBackColor = true;
             this.openBtn.Click += new System.EventHandler(this.OpenBtn_Click);
             // 
@@ -247,7 +241,6 @@ namespace ScreenShare
             this.configBtn.Size = new System.Drawing.Size(90, 23);
             this.configBtn.TabIndex = 7;
             this.configBtn.Text = "系统配置";
-            this.toolTip.SetToolTip(this.configBtn, "点击显示系统配置界面");
             this.configBtn.UseVisualStyleBackColor = true;
             this.configBtn.Click += new System.EventHandler(this.ConfigBtn_Click);
             // 
@@ -258,7 +251,6 @@ namespace ScreenShare
             this.qrBtn.Size = new System.Drawing.Size(90, 23);
             this.qrBtn.TabIndex = 8;
             this.qrBtn.Text = "网站二维码";
-            this.toolTip.SetToolTip(this.qrBtn, "点击显示网站二维码界面");
             this.qrBtn.UseVisualStyleBackColor = true;
             this.qrBtn.Click += new System.EventHandler(this.QrBtn_Click);
             // 
@@ -266,8 +258,8 @@ namespace ScreenShare
             // 
             this.middlePanel.Controls.Add(this.encryptionBox);
             this.middlePanel.Controls.Add(this.coordinatesBox);
-            this.middlePanel.Controls.Add(this.scalingBox);
-            this.middlePanel.Controls.Add(this.videoBox);
+            this.middlePanel.Controls.Add(this.videoOptionBox);
+            this.middlePanel.Controls.Add(this.videoSetBox);
             this.middlePanel.Controls.Add(this.userCountLinkLabel);
             this.middlePanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.middlePanel.Location = new System.Drawing.Point(0, 110);
@@ -295,7 +287,6 @@ namespace ScreenShare
             this.isEncryptionCb.Size = new System.Drawing.Size(48, 16);
             this.isEncryptionCb.TabIndex = 1;
             this.isEncryptionCb.Text = "开启";
-            this.toolTip.SetToolTip(this.isEncryptionCb, "开启后需要输入密码才能访问");
             this.isEncryptionCb.UseVisualStyleBackColor = true;
             this.isEncryptionCb.CheckStateChanged += new System.EventHandler(this.IsEncryptionCb_CheckStateChanged);
             // 
@@ -306,7 +297,6 @@ namespace ScreenShare
             this.pwdText.Name = "pwdText";
             this.pwdText.Size = new System.Drawing.Size(80, 21);
             this.pwdText.TabIndex = 2;
-            this.toolTip.SetToolTip(this.pwdText, "请输入密码");
             // 
             // pwdLabel
             // 
@@ -348,7 +338,6 @@ namespace ScreenShare
             this.isFullScreenCb.Size = new System.Drawing.Size(48, 16);
             this.isFullScreenCb.TabIndex = 1;
             this.isFullScreenCb.Text = "全屏";
-            this.toolTip.SetToolTip(this.isFullScreenCb, "是否选择全屏共享");
             this.isFullScreenCb.UseVisualStyleBackColor = true;
             this.isFullScreenCb.CheckStateChanged += new System.EventHandler(this.IsFullScreenCb_CheckStateChanged);
             // 
@@ -360,7 +349,6 @@ namespace ScreenShare
             this.screenComboBox.Name = "screenComboBox";
             this.screenComboBox.Size = new System.Drawing.Size(130, 20);
             this.screenComboBox.TabIndex = 2;
-            this.toolTip.SetToolTip(this.screenComboBox, "请选择要共享的显示器");
             this.screenComboBox.SelectedValueChanged += new System.EventHandler(this.ScreenComboBox_SelectedValueChanged);
             // 
             // screenLabel
@@ -389,7 +377,6 @@ namespace ScreenShare
             this.screenXNud.Name = "screenXNud";
             this.screenXNud.Size = new System.Drawing.Size(50, 21);
             this.screenXNud.TabIndex = 3;
-            this.toolTip.SetToolTip(this.screenXNud, "选取矩形左上角的横坐标X");
             this.screenXNud.ValueChanged += new System.EventHandler(this.ScreenXNud_ValueChanged);
             // 
             // screenXLabel
@@ -418,7 +405,6 @@ namespace ScreenShare
             this.screenYNud.Name = "screenYNud";
             this.screenYNud.Size = new System.Drawing.Size(50, 21);
             this.screenYNud.TabIndex = 4;
-            this.toolTip.SetToolTip(this.screenYNud, "选取矩形左上角的纵坐标Y");
             this.screenYNud.ValueChanged += new System.EventHandler(this.ScreenYNud_ValueChanged);
             // 
             // screenYLabel
@@ -452,7 +438,6 @@ namespace ScreenShare
             this.screenWNud.Name = "screenWNud";
             this.screenWNud.Size = new System.Drawing.Size(50, 21);
             this.screenWNud.TabIndex = 5;
-            this.toolTip.SetToolTip(this.screenWNud, "选取矩形的宽");
             this.screenWNud.Value = new decimal(new int[] {
             1920,
             0,
@@ -491,7 +476,6 @@ namespace ScreenShare
             this.screenHNud.Name = "screenHNud";
             this.screenHNud.Size = new System.Drawing.Size(50, 21);
             this.screenHNud.TabIndex = 6;
-            this.toolTip.SetToolTip(this.screenHNud, "选取矩形的高");
             this.screenHNud.Value = new decimal(new int[] {
             1080,
             0,
@@ -515,25 +499,24 @@ namespace ScreenShare
             this.captureScreenCoordinatesBtn.Size = new System.Drawing.Size(75, 51);
             this.captureScreenCoordinatesBtn.TabIndex = 7;
             this.captureScreenCoordinatesBtn.Text = "选取\r\n屏幕坐标";
-            this.toolTip.SetToolTip(this.captureScreenCoordinatesBtn, "点击选取屏幕坐标");
             this.captureScreenCoordinatesBtn.UseVisualStyleBackColor = true;
             this.captureScreenCoordinatesBtn.Click += new System.EventHandler(this.CaptureScreenCoordinatesBtn_Click);
             // 
-            // scalingBox
+            // videoOptionBox
             // 
-            this.scalingBox.Controls.Add(this.isLockAspectRatioCb);
-            this.scalingBox.Controls.Add(this.scalingNud);
-            this.scalingBox.Controls.Add(this.scalingLabel);
-            this.scalingBox.Controls.Add(this.videoWNud);
-            this.scalingBox.Controls.Add(this.videoWLabel);
-            this.scalingBox.Controls.Add(this.videoHNud);
-            this.scalingBox.Controls.Add(this.videoHLabel);
-            this.scalingBox.Location = new System.Drawing.Point(435, 10);
-            this.scalingBox.Name = "scalingBox";
-            this.scalingBox.Size = new System.Drawing.Size(185, 100);
-            this.scalingBox.TabIndex = 3;
-            this.scalingBox.TabStop = false;
-            this.scalingBox.Text = "视频尺寸";
+            this.videoOptionBox.Controls.Add(this.isLockAspectRatioCb);
+            this.videoOptionBox.Controls.Add(this.scalingNud);
+            this.videoOptionBox.Controls.Add(this.scalingLabel);
+            this.videoOptionBox.Controls.Add(this.videoWNud);
+            this.videoOptionBox.Controls.Add(this.videoWLabel);
+            this.videoOptionBox.Controls.Add(this.videoHNud);
+            this.videoOptionBox.Controls.Add(this.videoHLabel);
+            this.videoOptionBox.Location = new System.Drawing.Point(435, 10);
+            this.videoOptionBox.Name = "videoOptionBox";
+            this.videoOptionBox.Size = new System.Drawing.Size(185, 100);
+            this.videoOptionBox.TabIndex = 3;
+            this.videoOptionBox.TabStop = false;
+            this.videoOptionBox.Text = "视频尺寸";
             // 
             // isLockAspectRatioCb
             // 
@@ -545,7 +528,6 @@ namespace ScreenShare
             this.isLockAspectRatioCb.Size = new System.Drawing.Size(84, 16);
             this.isLockAspectRatioCb.TabIndex = 1;
             this.isLockAspectRatioCb.Text = "锁定纵横比";
-            this.toolTip.SetToolTip(this.isLockAspectRatioCb, "是否锁定纵横比");
             this.isLockAspectRatioCb.UseVisualStyleBackColor = true;
             this.isLockAspectRatioCb.CheckStateChanged += new System.EventHandler(this.IsLockAspectRatioCb_CheckStateChanged);
             // 
@@ -570,7 +552,6 @@ namespace ScreenShare
             this.scalingNud.Name = "scalingNud";
             this.scalingNud.Size = new System.Drawing.Size(50, 21);
             this.scalingNud.TabIndex = 2;
-            this.toolTip.SetToolTip(this.scalingNud, "相对于选取的矩形的缩放比例");
             this.scalingNud.Value = new decimal(new int[] {
             100,
             0,
@@ -609,7 +590,6 @@ namespace ScreenShare
             this.videoWNud.Name = "videoWNud";
             this.videoWNud.Size = new System.Drawing.Size(50, 21);
             this.videoWNud.TabIndex = 3;
-            this.toolTip.SetToolTip(this.videoWNud, "视频宽");
             this.videoWNud.Value = new decimal(new int[] {
             1920,
             0,
@@ -647,7 +627,6 @@ namespace ScreenShare
             this.videoHNud.Name = "videoHNud";
             this.videoHNud.Size = new System.Drawing.Size(50, 21);
             this.videoHNud.TabIndex = 4;
-            this.toolTip.SetToolTip(this.videoHNud, "视频高");
             this.videoHNud.Value = new decimal(new int[] {
             1080,
             0,
@@ -663,19 +642,19 @@ namespace ScreenShare
             this.videoHLabel.TabIndex = 0;
             this.videoHLabel.Text = "高：";
             // 
-            // videoBox
+            // videoSetBox
             // 
-            this.videoBox.Controls.Add(this.isDisplayCursorCb);
-            this.videoBox.Controls.Add(this.videoFrameNud);
-            this.videoBox.Controls.Add(this.videoFrameLabel);
-            this.videoBox.Controls.Add(this.videoQualityNud);
-            this.videoBox.Controls.Add(this.videoQualityLabel);
-            this.videoBox.Location = new System.Drawing.Point(630, 10);
-            this.videoBox.Name = "videoBox";
-            this.videoBox.Size = new System.Drawing.Size(130, 100);
-            this.videoBox.TabIndex = 4;
-            this.videoBox.TabStop = false;
-            this.videoBox.Text = "视频设置";
+            this.videoSetBox.Controls.Add(this.isDisplayCursorCb);
+            this.videoSetBox.Controls.Add(this.videoFrameNud);
+            this.videoSetBox.Controls.Add(this.videoFrameLabel);
+            this.videoSetBox.Controls.Add(this.videoQualityNud);
+            this.videoSetBox.Controls.Add(this.videoQualityLabel);
+            this.videoSetBox.Location = new System.Drawing.Point(630, 10);
+            this.videoSetBox.Name = "videoSetBox";
+            this.videoSetBox.Size = new System.Drawing.Size(130, 100);
+            this.videoSetBox.TabIndex = 4;
+            this.videoSetBox.TabStop = false;
+            this.videoSetBox.Text = "视频设置";
             // 
             // isDisplayCursorCb
             // 
@@ -687,7 +666,6 @@ namespace ScreenShare
             this.isDisplayCursorCb.Size = new System.Drawing.Size(72, 16);
             this.isDisplayCursorCb.TabIndex = 1;
             this.isDisplayCursorCb.Text = "显示光标";
-            this.toolTip.SetToolTip(this.isDisplayCursorCb, "是否显示光标");
             this.isDisplayCursorCb.UseVisualStyleBackColor = true;
             // 
             // videoFrameNud
@@ -701,7 +679,7 @@ namespace ScreenShare
             this.videoFrameNud.Name = "videoFrameNud";
             this.videoFrameNud.Size = new System.Drawing.Size(50, 21);
             this.videoFrameNud.TabIndex = 2;
-            this.toolTip.SetToolTip(this.videoFrameNud, "每秒刷新次数，数字越大越流畅；为0时以最快速度刷新");
+            this.toolTip.SetToolTip(this.videoFrameNud, "每秒刷新次数，数字越大越流畅\r\n为0时以最快速度刷新");
             this.videoFrameNud.Value = new decimal(new int[] {
             5,
             0,
@@ -758,15 +736,14 @@ namespace ScreenShare
             this.userCountLinkLabel.TabIndex = 5;
             this.userCountLinkLabel.TabStop = true;
             this.userCountLinkLabel.Text = "当前在线用户数量：0";
-            this.toolTip.SetToolTip(this.userCountLinkLabel, "点击显示用户在线历史界面");
             this.userCountLinkLabel.Click += new System.EventHandler(this.UserCountLinkLabel_Click);
             // 
             // bottomPanel
             // 
-            this.bottomPanel.Controls.Add(this.previewLabel);
             this.bottomPanel.Controls.Add(this.fpsLabel);
+            this.bottomPanel.Controls.Add(this.previewLabel);
             this.bottomPanel.Controls.Add(this.previewImg);
-            this.bottomPanel.Controls.Add(this.startSharingScreenBtn);
+            this.bottomPanel.Controls.Add(this.startBtn);
             this.bottomPanel.Controls.Add(this.logText);
             this.bottomPanel.Controls.Add(this.clearLogLinkLabel);
             this.bottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -774,17 +751,6 @@ namespace ScreenShare
             this.bottomPanel.Name = "bottomPanel";
             this.bottomPanel.Size = new System.Drawing.Size(768, 212);
             this.bottomPanel.TabIndex = 1;
-            // 
-            // previewLabel
-            // 
-            this.previewLabel.AutoSize = true;
-            this.previewLabel.Location = new System.Drawing.Point(555, 100);
-            this.previewLabel.Name = "previewLabel";
-            this.previewLabel.Size = new System.Drawing.Size(77, 12);
-            this.previewLabel.TabIndex = 0;
-            this.previewLabel.Text = "点击此处预览";
-            this.previewLabel.Visible = false;
-            this.previewLabel.Click += new System.EventHandler(this.PreviewLabel_Click);
             // 
             // fpsLabel
             // 
@@ -797,28 +763,39 @@ namespace ScreenShare
             this.fpsLabel.TabIndex = 4;
             this.fpsLabel.Text = "0.00 FPS ";
             // 
+            // previewLabel
+            // 
+            this.previewLabel.AutoSize = true;
+            this.previewLabel.Location = new System.Drawing.Point(555, 100);
+            this.previewLabel.Name = "previewLabel";
+            this.previewLabel.Size = new System.Drawing.Size(77, 12);
+            this.previewLabel.TabIndex = 0;
+            this.previewLabel.Text = "点击此处预览";
+            this.previewLabel.Visible = false;
+            this.previewLabel.Click += new System.EventHandler(this.PreviewLabel_Click);
+            // 
             // previewImg
             // 
-            this.previewImg.Location = new System.Drawing.Point(435, 10);
+            this.previewImg.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.previewImg.Location = new System.Drawing.Point(438, 18);
             this.previewImg.Margin = new System.Windows.Forms.Padding(0);
             this.previewImg.Name = "previewImg";
-            this.previewImg.Size = new System.Drawing.Size(325, 190);
+            this.previewImg.Size = new System.Drawing.Size(322, 182);
             this.previewImg.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.previewImg.TabIndex = 0;
             this.previewImg.TabStop = false;
             this.previewImg.Click += new System.EventHandler(this.PreviewImg_Click);
             // 
-            // startSharingScreenBtn
+            // startBtn
             // 
-            this.startSharingScreenBtn.Font = new System.Drawing.Font("宋体", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.startSharingScreenBtn.Location = new System.Drawing.Point(125, 10);
-            this.startSharingScreenBtn.Name = "startSharingScreenBtn";
-            this.startSharingScreenBtn.Size = new System.Drawing.Size(185, 40);
-            this.startSharingScreenBtn.TabIndex = 1;
-            this.startSharingScreenBtn.Text = "开始共享";
-            this.toolTip.SetToolTip(this.startSharingScreenBtn, "点击开始共享或结束共享");
-            this.startSharingScreenBtn.UseVisualStyleBackColor = true;
-            this.startSharingScreenBtn.Click += new System.EventHandler(this.StartSharingScreenBtn_Click);
+            this.startBtn.Font = new System.Drawing.Font("宋体", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.startBtn.Location = new System.Drawing.Point(125, 10);
+            this.startBtn.Name = "startBtn";
+            this.startBtn.Size = new System.Drawing.Size(185, 40);
+            this.startBtn.TabIndex = 1;
+            this.startBtn.Text = "开始共享";
+            this.startBtn.UseVisualStyleBackColor = true;
+            this.startBtn.Click += new System.EventHandler(this.StartSharingScreenBtn_Click);
             // 
             // logText
             // 
@@ -840,7 +817,6 @@ namespace ScreenShare
             this.clearLogLinkLabel.TabIndex = 2;
             this.clearLogLinkLabel.TabStop = true;
             this.clearLogLinkLabel.Text = "清空日志";
-            this.toolTip.SetToolTip(this.clearLogLinkLabel, "点击清空日志");
             this.clearLogLinkLabel.Click += new System.EventHandler(this.ClearLogLinkLabel_Click);
             // 
             // notifyIcon
@@ -878,13 +854,13 @@ namespace ScreenShare
             ((System.ComponentModel.ISupportInitialize)(this.screenYNud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.screenWNud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.screenHNud)).EndInit();
-            this.scalingBox.ResumeLayout(false);
-            this.scalingBox.PerformLayout();
+            this.videoOptionBox.ResumeLayout(false);
+            this.videoOptionBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.scalingNud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.videoWNud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.videoHNud)).EndInit();
-            this.videoBox.ResumeLayout(false);
-            this.videoBox.PerformLayout();
+            this.videoSetBox.ResumeLayout(false);
+            this.videoSetBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.videoFrameNud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.videoQualityNud)).EndInit();
             this.bottomPanel.ResumeLayout(false);
@@ -901,11 +877,10 @@ namespace ScreenShare
         /// 头部Panel
         /// </summary>
         private System.Windows.Forms.Panel topPanel;
-
         /// <summary>
-        /// 屏幕共享Label
+        /// 标题Label
         /// </summary>
-        private System.Windows.Forms.Label shareScreenLabel;
+        private System.Windows.Forms.Label titleLabel;
         /// <summary>
         /// IP地址Label
         /// </summary>
@@ -1029,11 +1004,11 @@ namespace ScreenShare
         /// </summary>
         private System.Windows.Forms.Button captureScreenCoordinatesBtn;
 
-        /* 视频尺寸GroupBox */
+        /* 视频选项GroupBox */
         /// <summary>
-        /// 视频尺寸GroupBox
+        /// 视频选项GroupBox
         /// </summary>
-        private System.Windows.Forms.GroupBox scalingBox;
+        private System.Windows.Forms.GroupBox videoOptionBox;
         /// <summary>
         /// 锁定纵横比CheckBox
         /// </summary>
@@ -1067,7 +1042,7 @@ namespace ScreenShare
         /// <summary>
         /// 视频设置GroupBox
         /// </summary>
-        private System.Windows.Forms.GroupBox videoBox;
+        private System.Windows.Forms.GroupBox videoSetBox;
         /// <summary>
         /// 显示光标CheckBox
         /// </summary>
@@ -1099,11 +1074,10 @@ namespace ScreenShare
         /// 底部Panel
         /// </summary>
         private System.Windows.Forms.Panel bottomPanel;
-
         /// <summary>
-        /// 开始分享Button
+        /// 开始Button
         /// </summary>
-        private System.Windows.Forms.Button startSharingScreenBtn;
+        private System.Windows.Forms.Button startBtn;
         /// <summary>
         /// 日志TextBox
         /// </summary>
@@ -1113,6 +1087,10 @@ namespace ScreenShare
         /// </summary>
         private System.Windows.Forms.Label fpsLabel;
         /// <summary>
+        /// 清空日志LinkLabel
+        /// </summary>
+        private System.Windows.Forms.LinkLabel clearLogLinkLabel;
+        /// <summary>
         /// 预览Label
         /// </summary>
         private System.Windows.Forms.Label previewLabel;
@@ -1120,10 +1098,6 @@ namespace ScreenShare
         /// 预览图像PictureBox
         /// </summary>
         private System.Windows.Forms.PictureBox previewImg;
-        /// <summary>
-        /// 清空日志LinkLabel
-        /// </summary>
-        private System.Windows.Forms.LinkLabel clearLogLinkLabel;
 
         /* 提示 */
         /// <summary>
@@ -1136,5 +1110,6 @@ namespace ScreenShare
         /// 通知NotifyIcon
         /// </summary>
         private System.Windows.Forms.NotifyIcon notifyIcon;
+
     }
 }
