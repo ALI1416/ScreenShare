@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Obfuscator>
+  <Var name="InPath" value="." />
+  <Var name="OutPath" value=".\Obfuscator_Output" />
+  <Var name="KeepPublicApi" value="false" />
+  <Var name="HideStrings" value="false" />
+  <Module file="$(InPath)\ScreenShare.exe" />
+</Obfuscator>
