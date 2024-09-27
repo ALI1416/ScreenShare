@@ -24,7 +24,7 @@ namespace ScreenShare.Service
         /// </summary>
         private List<WebSocketClient> clientList;
         /// <summary>
-        /// 客户端上下线回调函数&lt;客户端,上线或下线>
+        /// 客户端上下线回调函数 客户端,上线或下线
         /// </summary>
         private Action<WebSocketClient, bool> clientCallback;
 
@@ -92,7 +92,7 @@ namespace ScreenShare.Service
         /// </summary>
         /// <param name="ip">IP地址</param>
         /// <param name="port">端口号</param>
-        /// <param name="clientCallback">客户端上下线回调函数&lt;客户端,上线或下线></param>
+        /// <param name="clientCallback">客户端上下线回调函数 客户端,上线或下线</param>
         /// <returns>是否启动成功</returns>
         public bool Start(IPAddress ip, int port, Action<WebSocketClient, bool> clientCallback)
         {

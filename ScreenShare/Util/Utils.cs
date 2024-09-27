@@ -19,7 +19,7 @@ namespace ScreenShare.Util
         /// <summary>
         /// 获取所有的IP地址
         /// </summary>
-        /// <returns>List&lt;Tuple&lt;IP地址名称, IP地址IPAddress&gt;&gt;</returns>
+        /// <returns>List Tuple IP地址名称, IP地址IPAddress</returns>
         public static List<Tuple<string, IPAddress>> GetAllIPv4Address()
         {
             var ipList = new List<Tuple<string, IPAddress>>();
@@ -46,7 +46,7 @@ namespace ScreenShare.Util
         /// 总共返回n+1个Tuple
         /// </para>
         /// </summary>
-        /// <returns>List&lt;Tuple&lt;屏幕名称, 屏幕Rectangle&gt;&gt;</returns>
+        /// <returns>List Tuple 屏幕名称, 屏幕Rectangle</returns>
         public static List<Tuple<string, Rectangle>> GetAllScreen()
         {
             var screenList = new List<Tuple<string, Rectangle>>();

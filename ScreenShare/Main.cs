@@ -10,9 +10,10 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading.Tasks;
-using System.Reflection;
 using System.Collections.Specialized;
 using ScreenShare.Service;
+using IniParser;
+using IniParser.Model;
 
 namespace ScreenShare
 {
@@ -31,6 +32,11 @@ namespace ScreenShare
         public Main()
         {
             InitializeComponent();
+            // 日志
+            Log("欢迎使用屏幕共享软件！");
+            Log("当前版本 " + Constant.VERSION_NUMBER);
+            Log("帮助与反馈 https://github.com/ALI1416/ScreenShare");
+            InitIni();
             Init();
             // 图标
             MemoryStream stream = new MemoryStream();
@@ -38,12 +44,82 @@ namespace ScreenShare
             httpIconHeaderBytes = HttpService.GetBytes(HttpService.icoHeaderBytes, stream);
             // FPS
             fpsLabel.Parent = previewImg;
-            // 日志
-            Version version = Assembly.GetExecutingAssembly().GetName().Version;
-            Log("欢迎使用屏幕共享软件！");
-            Log("当前版本 " + version.Major + "." + version.Minor + "." + version.Build);
-            Log("帮助与反馈 https://github.com/ALI1416/ScreenShare");
             Log("初始化完成！");
+        }
+
+        /// <summary>
+        /// 初始化INI配置
+        /// </summary>
+        public void InitIni()
+        {
+            if (File.Exists(Constant.INI_PATH))
+            {
+                // 存在去读取
+                try
+                {
+                    LoadIni();
+                    Log("配置文件加载完成！");
+                }
+                catch
+                {
+                    Log("配置文件加载失败！路径：" + Constant.INI_PATH);
+                    Log("已加载默认配置。");
+                }
+            }
+            else
+            {
+                // 不存在去创建
+                CreateIni();
+                Log("配置文件不存在，已创建默认配置。");
+            }
+        }
+
+        /// <summary>
+        /// 加载INI配置
+        /// </summary>
+        public static void LoadIni()
+        {
+            FileIniDataParser parser = new FileIniDataParser();
+            IniData iniData = parser.ReadFile(Constant.INI_PATH);
+        }
+
+        /// <summary>
+        /// 创建INI配置
+        /// </summary>
+        public static void CreateIni()
+        {
+            SectionData system = new SectionData("System");
+            system.Keys["AutoLaunch"] = IniConfig.System.AutoLaunch.ToString();
+            system.Keys["AutoRun"] = IniConfig.System.AutoRun.ToString();
+            system.Keys["OpenBlack"] = IniConfig.System.OpenBlack.ToString();
+            system.Keys["OpenWhite"] = IniConfig.System.OpenWhite.ToString();
+            SectionData program = new SectionData("Program");
+            program.Keys["IpAddress"] = IniConfig.Program.IpAddress;
+            program.Keys["IpPort"] = IniConfig.Program.IpPort.ToString();
+            program.Keys["IsEncryption"] = IniConfig.Program.IsEncryption.ToString();
+            program.Keys["Pwd"] = IniConfig.Program.Pwd;
+            program.Keys["IsFullScreen"] = IniConfig.Program.IsFullScreen.ToString();
+            program.Keys["Screen"] = IniConfig.Program.Screen;
+            program.Keys["ScreenX"] = IniConfig.Program.ScreenX.ToString();
+            program.Keys["ScreenY"] = IniConfig.Program.ScreenY.ToString();
+            program.Keys["ScreenW"] = IniConfig.Program.ScreenW.ToString();
+            program.Keys["ScreenH"] = IniConfig.Program.ScreenH.ToString();
+            program.Keys["IsLockAspectRatio"] = IniConfig.Program.IsLockAspectRatio.ToString();
+            program.Keys["Scaling"] = IniConfig.Program.Scaling.ToString();
+            program.Keys["VideoW"] = IniConfig.Program.VideoW.ToString();
+            program.Keys["VideoH"] = IniConfig.Program.VideoH.ToString();
+            program.Keys["IsDisplayCursor"] = IniConfig.Program.IsDisplayCursor.ToString();
+            program.Keys["VideoFrame"] = IniConfig.Program.VideoFrame.ToString();
+            program.Keys["VideoQuality"] = IniConfig.Program.VideoQuality.ToString();
+            SectionDataCollection sdc = new SectionDataCollection
+            {
+                system,
+                program
+            };
+            IniData iniData = new IniData(sdc);
+            Directory.CreateDirectory(Constant.INI_DIRECTORY);
+            FileIniDataParser parser = new FileIniDataParser();
+            parser.WriteFile(Constant.INI_PATH, iniData);
         }
 
         /// <summary>
@@ -117,7 +193,7 @@ namespace ScreenShare
         /// 获取分享地址
         /// </summary>
         /// <returns>分享地址</returns>
-        public string ShareLinkText()
+        public string GetShareLink()
         {
             return shareLinkText.Text;
         }

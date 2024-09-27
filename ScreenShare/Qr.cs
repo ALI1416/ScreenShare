@@ -29,7 +29,7 @@ namespace ScreenShare
         private void Qr_Load(object sender, System.EventArgs e)
         {
             // HTTP://192.168.123.102:12345/ 分享地址最多29字节 v2l2m1最多容纳29字节
-            QRCode qrCode = new QRCode(FormManager.Main.ShareLinkText().ToUpperInvariant(), 2);
+            QRCode qrCode = new QRCode(FormManager.Main.GetShareLink().ToUpperInvariant(), 2);
             Bitmap bitmap = ImageUtils.QrBytes2Bitmap(qrCode.Matrix, 20);
             if (img.Image != null)
             {
