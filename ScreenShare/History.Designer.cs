@@ -47,7 +47,6 @@ namespace ScreenShare
             this.frameAvg = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.byteAvg = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.byteCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.topPanel.SuspendLayout();
             this.bottomPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tableDataGridView)).BeginInit();
@@ -75,7 +74,6 @@ namespace ScreenShare
             this.autoRefreshCb.Size = new System.Drawing.Size(72, 16);
             this.autoRefreshCb.TabIndex = 2;
             this.autoRefreshCb.Text = "自动刷新";
-            this.toolTip.SetToolTip(this.autoRefreshCb, "是否自动刷新");
             this.autoRefreshCb.UseVisualStyleBackColor = true;
             // 
             // onlyOnlineCb
@@ -86,7 +84,6 @@ namespace ScreenShare
             this.onlyOnlineCb.Size = new System.Drawing.Size(108, 16);
             this.onlyOnlineCb.TabIndex = 1;
             this.onlyOnlineCb.Text = "仅显示在线用户";
-            this.toolTip.SetToolTip(this.onlyOnlineCb, "是否仅显示在线用户");
             this.onlyOnlineCb.UseVisualStyleBackColor = true;
             this.onlyOnlineCb.CheckStateChanged += new System.EventHandler(this.OnlyOnlineCheckBox_CheckStateChanged);
             // 
@@ -99,7 +96,6 @@ namespace ScreenShare
             this.refreshLinkLabel.TabIndex = 3;
             this.refreshLinkLabel.TabStop = true;
             this.refreshLinkLabel.Text = "手动刷新";
-            this.toolTip.SetToolTip(this.refreshLinkLabel, "点击手动刷新");
             this.refreshLinkLabel.Click += new System.EventHandler(this.RefreshLinkLabel_Click);
             // 
             // titleLabel
@@ -275,12 +271,6 @@ namespace ScreenShare
         /// </summary>
         private System.Windows.Forms.Label textLabel;
 
-        /* 提示 */
-        /// <summary>
-        /// 提示ToolTip
-        /// </summary>
-        private System.Windows.Forms.ToolTip toolTip;
-
         /* 表格DataGridView */
         /// <summary>
         /// 表格DataGridView
@@ -294,5 +284,6 @@ namespace ScreenShare
         private System.Windows.Forms.DataGridViewTextBoxColumn frameAvg;
         private System.Windows.Forms.DataGridViewTextBoxColumn byteAvg;
         private System.Windows.Forms.DataGridViewTextBoxColumn byteCount;
+
     }
 }

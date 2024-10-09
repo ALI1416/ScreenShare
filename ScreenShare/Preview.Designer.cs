@@ -85,5 +85,6 @@ namespace ScreenShare
         /// FPS Label
         /// </summary>
         private System.Windows.Forms.Label fpsLabel;
+
     }
 }

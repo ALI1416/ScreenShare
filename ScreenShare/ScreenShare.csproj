@@ -12,10 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -140,11 +137,44 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cursor.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\favicon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\index.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\app.manifest" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <Compile Include="Config.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Config.Designer.cs">
       <DependentUpon>Config.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DrawScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DrawScreen.Designer.cs">
+      <DependentUpon>DrawScreen.cs</DependentUpon>
     </Compile>
     <Compile Include="History.cs">
       <SubType>Form</SubType>
@@ -152,14 +182,16 @@
     <Compile Include="History.Designer.cs">
       <DependentUpon>History.cs</DependentUpon>
     </Compile>
-    <Compile Include="Model\Constant.cs" />
-    <Compile Include="Model\FormManager.cs" />
-    <Compile Include="Model\HttpClient.cs" />
-    <Compile Include="Model\IniConfig.cs" />
-    <Compile Include="Model\WebSocketClient.cs" />
-    <Compile Include="Model\HttpServer.cs" />
-    <Compile Include="Model\WebSocketServer.cs" />
-    <Compile Include="Model\StatusManager.cs" />
+    <Compile Include="Main.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main.Designer.cs">
+      <DependentUpon>Main.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Main.resx">
+      <DependentUpon>Main.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <Compile Include="Preview.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -172,58 +204,22 @@
     <Compile Include="Qr.Designer.cs">
       <DependentUpon>Qr.cs</DependentUpon>
     </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Model\Constant.cs" />
+    <Compile Include="Model\FormManager.cs" />
+    <Compile Include="Model\HttpClient.cs" />
+    <Compile Include="Model\HttpServer.cs" />
+    <Compile Include="Model\IniConfig.cs" />
+    <Compile Include="Model\StatusManager.cs" />
+    <Compile Include="Model\WebSocketClient.cs" />
+    <Compile Include="Model\WebSocketServer.cs" />
     <Compile Include="ScheduledTask\ScheduledTasks.cs" />
     <Compile Include="Service\HttpService.cs" />
     <Compile Include="Service\WebSocketService.cs" />
+    <Compile Include="Util\ImageUtils.cs" />
     <Compile Include="Util\RegistryUtils.cs" />
     <Compile Include="Util\Utils.cs" />
-    <Compile Include="Util\ImageUtils.cs" />
-    <Compile Include="DrawScreen.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DrawScreen.Designer.cs">
-      <DependentUpon>DrawScreen.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Main.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Main.Designer.cs">
-      <DependentUpon>Main.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\WebSocketUtils.cs" />
-    <EmbeddedResource Include="History.resx">
-      <DependentUpon>History.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Main.resx">
-      <DependentUpon>Main.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <EmbeddedResource Include="Qr.resx">
-      <DependentUpon>Qr.cs</DependentUpon>
-    </EmbeddedResource>
-    <None Include="Properties\app.manifest" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\cursor.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">
@@ -236,12 +232,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\favicon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\index.html" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Costura.Fody">

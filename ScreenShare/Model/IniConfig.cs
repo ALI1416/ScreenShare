@@ -1,4 +1,4 @@
-﻿namespace ScreenShare.Model
+namespace ScreenShare.Model
 {
 
     /// <summary>
@@ -110,5 +110,4 @@
         }
 
     }
-
 }

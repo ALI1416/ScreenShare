@@ -34,6 +34,8 @@ namespace ScreenShare
             this.resetConfigBtn = new System.Windows.Forms.Button();
             this.openConfigBtn = new System.Windows.Forms.Button();
             this.saveConfigBtn = new System.Windows.Forms.Button();
+            this.programConfigBox = new System.Windows.Forms.GroupBox();
+            this.programConfigText = new System.Windows.Forms.TextBox();
             this.ruleBox = new System.Windows.Forms.GroupBox();
             this.ruleLabel = new System.Windows.Forms.Label();
             this.blackBox = new System.Windows.Forms.GroupBox();
@@ -43,6 +45,7 @@ namespace ScreenShare
             this.openWhiteCb = new System.Windows.Forms.CheckBox();
             this.whiteText = new System.Windows.Forms.TextBox();
             this.systemConfigBox.SuspendLayout();
+            this.programConfigBox.SuspendLayout();
             this.ruleBox.SuspendLayout();
             this.blackBox.SuspendLayout();
             this.whiteBox.SuspendLayout();
@@ -55,10 +58,9 @@ namespace ScreenShare
             this.systemConfigBox.Controls.Add(this.resetConfigBtn);
             this.systemConfigBox.Controls.Add(this.openConfigBtn);
             this.systemConfigBox.Controls.Add(this.saveConfigBtn);
-            this.systemConfigBox.Controls.Add(this.ruleBox);
             this.systemConfigBox.Location = new System.Drawing.Point(10, 10);
             this.systemConfigBox.Name = "systemConfigBox";
-            this.systemConfigBox.Size = new System.Drawing.Size(290, 410);
+            this.systemConfigBox.Size = new System.Drawing.Size(290, 80);
             this.systemConfigBox.TabIndex = 0;
             this.systemConfigBox.TabStop = false;
             this.systemConfigBox.Text = "系统配置";
@@ -85,7 +87,7 @@ namespace ScreenShare
             // 
             // resetConfigBtn
             // 
-            this.resetConfigBtn.Location = new System.Drawing.Point(10, 380);
+            this.resetConfigBtn.Location = new System.Drawing.Point(10, 45);
             this.resetConfigBtn.Name = "resetConfigBtn";
             this.resetConfigBtn.Size = new System.Drawing.Size(80, 23);
             this.resetConfigBtn.TabIndex = 5;
@@ -95,7 +97,7 @@ namespace ScreenShare
             // 
             // openConfigBtn
             // 
-            this.openConfigBtn.Location = new System.Drawing.Point(105, 380);
+            this.openConfigBtn.Location = new System.Drawing.Point(105, 45);
             this.openConfigBtn.Name = "openConfigBtn";
             this.openConfigBtn.Size = new System.Drawing.Size(80, 23);
             this.openConfigBtn.TabIndex = 4;
@@ -105,7 +107,7 @@ namespace ScreenShare
             // 
             // saveConfigBtn
             // 
-            this.saveConfigBtn.Location = new System.Drawing.Point(200, 380);
+            this.saveConfigBtn.Location = new System.Drawing.Point(200, 45);
             this.saveConfigBtn.Name = "saveConfigBtn";
             this.saveConfigBtn.Size = new System.Drawing.Size(80, 23);
             this.saveConfigBtn.TabIndex = 3;
@@ -113,12 +115,34 @@ namespace ScreenShare
             this.saveConfigBtn.UseVisualStyleBackColor = true;
             this.saveConfigBtn.Click += new System.EventHandler(this.SaveConfigBtn_Click);
             // 
+            // programConfigBox
+            // 
+            this.programConfigBox.Controls.Add(this.programConfigText);
+            this.programConfigBox.Location = new System.Drawing.Point(10, 100);
+            this.programConfigBox.Name = "programConfigBox";
+            this.programConfigBox.Size = new System.Drawing.Size(290, 220);
+            this.programConfigBox.TabIndex = 5;
+            this.programConfigBox.TabStop = false;
+            this.programConfigBox.Text = "程序配置";
+            // 
+            // programConfigText
+            // 
+            this.programConfigText.BackColor = System.Drawing.SystemColors.Window;
+            this.programConfigText.Location = new System.Drawing.Point(10, 20);
+            this.programConfigText.Multiline = true;
+            this.programConfigText.Name = "programConfigText";
+            this.programConfigText.ReadOnly = true;
+            this.programConfigText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.programConfigText.Size = new System.Drawing.Size(270, 190);
+            this.programConfigText.TabIndex = 0;
+            this.programConfigText.Text = "啊啊啊1";
+            // 
             // ruleBox
             // 
             this.ruleBox.Controls.Add(this.ruleLabel);
-            this.ruleBox.Location = new System.Drawing.Point(10, 280);
+            this.ruleBox.Location = new System.Drawing.Point(10, 330);
             this.ruleBox.Name = "ruleBox";
-            this.ruleBox.Size = new System.Drawing.Size(270, 90);
+            this.ruleBox.Size = new System.Drawing.Size(290, 90);
             this.ruleBox.TabIndex = 4;
             this.ruleBox.TabStop = false;
             this.ruleBox.Text = "黑白名单规则";
@@ -128,10 +152,10 @@ namespace ScreenShare
             this.ruleLabel.AutoSize = true;
             this.ruleLabel.Location = new System.Drawing.Point(5, 20);
             this.ruleLabel.Name = "ruleLabel";
-            this.ruleLabel.Size = new System.Drawing.Size(263, 60);
+            this.ruleLabel.Size = new System.Drawing.Size(275, 60);
             this.ruleLabel.TabIndex = 0;
-            this.ruleLabel.Text = "1.黑名单和白名单最多生效一个\r\n2.每条规则使用换行隔开\r\n3.通配符使用 * 例如 192.168.*.*\r\n4.范围使用 - 例如 192.168.1.0-" +
-    "192.168.2.255\r\n5.通配符和范围不能同时使用";
+            this.ruleLabel.Text = "1.黑名单和白名单最多生效一个\r\n2.每条规则使用换行隔开\r\n3.通配符使用 * 例如 192.168.*.*\r\n4.范围使用 - 例如 192.168.1.0 " +
+    "- 192.168.2.255\r\n5.通配符和范围不能同时使用";
             // 
             // blackBox
             // 
@@ -196,9 +220,11 @@ namespace ScreenShare
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(768, 432);
+            this.Controls.Add(this.programConfigBox);
             this.Controls.Add(this.systemConfigBox);
             this.Controls.Add(this.blackBox);
             this.Controls.Add(this.whiteBox);
+            this.Controls.Add(this.ruleBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = global::ScreenShare.Properties.Resources.icon;
             this.MaximizeBox = false;
@@ -209,6 +235,8 @@ namespace ScreenShare
             this.Text = "系统配置";
             this.systemConfigBox.ResumeLayout(false);
             this.systemConfigBox.PerformLayout();
+            this.programConfigBox.ResumeLayout(false);
+            this.programConfigBox.PerformLayout();
             this.ruleBox.ResumeLayout(false);
             this.ruleBox.PerformLayout();
             this.blackBox.ResumeLayout(false);
@@ -235,14 +263,6 @@ namespace ScreenShare
         /// </summary>
         private System.Windows.Forms.CheckBox autoRunBtn;
         /// <summary>
-        /// 黑白名单规则CheckBox
-        /// </summary>
-        private System.Windows.Forms.GroupBox ruleBox;
-        /// <summary>
-        /// 黑白名单规则Label
-        /// </summary>
-        private System.Windows.Forms.Label ruleLabel;
-        /// <summary>
         /// 重置配置Button
         /// </summary>
         private System.Windows.Forms.Button resetConfigBtn;
@@ -254,6 +274,26 @@ namespace ScreenShare
         /// 保存配置Button
         /// </summary>
         private System.Windows.Forms.Button saveConfigBtn;
+
+        /* 程序配置 */
+        /// <summary>
+        /// 程序配置GroupBox
+        /// </summary>
+        private System.Windows.Forms.GroupBox programConfigBox;
+        /// <summary>
+        /// 程序配置TextBox
+        /// </summary>
+        private System.Windows.Forms.TextBox programConfigText;
+
+        /* 黑白名单规则 */
+        /// <summary>
+        /// 黑白名单规则GroupBox
+        /// </summary>
+        private System.Windows.Forms.GroupBox ruleBox;
+        /// <summary>
+        /// 黑白名单规则Label
+        /// </summary>
+        private System.Windows.Forms.Label ruleLabel;
 
         /* 黑名单 */
         /// <summary>

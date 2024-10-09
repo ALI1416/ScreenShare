@@ -29,5 +29,4 @@ namespace ScreenShare.Model
         public static Qr Qr { get; set; }
 
     }
-
 }

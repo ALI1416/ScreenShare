@@ -14,7 +14,7 @@ namespace ScreenShare
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="rect">绘图的rect</param>
+        /// <param name="rect">绘图的Rectangle</param>
         public DrawScreen(Rectangle rect)
         {
             InitializeComponent();
@@ -35,7 +35,7 @@ namespace ScreenShare
         /// </summary>
         private Point start;
         /// <summary>
-        /// 结果rect
+        /// 结果Rectangle
         /// </summary>
         public Rectangle rect;
 
@@ -87,7 +87,7 @@ namespace ScreenShare
             {
                 rect.Height = Size.Height - rect.Y;
             }
-            // 返回父窗口对应的rect
+            // 返回父窗口对应的Rectangle
             rect = new Rectangle(rect.X + Location.X, rect.Y + Location.Y, rect.Width, rect.Height);
             DialogResult = DialogResult.OK;
             Close();

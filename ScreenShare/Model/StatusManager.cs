@@ -35,5 +35,4 @@ namespace ScreenShare.Model
         public static WebSocketService WebSocketService { get; set; }
 
     }
-
 }

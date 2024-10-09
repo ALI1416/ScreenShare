@@ -70,5 +70,4 @@ namespace ScreenShare.Util
         }
 
     }
-
 }

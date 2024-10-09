@@ -37,7 +37,7 @@ namespace ScreenShare
             Log("当前版本 " + Constant.VERSION_NUMBER);
             Log("帮助与反馈 https://github.com/ALI1416/ScreenShare");
             InitIni();
-            Init();
+            InitForm();
             // 图标
             MemoryStream stream = new MemoryStream();
             Resources.favicon.Save(stream);
@@ -480,9 +480,9 @@ namespace ScreenShare
         #region 界面事件
 
         /// <summary>
-        /// 初始化
+        /// 初始化界面
         /// </summary>
-        private void Init()
+        private void InitForm()
         {
             StatusManager.IsStarted = false;
             /* 头部 */
@@ -748,7 +748,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void ReloadConfigBtn_Click(object sender, EventArgs e)
         {
-            Init();
+            InitForm();
         }
 
         /// <summary>
@@ -1024,5 +1024,4 @@ namespace ScreenShare
         #endregion
 
     }
-
 }

@@ -32,7 +32,7 @@ namespace ScreenShare.Model
         /// </summary>
         public static readonly string INI_NAME = APP_NAME + ".ini";
         /// <summary>
-        /// INI目录
+        /// INI目录(%APPDATA%)
         /// </summary>
         public static readonly string INI_DIRECTORY = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\" + APP_NAME;
         /// <summary>
