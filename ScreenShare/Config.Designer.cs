@@ -31,13 +31,12 @@ namespace ScreenShare
             this.systemConfigBox = new System.Windows.Forms.GroupBox();
             this.autoLaunchBtn = new System.Windows.Forms.CheckBox();
             this.autoRunBtn = new System.Windows.Forms.CheckBox();
-            this.resetConfigBtn = new System.Windows.Forms.Button();
             this.openConfigBtn = new System.Windows.Forms.Button();
             this.saveConfigBtn = new System.Windows.Forms.Button();
             this.programConfigBox = new System.Windows.Forms.GroupBox();
             this.programConfigText = new System.Windows.Forms.TextBox();
             this.ruleBox = new System.Windows.Forms.GroupBox();
-            this.ruleLabel = new System.Windows.Forms.Label();
+            this.ruleText = new System.Windows.Forms.TextBox();
             this.blackBox = new System.Windows.Forms.GroupBox();
             this.openBlackCb = new System.Windows.Forms.CheckBox();
             this.blackText = new System.Windows.Forms.TextBox();
@@ -55,12 +54,11 @@ namespace ScreenShare
             // 
             this.systemConfigBox.Controls.Add(this.autoLaunchBtn);
             this.systemConfigBox.Controls.Add(this.autoRunBtn);
-            this.systemConfigBox.Controls.Add(this.resetConfigBtn);
             this.systemConfigBox.Controls.Add(this.openConfigBtn);
             this.systemConfigBox.Controls.Add(this.saveConfigBtn);
             this.systemConfigBox.Location = new System.Drawing.Point(10, 10);
             this.systemConfigBox.Name = "systemConfigBox";
-            this.systemConfigBox.Size = new System.Drawing.Size(290, 80);
+            this.systemConfigBox.Size = new System.Drawing.Size(230, 80);
             this.systemConfigBox.TabIndex = 0;
             this.systemConfigBox.TabStop = false;
             this.systemConfigBox.Text = "系统配置";
@@ -85,19 +83,9 @@ namespace ScreenShare
             this.autoRunBtn.Text = "自动运行";
             this.autoRunBtn.UseVisualStyleBackColor = true;
             // 
-            // resetConfigBtn
-            // 
-            this.resetConfigBtn.Location = new System.Drawing.Point(10, 45);
-            this.resetConfigBtn.Name = "resetConfigBtn";
-            this.resetConfigBtn.Size = new System.Drawing.Size(80, 23);
-            this.resetConfigBtn.TabIndex = 5;
-            this.resetConfigBtn.Text = "重置配置";
-            this.resetConfigBtn.UseVisualStyleBackColor = true;
-            this.resetConfigBtn.Click += new System.EventHandler(this.ResetConfigBtn_Click);
-            // 
             // openConfigBtn
             // 
-            this.openConfigBtn.Location = new System.Drawing.Point(105, 45);
+            this.openConfigBtn.Location = new System.Drawing.Point(10, 45);
             this.openConfigBtn.Name = "openConfigBtn";
             this.openConfigBtn.Size = new System.Drawing.Size(80, 23);
             this.openConfigBtn.TabIndex = 4;
@@ -107,7 +95,7 @@ namespace ScreenShare
             // 
             // saveConfigBtn
             // 
-            this.saveConfigBtn.Location = new System.Drawing.Point(200, 45);
+            this.saveConfigBtn.Location = new System.Drawing.Point(140, 45);
             this.saveConfigBtn.Name = "saveConfigBtn";
             this.saveConfigBtn.Size = new System.Drawing.Size(80, 23);
             this.saveConfigBtn.TabIndex = 3;
@@ -120,7 +108,7 @@ namespace ScreenShare
             this.programConfigBox.Controls.Add(this.programConfigText);
             this.programConfigBox.Location = new System.Drawing.Point(10, 100);
             this.programConfigBox.Name = "programConfigBox";
-            this.programConfigBox.Size = new System.Drawing.Size(290, 220);
+            this.programConfigBox.Size = new System.Drawing.Size(230, 200);
             this.programConfigBox.TabIndex = 5;
             this.programConfigBox.TabStop = false;
             this.programConfigBox.Text = "程序配置";
@@ -133,37 +121,42 @@ namespace ScreenShare
             this.programConfigText.Name = "programConfigText";
             this.programConfigText.ReadOnly = true;
             this.programConfigText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.programConfigText.Size = new System.Drawing.Size(270, 190);
+            this.programConfigText.Size = new System.Drawing.Size(210, 170);
             this.programConfigText.TabIndex = 0;
-            this.programConfigText.Text = "啊啊啊1";
+            this.programConfigText.Text = "IP地址 127.0.0.1\r\n端口号 7070\r\n开启密码验证 False\r\n密码 \r\n全屏显示 True\r\n显示器 1(主)[1920x1080]\r\n显示器X" +
+    " 0\r\n显示器Y 0\r\n显示器宽 1920\r\n显示器高 1080\r\n锁定纵横比 True\r\n缩放比例 100\r\n视频宽 1920\r\n视频高 1080\r\n显示光标" +
+    " True\r\n每秒帧数 5\r\n视频质量 100";
             // 
             // ruleBox
             // 
-            this.ruleBox.Controls.Add(this.ruleLabel);
-            this.ruleBox.Location = new System.Drawing.Point(10, 330);
+            this.ruleBox.Controls.Add(this.ruleText);
+            this.ruleBox.Location = new System.Drawing.Point(10, 310);
             this.ruleBox.Name = "ruleBox";
-            this.ruleBox.Size = new System.Drawing.Size(290, 90);
+            this.ruleBox.Size = new System.Drawing.Size(230, 110);
             this.ruleBox.TabIndex = 4;
             this.ruleBox.TabStop = false;
             this.ruleBox.Text = "黑白名单规则";
             // 
-            // ruleLabel
+            // ruleText
             // 
-            this.ruleLabel.AutoSize = true;
-            this.ruleLabel.Location = new System.Drawing.Point(5, 20);
-            this.ruleLabel.Name = "ruleLabel";
-            this.ruleLabel.Size = new System.Drawing.Size(275, 60);
-            this.ruleLabel.TabIndex = 0;
-            this.ruleLabel.Text = "1.黑名单和白名单最多生效一个\r\n2.每条规则使用换行隔开\r\n3.通配符使用 * 例如 192.168.*.*\r\n4.范围使用 - 例如 192.168.1.0 " +
-    "- 192.168.2.255\r\n5.通配符和范围不能同时使用";
+            this.ruleText.BackColor = System.Drawing.SystemColors.Window;
+            this.ruleText.Location = new System.Drawing.Point(10, 20);
+            this.ruleText.Multiline = true;
+            this.ruleText.Name = "ruleText";
+            this.ruleText.ReadOnly = true;
+            this.ruleText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.ruleText.Size = new System.Drawing.Size(210, 80);
+            this.ruleText.TabIndex = 1;
+            this.ruleText.Text = "1.黑名单和白名单最多生效一个\r\n2.每条规则使用换行隔开\r\n3.通配符使用 * 例如 192.168.*.*\r\n4.范围使用 - 例如\r\n192.168.1.0" +
+    " - 192.168.2.255\r\n5.通配符和范围不能同时使用";
             // 
             // blackBox
             // 
             this.blackBox.Controls.Add(this.openBlackCb);
             this.blackBox.Controls.Add(this.blackText);
-            this.blackBox.Location = new System.Drawing.Point(310, 10);
+            this.blackBox.Location = new System.Drawing.Point(250, 10);
             this.blackBox.Name = "blackBox";
-            this.blackBox.Size = new System.Drawing.Size(220, 410);
+            this.blackBox.Size = new System.Drawing.Size(250, 410);
             this.blackBox.TabIndex = 3;
             this.blackBox.TabStop = false;
             this.blackBox.Text = "黑名单";
@@ -183,16 +176,17 @@ namespace ScreenShare
             this.blackText.Location = new System.Drawing.Point(10, 40);
             this.blackText.Multiline = true;
             this.blackText.Name = "blackText";
-            this.blackText.Size = new System.Drawing.Size(200, 360);
+            this.blackText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.blackText.Size = new System.Drawing.Size(230, 360);
             this.blackText.TabIndex = 1;
             // 
             // whiteBox
             // 
             this.whiteBox.Controls.Add(this.openWhiteCb);
             this.whiteBox.Controls.Add(this.whiteText);
-            this.whiteBox.Location = new System.Drawing.Point(540, 10);
+            this.whiteBox.Location = new System.Drawing.Point(510, 10);
             this.whiteBox.Name = "whiteBox";
-            this.whiteBox.Size = new System.Drawing.Size(220, 410);
+            this.whiteBox.Size = new System.Drawing.Size(250, 410);
             this.whiteBox.TabIndex = 2;
             this.whiteBox.TabStop = false;
             this.whiteBox.Text = "白名单";
@@ -212,7 +206,8 @@ namespace ScreenShare
             this.whiteText.Location = new System.Drawing.Point(10, 40);
             this.whiteText.Multiline = true;
             this.whiteText.Name = "whiteText";
-            this.whiteText.Size = new System.Drawing.Size(200, 360);
+            this.whiteText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.whiteText.Size = new System.Drawing.Size(230, 360);
             this.whiteText.TabIndex = 1;
             // 
             // Config
@@ -222,9 +217,9 @@ namespace ScreenShare
             this.ClientSize = new System.Drawing.Size(768, 432);
             this.Controls.Add(this.programConfigBox);
             this.Controls.Add(this.systemConfigBox);
+            this.Controls.Add(this.ruleBox);
             this.Controls.Add(this.blackBox);
             this.Controls.Add(this.whiteBox);
-            this.Controls.Add(this.ruleBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = global::ScreenShare.Properties.Resources.icon;
             this.MaximizeBox = false;
@@ -263,10 +258,6 @@ namespace ScreenShare
         /// </summary>
         private System.Windows.Forms.CheckBox autoRunBtn;
         /// <summary>
-        /// 重置配置Button
-        /// </summary>
-        private System.Windows.Forms.Button resetConfigBtn;
-        /// <summary>
         /// 打开配置Button
         /// </summary>
         private System.Windows.Forms.Button openConfigBtn;
@@ -291,9 +282,9 @@ namespace ScreenShare
         /// </summary>
         private System.Windows.Forms.GroupBox ruleBox;
         /// <summary>
-        /// 黑白名单规则Label
+        /// 黑白名单规则TextBox
         /// </summary>
-        private System.Windows.Forms.Label ruleLabel;
+        private System.Windows.Forms.TextBox ruleText;
 
         /* 黑名单 */
         /// <summary>
@@ -322,6 +313,5 @@ namespace ScreenShare
         /// 白名单TextBox
         /// </summary>
         private System.Windows.Forms.TextBox whiteText;
-
     }
 }
