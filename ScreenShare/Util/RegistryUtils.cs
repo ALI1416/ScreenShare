@@ -28,6 +28,14 @@ namespace ScreenShare.Util
         }
 
         /// <summary>
+        /// 获取自启路径
+        /// </summary>
+        public static string AutoLaunchGet()
+        {
+            return AutoLaunchGet(Constant.APP_NAME);
+        }
+
+        /// <summary>
         /// 开启自启
         /// </summary>
         /// <param name="name">名称</param>

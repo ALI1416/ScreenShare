@@ -36,6 +36,8 @@ namespace ScreenShare
             Log("欢迎使用屏幕共享软件！");
             Log("当前版本 " + Constant.VERSION_NUMBER);
             Log("帮助与反馈 https://github.com/ALI1416/ScreenShare");
+            // 初始化
+            InitSystem();
             InitIni();
             InitForm();
             // 图标
@@ -45,6 +47,36 @@ namespace ScreenShare
             // FPS
             fpsLabel.Parent = previewImg;
             Log("初始化完成！");
+        }
+
+        /// <summary>
+        /// 初始化系统
+        /// </summary>
+        public void InitSystem()
+        {
+            // IP地址
+            StatusManager.IpList = Utils.GetAllIPv4Address();
+            ipAddressComboBox.Items.Clear();
+            foreach (var ip in StatusManager.IpList)
+            {
+                ipAddressComboBox.Items.Add(ip.Item2 + " - " + ip.Item1);
+            }
+            ipAddressComboBox.SelectedIndex = 0;
+            // 显示器
+            StatusManager.ScreenList = Utils.GetAllScreen();
+            screenComboBox.Items.Clear();
+            foreach (var screen in StatusManager.ScreenList)
+            {
+                screenComboBox.Items.Add(screen.Item1 + "[" + screen.Item2.Width + "x" + screen.Item2.Height + "]");
+            }
+            if (StatusManager.ScreenList.Count == 1)
+            {
+                screenComboBox.SelectedIndex = 0;
+            }
+            else
+            {
+                screenComboBox.SelectedIndex = 1;
+            }
         }
 
         /// <summary>
@@ -60,15 +92,19 @@ namespace ScreenShare
                     LoadIni();
                     Log("配置文件加载完成！");
                 }
-                catch
+                catch (Exception e)
                 {
-                    Log("配置文件加载失败！路径：" + Constant.INI_PATH);
+                    StatusManager.IniOk = false;
+                    SetDefaultIni();
+                    Log("配置文件加载失败！路径：" + Constant.INI_PATH + " 错误原因：" + e.Message);
                     Log("已加载默认配置。");
+                    ShowError("配置文件加载失败！已加载默认配置。");
                 }
             }
             else
             {
                 // 不存在去创建
+                SetDefaultIni();
                 CreateIni();
                 Log("配置文件不存在，已创建默认配置。");
             }
@@ -77,10 +113,175 @@ namespace ScreenShare
         /// <summary>
         /// 加载INI配置
         /// </summary>
-        public static void LoadIni()
+        public void LoadIni()
         {
             FileIniDataParser parser = new FileIniDataParser();
             IniData iniData = parser.ReadFile(Constant.INI_PATH);
+            /* 系统 */
+            KeyDataCollection system = iniData["System"];
+            /* 开机自启 */
+            string autoLaunch = system["AutoLaunch"];
+            if (autoLaunch != null)
+            {
+                try
+                {
+                    IniConfig.System.AutoLaunch = bool.Parse(autoLaunch);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("[System] AutoLaunch = " + autoLaunch + " " + e.Message);
+                }
+            }
+            /* 自动运行 */
+            string autoRun = system["AutoRun"];
+            if (autoRun != null)
+            {
+                try
+                {
+                    IniConfig.System.AutoRun = bool.Parse(autoRun);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("[System] AutoRun = " + autoRun + " " + e.Message);
+                }
+            }
+            /* 开启黑名单 */
+            string openBlack = system["OpenBlack"];
+            if (openBlack != null)
+            {
+                try
+                {
+                    IniConfig.System.OpenBlack = bool.Parse(openBlack);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("[System] OpenBlack = " + openBlack + " " + e.Message);
+                }
+            }
+            /* 开启白名单 */
+            string openWhite = system["OpenWhite"];
+            if (openWhite != null)
+            {
+                try
+                {
+                    IniConfig.System.OpenWhite = bool.Parse(openWhite);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("[System] OpenWhite = " + openWhite + " " + e.Message);
+                }
+            }
+            /* 程序 */
+            KeyDataCollection program = iniData["Program"];
+            /* IP地址 */
+            string ipAddress = program["IpAddress"];
+            if (ipAddress != null)
+            {
+                int index = ipAddressComboBox.Items.IndexOf(ipAddress);
+                // 找到
+                if (index >= 0)
+                {
+                    ipAddressComboBox.SelectedIndex = index;
+                }
+            }
+            /* 端口号 */
+            string ipPort = program["IpPort"];
+            if (ipPort != null)
+            {
+                try
+                {
+                    IniConfig.Program.IpPort = int.Parse(ipPort);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("[Program] IpPort = " + ipPort + " " + e.Message);
+                }
+            }
+            /* 开启密码验证 */
+            string isEncryption = program["IsEncryption"];
+            if (isEncryption != null)
+            {
+                try
+                {
+                    IniConfig.Program.IsEncryption = bool.Parse(isEncryption);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("[Program] IsEncryption = " + isEncryption + " " + e.Message);
+                }
+            }
+            /* 密码 */
+            string pwd = program["Pwd"];
+            if (pwd != null)
+            {
+                IniConfig.Program.Pwd = pwd;
+            }
+            /* 全屏显示 */
+            string isFullScreen = program["IsFullScreen"];
+            if (isFullScreen != null)
+            {
+                try
+                {
+                    IniConfig.Program.IsEncryption = bool.Parse(isFullScreen);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("[Program] IsFullScreen = " + isFullScreen + " " + e.Message);
+                }
+            }
+            /* 显示器 */
+            string screen = program["Screen"];
+            if (screen != null)
+            {
+                int index = screenComboBox.Items.IndexOf(screen);
+                // 找到
+                if (index >= 0)
+                {
+                    screenComboBox.SelectedIndex = index;
+                    // 启用全屏显示
+                    //StatusManager.ScreenList
+                    /* 显示器X */
+                    string screenX = program["ScreenX"];
+                    if (screenX != null)
+                    {
+                        try
+                        {
+                            IniConfig.Program.IpPort = int.Parse(screenX);
+                        }
+                        catch (Exception e)
+                        {
+                            throw new Exception("[Program] ScreenX = " + screenX + " " + e.Message);
+                        }
+                    }
+
+                }
+            }
+
+            /* 注册表 */
+            if (IniConfig.System.AutoLaunch)
+            {
+                RegistryUtils.AutoLaunchOpen();
+            }
+            else
+            {
+                RegistryUtils.AutoLaunchClose();
+            }
+        }
+
+        /// <summary>
+        /// 设置默认INI配置
+        /// </summary>
+        public void SetDefaultIni()
+        {
+            IniConfig.Program.IpAddress = (string)ipAddressComboBox.SelectedItem;
+            IniConfig.Program.Screen = (string)screenComboBox.SelectedItem;
+            var screen = StatusManager.ScreenList.ElementAt(screenComboBox.SelectedIndex);
+            IniConfig.Program.ScreenX = screen.Item2.X;
+            IniConfig.Program.ScreenY = screen.Item2.Y;
+            IniConfig.Program.ScreenW = screen.Item2.Width;
+            IniConfig.Program.ScreenH = screen.Item2.Height;
+            IniConfig.Program.VideoW = screen.Item2.Width;
+            IniConfig.Program.VideoH = screen.Item2.Height;
         }
 
         /// <summary>
@@ -111,10 +312,14 @@ namespace ScreenShare
             program.Keys["IsDisplayCursor"] = IniConfig.Program.IsDisplayCursor.ToString();
             program.Keys["VideoFrame"] = IniConfig.Program.VideoFrame.ToString();
             program.Keys["VideoQuality"] = IniConfig.Program.VideoQuality.ToString();
+            SectionData blackList = new SectionData("BlackList");
+            SectionData writeList = new SectionData("WriteList");
             SectionDataCollection sdc = new SectionDataCollection
             {
                 system,
-                program
+                program,
+                blackList,
+                writeList
             };
             IniData iniData = new IniData(sdc);
             Directory.CreateDirectory(Constant.INI_DIRECTORY);
@@ -135,7 +340,7 @@ namespace ScreenShare
             if (!StatusManager.HttpService.Start(StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2, (int)ipPortNud.Value, HttpResponseCallback))
             {
                 Log("http服务启动失败！请尝试更改IP地址或端口号。");
-                MessageBox.Show("http服务启动失败！请尝试更改IP地址或端口号。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError("http服务启动失败！请尝试更改IP地址或端口号。");
                 return;
             }
             // 启动webSocket服务
@@ -147,7 +352,7 @@ namespace ScreenShare
             {
                 StatusManager.HttpService.Close();
                 Log("webSocket服务启动失败！请尝试重启程序或联系开发者。");
-                MessageBox.Show("webSocket服务启动失败！请尝试重启程序或联系开发者。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError("webSocket服务启动失败！请尝试重启程序或联系开发者。");
                 return;
             }
             StatusManager.IsStarted = true;
@@ -487,42 +692,21 @@ namespace ScreenShare
             StatusManager.IsStarted = false;
             /* 头部 */
             // IP地址
-            StatusManager.IpList = Utils.GetAllIPv4Address();
-            ipAddressComboBox.Items.Clear();
-            foreach (var ip in StatusManager.IpList)
-            {
-                ipAddressComboBox.Items.Add(ip.Item2 + " - " + ip.Item1);
-            }
-            ipAddressComboBox.SelectedIndex = 0;
             // 端口号
-            ipPortNud.Value = 7070;
+            ipPortNud.Value = IniConfig.Program.IpPort;
             // 分享地址
             shareLinkText.Text = "http://" + StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value + "/";
 
             /* 加密传输 */
             // 开启加密
-            isEncryptionCb.Checked = false;
+            isEncryptionCb.Checked = IniConfig.Program.IsEncryption;
             // 密码
-            pwdText.Text = "";
+            pwdText.Text = IniConfig.Program.Pwd;
 
             /* 选取位置 */
             // 全屏
-            isFullScreenCb.Checked = true;
+            isFullScreenCb.Checked = IniConfig.Program.IsFullScreen;
             // 显示器
-            StatusManager.ScreenList = Utils.GetAllScreen();
-            screenComboBox.Items.Clear();
-            foreach (var screen in StatusManager.ScreenList)
-            {
-                screenComboBox.Items.Add(screen.Item1 + "[" + screen.Item2.Width + "x" + screen.Item2.Height + "]");
-            }
-            if (StatusManager.ScreenList.Count == 1)
-            {
-                screenComboBox.SelectedIndex = 0;
-            }
-            else
-            {
-                screenComboBox.SelectedIndex = 1;
-            }
             Rectangle selectedScreen = StatusManager.ScreenList.ElementAt(screenComboBox.SelectedIndex).Item2;
             // X
             screenXNud.Minimum = selectedScreen.Left;
@@ -541,9 +725,9 @@ namespace ScreenShare
 
             /* 视频尺寸 */
             // 锁定缩放比
-            isLockAspectRatioCb.Checked = true;
+            isLockAspectRatioCb.Checked = IniConfig.Program.IsLockAspectRatio;
             // 缩放比例
-            scalingNud.Value = 100;
+            scalingNud.Value = IniConfig.Program.Scaling;
             // 宽
             videoWNud.Value = selectedScreen.Width;
             // 高
@@ -551,11 +735,11 @@ namespace ScreenShare
 
             /* 视频设置 */
             // 显示光标
-            isDisplayCursorCb.Checked = true;
+            isDisplayCursorCb.Checked = IniConfig.Program.IsDisplayCursor;
             // 每秒帧数
-            videoFrameNud.Value = 5;
+            videoFrameNud.Value = IniConfig.Program.VideoFrame;
             // 视频质量
-            videoQualityNud.Value = 100;
+            videoQualityNud.Value = IniConfig.Program.VideoQuality;
 
             /* 预览图像 */
             UpdatePreviewImgWithCaptureScreen();
@@ -679,6 +863,15 @@ namespace ScreenShare
             logText.ScrollToCaret();
         }
 
+        /// <summary>
+        /// 显示错误
+        /// </summary>
+        /// <param name="text"></param>
+        private static void ShowError(string text)
+        {
+            MessageBox.Show(text, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
         #endregion
 
         #region 界面触发事件
@@ -737,7 +930,7 @@ namespace ScreenShare
             catch
             {
                 Log("复制失败！请手动复制。");
-                MessageBox.Show("复制失败！请手动复制。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError("复制失败！请手动复制。");
             }
         }
 

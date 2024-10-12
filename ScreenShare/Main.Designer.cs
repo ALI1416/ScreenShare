@@ -539,11 +539,6 @@ namespace ScreenShare
             0,
             0});
             this.scalingNud.Location = new System.Drawing.Point(70, 40);
-            this.scalingNud.Maximum = new decimal(new int[] {
-            65535,
-            0,
-            0,
-            0});
             this.scalingNud.Minimum = new decimal(new int[] {
             1,
             0,

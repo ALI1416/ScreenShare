@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace ScreenShare.Model
 {
 
@@ -53,7 +55,7 @@ namespace ScreenShare.Model
             /// <summary>
             /// 密码
             /// </summary>
-            public static string Pwd { get; set; }
+            public static string Pwd { get; set; } = "";
             /// <summary>
             /// 全屏显示
             /// </summary>
@@ -108,6 +110,16 @@ namespace ScreenShare.Model
             public static int VideoQuality { get; set; } = 100;
 
         }
+
+        /// <summary>
+        /// 黑名单
+        /// </summary>
+        public static List<string> BlackList { get; set; }
+
+        /// <summary>
+        /// 白名单
+        /// </summary>
+        public static List<string> WriteList { get; set; }
 
     }
 }

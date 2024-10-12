@@ -14,6 +14,10 @@ namespace ScreenShare.Model
     {
 
         /// <summary>
+        /// INI配置文件加载成功
+        /// </summary>
+        public static bool IniOk { get; set; } = true;
+        /// <summary>
         /// 屏幕共享已启动
         /// </summary>
         public static bool IsStarted { get; set; }
