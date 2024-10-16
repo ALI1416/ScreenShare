@@ -6,7 +6,6 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading.Tasks;
@@ -84,6 +83,7 @@ namespace ScreenShare
         /// </summary>
         public void InitIni()
         {
+            SetDefaultIni();
             if (File.Exists(Constant.INI_PATH))
             {
                 // 存在去读取
@@ -95,16 +95,13 @@ namespace ScreenShare
                 catch (Exception e)
                 {
                     StatusManager.IniOk = false;
-                    SetDefaultIni();
                     Log("配置文件加载失败！路径：" + Constant.INI_PATH + " 错误原因：" + e.Message);
-                    Log("已加载默认配置。");
-                    ShowError("配置文件加载失败！已加载默认配置。");
+                    Utils.ShowError("配置文件加载失败！");
                 }
             }
             else
             {
                 // 不存在去创建
-                SetDefaultIni();
                 CreateIni();
                 Log("配置文件不存在，已创建默认配置。");
             }
@@ -129,7 +126,7 @@ namespace ScreenShare
                 }
                 catch (Exception e)
                 {
-                    throw new Exception("[System] AutoLaunch = " + autoLaunch + " " + e.Message);
+                    throw new Exception("开机自启 [System] AutoLaunch = " + autoLaunch + " " + e.Message);
                 }
             }
             /* 自动运行 */
@@ -142,7 +139,7 @@ namespace ScreenShare
                 }
                 catch (Exception e)
                 {
-                    throw new Exception("[System] AutoRun = " + autoRun + " " + e.Message);
+                    throw new Exception("自动运行 [System] AutoRun = " + autoRun + " " + e.Message);
                 }
             }
             /* 开启黑名单 */
@@ -155,7 +152,7 @@ namespace ScreenShare
                 }
                 catch (Exception e)
                 {
-                    throw new Exception("[System] OpenBlack = " + openBlack + " " + e.Message);
+                    throw new Exception("开启黑名单 [System] OpenBlack = " + openBlack + " " + e.Message);
                 }
             }
             /* 开启白名单 */
@@ -168,7 +165,7 @@ namespace ScreenShare
                 }
                 catch (Exception e)
                 {
-                    throw new Exception("[System] OpenWhite = " + openWhite + " " + e.Message);
+                    throw new Exception("开启白名单 [System] OpenWhite = " + openWhite + " " + e.Message);
                 }
             }
             /* 程序 */
@@ -188,14 +185,22 @@ namespace ScreenShare
             string ipPort = program["IpPort"];
             if (ipPort != null)
             {
+                int ipPortParse;
                 try
                 {
-                    IniConfig.Program.IpPort = int.Parse(ipPort);
+                    ipPortParse = int.Parse(ipPort);
                 }
                 catch (Exception e)
                 {
-                    throw new Exception("[Program] IpPort = " + ipPort + " " + e.Message);
+                    throw new Exception("端口号 [Program] IpPort = " + ipPort + " " + e.Message);
                 }
+                int ipPortMin = (int)ipPortNud.Minimum;
+                int ipPortMax = (int)ipPortNud.Maximum;
+                if (ipPortParse < ipPortMin || ipPortParse > ipPortMax)
+                {
+                    throw new Exception("端口号 [Program] IpPort = " + ipPort + " 需要在[" + ipPortMin + "," + ipPortMax + "]范围内");
+                }
+                IniConfig.Program.IpPort = ipPortParse;
             }
             /* 开启密码验证 */
             string isEncryption = program["IsEncryption"];
@@ -207,7 +212,7 @@ namespace ScreenShare
                 }
                 catch (Exception e)
                 {
-                    throw new Exception("[Program] IsEncryption = " + isEncryption + " " + e.Message);
+                    throw new Exception("开启密码验证 [Program] IsEncryption = " + isEncryption + " " + e.Message);
                 }
             }
             /* 密码 */
@@ -222,14 +227,15 @@ namespace ScreenShare
             {
                 try
                 {
-                    IniConfig.Program.IsEncryption = bool.Parse(isFullScreen);
+                    IniConfig.Program.IsFullScreen = bool.Parse(isFullScreen);
                 }
                 catch (Exception e)
                 {
-                    throw new Exception("[Program] IsFullScreen = " + isFullScreen + " " + e.Message);
+                    throw new Exception("全屏显示 [Program] IsFullScreen = " + isFullScreen + " " + e.Message);
                 }
             }
             /* 显示器 */
+            bool screenFind = false;
             string screen = program["Screen"];
             if (screen != null)
             {
@@ -238,23 +244,243 @@ namespace ScreenShare
                 if (index >= 0)
                 {
                     screenComboBox.SelectedIndex = index;
-                    // 启用全屏显示
-                    //StatusManager.ScreenList
-                    /* 显示器X */
-                    string screenX = program["ScreenX"];
-                    if (screenX != null)
-                    {
-                        try
-                        {
-                            IniConfig.Program.IpPort = int.Parse(screenX);
-                        }
-                        catch (Exception e)
-                        {
-                            throw new Exception("[Program] ScreenX = " + screenX + " " + e.Message);
-                        }
-                    }
-
+                    screenFind = true;
                 }
+            }
+            // 显示器
+            var selectedScreen = StatusManager.ScreenList[screenComboBox.SelectedIndex].Item2;
+            if (screenFind && !IniConfig.Program.IsFullScreen)
+            {
+                // 显示器匹配 并且 未启用全屏显示
+                /* 显示器X */
+                string screenX = program["ScreenX"];
+                if (screenX != null)
+                {
+                    int screenXParse;
+                    try
+                    {
+                        screenXParse = int.Parse(screenX);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("显示器X [Program] ScreenX = " + screenX + " " + e.Message);
+                    }
+                    int screenXMin = selectedScreen.Left;
+                    int screenXMax = selectedScreen.Right - 1;
+                    if (screenXParse < screenXMin || screenXParse > screenXMax)
+                    {
+                        throw new Exception("显示器X [Program] ScreenX = " + screenX + " 需要在[" + screenXMin + "," + screenXMax + "]范围内。");
+                    }
+                    IniConfig.Program.ScreenX = screenXParse;
+                }
+                /* 显示器Y */
+                string screenY = program["ScreenY"];
+                if (screenY != null)
+                {
+                    int screenYParse;
+                    try
+                    {
+                        screenYParse = int.Parse(screenY);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("显示器Y [Program] ScreenY = " + screenY + " " + e.Message);
+                    }
+                    int screenYMin = selectedScreen.Top;
+                    int screenYMax = selectedScreen.Bottom - 1;
+                    if (screenYParse < screenYMin || screenYParse > screenYMax)
+                    {
+                        throw new Exception("显示器Y [Program] ScreenY = " + screenY + " 需要在[" + screenYMin + "," + screenYMax + "]范围内。");
+                    }
+                    IniConfig.Program.ScreenY = screenYParse;
+                }
+                /* 显示器宽 */
+                string screenW = program["ScreenW"];
+                if (screenW != null)
+                {
+                    int screenWParse;
+                    try
+                    {
+                        screenWParse = int.Parse(screenW);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("显示器宽 [Program] ScreenW = " + screenW + " " + e.Message);
+                    }
+                    int screenWMin = (int)screenWNud.Minimum;
+                    int screenWMax = selectedScreen.Width;
+                    if (screenWParse < screenWMin || screenWParse > screenWMax)
+                    {
+                        throw new Exception("显示器宽 [Program] ScreenW = " + screenW + " 需要在[" + screenWMin + "," + screenWMax + "]范围内。");
+                    }
+                    IniConfig.Program.ScreenW = screenWParse;
+                }
+                /* 显示器高 */
+                string screenH = program["ScreenH"];
+                if (screenH != null)
+                {
+                    int screenHParse;
+                    try
+                    {
+                        screenHParse = int.Parse(screenH);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("显示器高 [Program] ScreenH = " + screenH + " " + e.Message);
+                    }
+                    int screenHMin = (int)screenHNud.Minimum;
+                    int screenHMax = selectedScreen.Height;
+                    if (screenHParse < screenHMin || screenHParse > screenHMax)
+                    {
+                        throw new Exception("显示器高 [Program] ScreenH = " + screenH + " 需要在[" + screenHMin + "," + screenHMax + "]范围内。");
+                    }
+                    IniConfig.Program.ScreenH = screenHParse;
+                }
+            }
+            else
+            {
+                IniConfig.Program.ScreenX = selectedScreen.X;
+                IniConfig.Program.ScreenY = selectedScreen.Y;
+                IniConfig.Program.ScreenW = selectedScreen.Width;
+                IniConfig.Program.ScreenH = selectedScreen.Height;
+            }
+            /* 锁定纵横比 */
+            string isLockAspectRatio = program["IsLockAspectRatio"];
+            if (isLockAspectRatio != null)
+            {
+                try
+                {
+                    IniConfig.Program.IsLockAspectRatio = bool.Parse(isLockAspectRatio);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("锁定纵横比 [Program] IsLockAspectRatio = " + isLockAspectRatio + " " + e.Message);
+                }
+            }
+            if (IniConfig.Program.IsLockAspectRatio)
+            {
+                // 锁定纵横比
+                /* 缩放比例 */
+                string scaling = program["Scaling"];
+                if (scaling != null)
+                {
+                    int scalingParse;
+                    try
+                    {
+                        scalingParse = int.Parse(scaling);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("缩放比例 [Program] Scaling = " + scaling + " " + e.Message);
+                    }
+                    int scalingMin = (int)scalingNud.Minimum;
+                    int scalingMax = (int)scalingNud.Maximum;
+                    if (scalingParse < scalingMin || scalingParse > scalingMax)
+                    {
+                        throw new Exception("缩放比例 [Program] Scaling = " + scaling + " 需要在[" + scalingMin + "," + scalingMax + "]范围内。");
+                    }
+                    IniConfig.Program.Scaling = scalingParse;
+                }
+            }
+            else
+            {
+                /* 视频宽 */
+                string videoW = program["VideoW"];
+                if (videoW != null)
+                {
+                    int videoWParse;
+                    try
+                    {
+                        videoWParse = int.Parse(videoW);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("视频宽 [Program] VideoW = " + videoW + " " + e.Message);
+                    }
+                    int videoWMin = (int)videoWNud.Minimum;
+                    int videoWMax = (int)videoWNud.Maximum;
+                    if (videoWParse < videoWMin || videoWParse > videoWMax)
+                    {
+                        throw new Exception("视频宽 [Program] VideoW = " + videoW + " 需要在[" + videoWMin + "," + videoWMax + "]范围内。");
+                    }
+                    IniConfig.Program.VideoW = videoWParse;
+                }
+                /* 视频高 */
+                string videoH = program["VideoH"];
+                if (videoH != null)
+                {
+                    int videoHParse;
+                    try
+                    {
+                        videoHParse = int.Parse(videoH);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("视频高 [Program] VideoH = " + videoH + " " + e.Message);
+                    }
+                    int videoHMin = (int)videoHNud.Minimum;
+                    int videoHMax = (int)videoHNud.Maximum;
+                    if (videoHParse < videoHMin || videoHParse > videoHMax)
+                    {
+                        throw new Exception("视频高 [Program] VideoH = " + videoH + " 需要在[" + videoHMin + "," + videoHMax + "]范围内。");
+                    }
+                    IniConfig.Program.VideoH = videoHParse;
+                }
+            }
+            /* 显示光标 */
+            string isDisplayCursor = program["IsDisplayCursor"];
+            if (isDisplayCursor != null)
+            {
+                try
+                {
+                    IniConfig.Program.IsDisplayCursor = bool.Parse(isDisplayCursor);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("显示光标 [Program] IsDisplayCursor = " + isDisplayCursor + " " + e.Message);
+                }
+            }
+            /* 每秒帧数 */
+            string videoFrame = program["VideoFrame"];
+            if (videoFrame != null)
+            {
+                int videoFrameParse;
+                try
+                {
+                    videoFrameParse = int.Parse(videoFrame);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("每秒帧数 [Program] VideoFrame = " + videoFrame + " " + e.Message);
+                }
+                int videoFrameMin = (int)videoFrameNud.Minimum;
+                int videoFrameMax = (int)videoFrameNud.Maximum;
+                if (videoFrameParse < videoFrameMin || videoFrameParse > videoFrameMax)
+                {
+                    throw new Exception("每秒帧数 [Program] VideoFrame = " + videoFrame + " 需要在[" + videoFrameMin + "," + videoFrameMax + "]范围内。");
+                }
+                IniConfig.Program.VideoFrame = videoFrameParse;
+            }
+            /* 视频质量 */
+            string videoQuality = program["VideoQuality"];
+            if (videoQuality != null)
+            {
+                int videoQualityParse;
+                try
+                {
+                    videoQualityParse = int.Parse(videoQuality);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("视频质量 [Program] VideoQuality = " + videoQuality + " " + e.Message);
+                }
+                int videoQualityMin = (int)videoQualityNud.Minimum;
+                int videoQualityMax = (int)videoQualityNud.Maximum;
+                if (videoQualityParse < videoQualityMin || videoQualityParse > videoQualityMax)
+                {
+                    throw new Exception("视频质量 [Program] VideoQuality = " + videoQuality + " 需要在[" + videoQualityMin + "," + videoQualityMax + "]范围内。");
+                }
+                IniConfig.Program.VideoQuality = videoQualityParse;
             }
 
             /* 注册表 */
@@ -275,7 +501,7 @@ namespace ScreenShare
         {
             IniConfig.Program.IpAddress = (string)ipAddressComboBox.SelectedItem;
             IniConfig.Program.Screen = (string)screenComboBox.SelectedItem;
-            var screen = StatusManager.ScreenList.ElementAt(screenComboBox.SelectedIndex);
+            var screen = StatusManager.ScreenList[screenComboBox.SelectedIndex];
             IniConfig.Program.ScreenX = screen.Item2.X;
             IniConfig.Program.ScreenY = screen.Item2.Y;
             IniConfig.Program.ScreenW = screen.Item2.Width;
@@ -337,10 +563,10 @@ namespace ScreenShare
             {
                 StatusManager.HttpService = new HttpService();
             }
-            if (!StatusManager.HttpService.Start(StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2, (int)ipPortNud.Value, HttpResponseCallback))
+            if (!StatusManager.HttpService.Start(StatusManager.IpList[ipAddressComboBox.SelectedIndex].Item2, (int)ipPortNud.Value, HttpResponseCallback))
             {
                 Log("http服务启动失败！请尝试更改IP地址或端口号。");
-                ShowError("http服务启动失败！请尝试更改IP地址或端口号。");
+                Utils.ShowError("http服务启动失败！请尝试更改IP地址或端口号。");
                 return;
             }
             // 启动webSocket服务
@@ -348,11 +574,11 @@ namespace ScreenShare
             {
                 StatusManager.WebSocketService = new WebSocketService();
             }
-            if (!StatusManager.WebSocketService.Start(StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2, 0, WebSocketClientCallback))
+            if (!StatusManager.WebSocketService.Start(StatusManager.IpList[ipAddressComboBox.SelectedIndex].Item2, 0, WebSocketClientCallback))
             {
                 StatusManager.HttpService.Close();
                 Log("webSocket服务启动失败！请尝试重启程序或联系开发者。");
-                ShowError("webSocket服务启动失败！请尝试重启程序或联系开发者。");
+                Utils.ShowError("webSocket服务启动失败！请尝试重启程序或联系开发者。");
                 return;
             }
             StatusManager.IsStarted = true;
@@ -695,7 +921,7 @@ namespace ScreenShare
             // 端口号
             ipPortNud.Value = IniConfig.Program.IpPort;
             // 分享地址
-            shareLinkText.Text = "http://" + StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value + "/";
+            shareLinkText.Text = "http://" + StatusManager.IpList[ipAddressComboBox.SelectedIndex].Item2 + ":" + ipPortNud.Value + "/";
 
             /* 加密传输 */
             // 开启加密
@@ -707,21 +933,21 @@ namespace ScreenShare
             // 全屏
             isFullScreenCb.Checked = IniConfig.Program.IsFullScreen;
             // 显示器
-            Rectangle selectedScreen = StatusManager.ScreenList.ElementAt(screenComboBox.SelectedIndex).Item2;
+            Rectangle selectedScreen = StatusManager.ScreenList[screenComboBox.SelectedIndex].Item2;
             // X
             screenXNud.Minimum = selectedScreen.Left;
-            screenXNud.Maximum = selectedScreen.Right - 2;
-            screenXNud.Value = selectedScreen.X;
+            screenXNud.Maximum = selectedScreen.Right - 1;
+            screenXNud.Value = (int)IniConfig.Program.ScreenX;
             // Y
             screenYNud.Minimum = selectedScreen.Top;
-            screenYNud.Maximum = selectedScreen.Bottom - 2;
-            screenYNud.Value = selectedScreen.Y;
+            screenYNud.Maximum = selectedScreen.Bottom - 1;
+            screenYNud.Value = (int)IniConfig.Program.ScreenY;
             // 宽
             screenWNud.Maximum = selectedScreen.Width;
-            screenWNud.Value = selectedScreen.Width;
+            screenWNud.Value = (int)IniConfig.Program.ScreenW;
             // 高
             screenHNud.Maximum = selectedScreen.Height;
-            screenHNud.Value = selectedScreen.Height;
+            screenHNud.Value = (int)IniConfig.Program.ScreenH;
 
             /* 视频尺寸 */
             // 锁定缩放比
@@ -729,9 +955,9 @@ namespace ScreenShare
             // 缩放比例
             scalingNud.Value = IniConfig.Program.Scaling;
             // 宽
-            videoWNud.Value = selectedScreen.Width;
+            videoWNud.Value = (int)IniConfig.Program.VideoW;
             // 高
-            screenHNud.Value = selectedScreen.Height;
+            screenHNud.Value = (int)IniConfig.Program.VideoH;
 
             /* 视频设置 */
             // 显示光标
@@ -863,15 +1089,6 @@ namespace ScreenShare
             logText.ScrollToCaret();
         }
 
-        /// <summary>
-        /// 显示错误
-        /// </summary>
-        /// <param name="text"></param>
-        private static void ShowError(string text)
-        {
-            MessageBox.Show(text, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-
         #endregion
 
         #region 界面触发事件
@@ -900,7 +1117,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void IpAddressComboBox_SelectedValueChanged(object sender, EventArgs e)
         {
-            shareLinkText.Text = "http://" + StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value + "/";
+            shareLinkText.Text = "http://" + StatusManager.IpList[ipAddressComboBox.SelectedIndex].Item2 + ":" + ipPortNud.Value + "/";
         }
 
         /// <summary>
@@ -910,7 +1127,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void IpPortNud_ValueChanged(object sender, EventArgs e)
         {
-            shareLinkText.Text = "http://" + StatusManager.IpList.ElementAt(ipAddressComboBox.SelectedIndex).Item2 + ":" + ipPortNud.Value + "/";
+            shareLinkText.Text = "http://" + StatusManager.IpList[ipAddressComboBox.SelectedIndex].Item2 + ":" + ipPortNud.Value + "/";
         }
 
         /// <summary>
@@ -930,7 +1147,7 @@ namespace ScreenShare
             catch
             {
                 Log("复制失败！请手动复制。");
-                ShowError("复制失败！请手动复制。");
+                Utils.ShowError("复制失败！请手动复制。");
             }
         }
 
@@ -1003,7 +1220,7 @@ namespace ScreenShare
             screenXNud.Enabled = screenYNud.Enabled = screenWNud.Enabled = screenHNud.Enabled = !isChecked;
             if (isChecked)
             {
-                Rectangle selectedScreen = StatusManager.ScreenList.ElementAt(screenComboBox.SelectedIndex).Item2;
+                Rectangle selectedScreen = StatusManager.ScreenList[screenComboBox.SelectedIndex].Item2;
                 screenXNud.Value = selectedScreen.X;
                 screenYNud.Value = selectedScreen.Y;
                 screenWNud.Value = selectedScreen.Width;
@@ -1018,7 +1235,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void ScreenComboBox_SelectedValueChanged(object sender, EventArgs e)
         {
-            Rectangle selectedScreen = StatusManager.ScreenList.ElementAt(screenComboBox.SelectedIndex).Item2;
+            Rectangle selectedScreen = StatusManager.ScreenList[screenComboBox.SelectedIndex].Item2;
             screenXNud.Minimum = selectedScreen.Left;
             screenXNud.Maximum = selectedScreen.Right - 1;
             screenXNud.Value = selectedScreen.X;
@@ -1038,7 +1255,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void ScreenXNud_ValueChanged(object sender, EventArgs e)
         {
-            screenWNud.Maximum = StatusManager.ScreenList.ElementAt(screenComboBox.SelectedIndex).Item2.Right - screenXNud.Value;
+            screenWNud.Maximum = StatusManager.ScreenList[screenComboBox.SelectedIndex].Item2.Right - screenXNud.Value;
             // TODO 屏幕的XY宽高同时发生改变可能会渲染多次预览图
             UpdatePreviewImgWithCaptureScreen();
         }
@@ -1050,7 +1267,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void ScreenYNud_ValueChanged(object sender, EventArgs e)
         {
-            screenHNud.Maximum = StatusManager.ScreenList.ElementAt(screenComboBox.SelectedIndex).Item2.Bottom - screenYNud.Value;
+            screenHNud.Maximum = StatusManager.ScreenList[screenComboBox.SelectedIndex].Item2.Bottom - screenYNud.Value;
             UpdatePreviewImgWithCaptureScreen();
         }
 
@@ -1083,7 +1300,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void CaptureScreenCoordinatesBtn_Click(object sender, EventArgs e)
         {
-            DrawScreen drawScreen = new DrawScreen(StatusManager.ScreenList.ElementAt(screenComboBox.SelectedIndex).Item2);
+            DrawScreen drawScreen = new DrawScreen(StatusManager.ScreenList[screenComboBox.SelectedIndex].Item2);
             if (drawScreen.ShowDialog() == DialogResult.OK)
             {
                 Rectangle rect = drawScreen.rect;

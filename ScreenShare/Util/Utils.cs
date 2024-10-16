@@ -79,5 +79,14 @@ namespace ScreenShare.Util
             return screenList;
         }
 
+        /// <summary>
+        /// 显示错误
+        /// </summary>
+        /// <param name="text"></param>
+        public static void ShowError(string text)
+        {
+            MessageBox.Show(text, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
     }
 }
