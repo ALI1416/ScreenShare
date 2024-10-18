@@ -84,6 +84,7 @@ namespace ScreenShare
             this.clearLogLinkLabel = new System.Windows.Forms.LinkLabel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
+            this.previewImgCms = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.topPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ipPortNud)).BeginInit();
             this.middlePanel.SuspendLayout();
@@ -573,7 +574,7 @@ namespace ScreenShare
             0});
             this.videoWNud.Location = new System.Drawing.Point(35, 70);
             this.videoWNud.Maximum = new decimal(new int[] {
-            65535,
+            1920,
             0,
             0,
             0});
@@ -610,7 +611,7 @@ namespace ScreenShare
             0});
             this.videoHNud.Location = new System.Drawing.Point(125, 70);
             this.videoHNud.Maximum = new decimal(new int[] {
-            65535,
+            1080,
             0,
             0,
             0});
@@ -772,6 +773,7 @@ namespace ScreenShare
             // previewImg
             // 
             this.previewImg.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.previewImg.ContextMenuStrip = this.previewImgCms;
             this.previewImg.Location = new System.Drawing.Point(438, 18);
             this.previewImg.Margin = new System.Windows.Forms.Padding(0);
             this.previewImg.Name = "previewImg";
@@ -821,6 +823,11 @@ namespace ScreenShare
             this.notifyIcon.Text = "屏幕共享";
             this.notifyIcon.Click += new System.EventHandler(this.NotifyIcon_Click);
             // 
+            // contextMenuStrip
+            // 
+            this.previewImgCms.Name = "contextMenuStrip1";
+            this.previewImgCms.Size = new System.Drawing.Size(61, 4);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -836,6 +843,7 @@ namespace ScreenShare
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "屏幕共享";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
+            this.Shown += new System.EventHandler(this.Main_Shown);
             this.topPanel.ResumeLayout(false);
             this.topPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ipPortNud)).EndInit();
@@ -1105,6 +1113,12 @@ namespace ScreenShare
         /// 通知NotifyIcon
         /// </summary>
         private System.Windows.Forms.NotifyIcon notifyIcon;
+
+        /* 右键菜单 */
+        /// <summary>
+        /// 预览图像右键菜单
+        /// </summary>
+        private System.Windows.Forms.ContextMenuStrip previewImgCms;
 
     }
 }

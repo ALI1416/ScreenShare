@@ -36,6 +36,10 @@ namespace ScreenShare.Model
         /// </summary>
         public static readonly string INI_DIRECTORY = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\" + APP_NAME;
         /// <summary>
+        /// 图片目录
+        /// </summary>
+        public static readonly string PICTURE_DIRECTORY = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+        /// <summary>
         /// INI路径(完整路径+名称+后缀)
         /// </summary>
         public static readonly string INI_PATH = INI_DIRECTORY + "\\" + INI_NAME;

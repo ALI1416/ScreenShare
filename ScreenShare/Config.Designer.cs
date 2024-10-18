@@ -29,8 +29,8 @@ namespace ScreenShare
         private void InitializeComponent()
         {
             this.systemConfigBox = new System.Windows.Forms.GroupBox();
-            this.autoLaunchBtn = new System.Windows.Forms.CheckBox();
-            this.autoRunBtn = new System.Windows.Forms.CheckBox();
+            this.autoLaunchCb = new System.Windows.Forms.CheckBox();
+            this.autoRunCb = new System.Windows.Forms.CheckBox();
             this.openConfigBtn = new System.Windows.Forms.Button();
             this.saveConfigBtn = new System.Windows.Forms.Button();
             this.programConfigBox = new System.Windows.Forms.GroupBox();
@@ -52,8 +52,8 @@ namespace ScreenShare
             // 
             // systemConfigBox
             // 
-            this.systemConfigBox.Controls.Add(this.autoLaunchBtn);
-            this.systemConfigBox.Controls.Add(this.autoRunBtn);
+            this.systemConfigBox.Controls.Add(this.autoLaunchCb);
+            this.systemConfigBox.Controls.Add(this.autoRunCb);
             this.systemConfigBox.Controls.Add(this.openConfigBtn);
             this.systemConfigBox.Controls.Add(this.saveConfigBtn);
             this.systemConfigBox.Location = new System.Drawing.Point(10, 10);
@@ -63,25 +63,25 @@ namespace ScreenShare
             this.systemConfigBox.TabStop = false;
             this.systemConfigBox.Text = "系统配置";
             // 
-            // autoLaunchBtn
+            // autoLaunchCb
             // 
-            this.autoLaunchBtn.AutoSize = true;
-            this.autoLaunchBtn.Location = new System.Drawing.Point(10, 20);
-            this.autoLaunchBtn.Name = "autoLaunchBtn";
-            this.autoLaunchBtn.Size = new System.Drawing.Size(72, 16);
-            this.autoLaunchBtn.TabIndex = 0;
-            this.autoLaunchBtn.Text = "开机自启";
-            this.autoLaunchBtn.UseVisualStyleBackColor = true;
+            this.autoLaunchCb.AutoSize = true;
+            this.autoLaunchCb.Location = new System.Drawing.Point(10, 20);
+            this.autoLaunchCb.Name = "autoLaunchCb";
+            this.autoLaunchCb.Size = new System.Drawing.Size(72, 16);
+            this.autoLaunchCb.TabIndex = 0;
+            this.autoLaunchCb.Text = "开机自启";
+            this.autoLaunchCb.UseVisualStyleBackColor = true;
             // 
-            // autoRunBtn
+            // autoRunCb
             // 
-            this.autoRunBtn.AutoSize = true;
-            this.autoRunBtn.Location = new System.Drawing.Point(100, 20);
-            this.autoRunBtn.Name = "autoRunBtn";
-            this.autoRunBtn.Size = new System.Drawing.Size(72, 16);
-            this.autoRunBtn.TabIndex = 1;
-            this.autoRunBtn.Text = "自动运行";
-            this.autoRunBtn.UseVisualStyleBackColor = true;
+            this.autoRunCb.AutoSize = true;
+            this.autoRunCb.Location = new System.Drawing.Point(100, 20);
+            this.autoRunCb.Name = "autoRunCb";
+            this.autoRunCb.Size = new System.Drawing.Size(72, 16);
+            this.autoRunCb.TabIndex = 1;
+            this.autoRunCb.Text = "自动运行";
+            this.autoRunCb.UseVisualStyleBackColor = true;
             // 
             // openConfigBtn
             // 
@@ -170,6 +170,7 @@ namespace ScreenShare
             this.openBlackCb.TabIndex = 0;
             this.openBlackCb.Text = "开启黑名单";
             this.openBlackCb.UseVisualStyleBackColor = true;
+            this.openBlackCb.CheckStateChanged += new System.EventHandler(this.OpenBlackCb_CheckStateChanged);
             // 
             // blackText
             // 
@@ -200,6 +201,7 @@ namespace ScreenShare
             this.openWhiteCb.TabIndex = 0;
             this.openWhiteCb.Text = "开启白名单";
             this.openWhiteCb.UseVisualStyleBackColor = true;
+            this.openWhiteCb.CheckStateChanged += new System.EventHandler(this.OpenWhiteCb_CheckStateChanged);
             // 
             // whiteText
             // 
@@ -228,6 +230,7 @@ namespace ScreenShare
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "系统配置";
+            this.Load += new System.EventHandler(this.Config_Load);
             this.systemConfigBox.ResumeLayout(false);
             this.systemConfigBox.PerformLayout();
             this.programConfigBox.ResumeLayout(false);
@@ -252,11 +255,11 @@ namespace ScreenShare
         /// <summary>
         /// 开机自启CheckBox
         /// </summary>
-        private System.Windows.Forms.CheckBox autoLaunchBtn;
+        private System.Windows.Forms.CheckBox autoLaunchCb;
         /// <summary>
         /// 自动运行CheckBox
         /// </summary>
-        private System.Windows.Forms.CheckBox autoRunBtn;
+        private System.Windows.Forms.CheckBox autoRunCb;
         /// <summary>
         /// 打开配置Button
         /// </summary>
