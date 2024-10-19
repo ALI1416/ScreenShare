@@ -1103,11 +1103,13 @@ namespace ScreenShare
         {
             if (previewImg.Image != null)
             {
-                SaveFileDialog saveFileDialog = new SaveFileDialog();
-                saveFileDialog.InitialDirectory = Constant.PICTURE_DIRECTORY;
-                saveFileDialog.RestoreDirectory = true;
-                saveFileDialog.FileName = "预览图.png";
-                saveFileDialog.Filter = "PNG图片(*.png)|*.png";
+                SaveFileDialog saveFileDialog = new SaveFileDialog
+                {
+                    InitialDirectory = Constant.PICTURE_DIRECTORY,
+                    RestoreDirectory = true,
+                    FileName = "预览图.png",
+                    Filter = "PNG图片(*.png)|*.png"
+                };
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     string fileName = saveFileDialog.FileName;
@@ -1492,7 +1494,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void PreviewLabel_Click(object sender, EventArgs e)
         {
-            PreviewImg_Click(sender, e);
+            PreviewImg_Click(null, null);
         }
 
         /// <summary>

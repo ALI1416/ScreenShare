@@ -71,7 +71,7 @@ namespace ScreenShare.Util
                 if (captureCursor)
                 {
                     Point p = Control.MousePosition;
-                    g.DrawImage(Resources.cursor, new Point(p.X - r.X, p.Y - r.Y));
+                    g.DrawImage(Resources.cursor, new Point(p.X - r.X + 1, p.Y - r.Y + 1));
                 }
             }
             return bitmap;

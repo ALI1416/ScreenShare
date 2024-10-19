@@ -74,11 +74,20 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void SaveConfigBtn_Click(object sender, EventArgs e)
         {
-            IniConfig.System.AutoLaunch = autoLaunchCb.Checked;
-            IniConfig.System.AutoRun = autoRunCb.Checked;
-            IniConfig.System.OpenBlack = openBlackCb.Checked;
-            IniConfig.System.OpenWhite = openWhiteCb.Checked;
-            FormManager.Main.SaveIni();
+            bool ok = true;
+            if (!StatusManager.IniOk)
+            {
+                ok = MessageBox.Show("确定覆盖配置文件？", "警告", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
+            }
+            if (ok)
+            {
+                StatusManager.IniOk = true;
+                IniConfig.System.AutoLaunch = autoLaunchCb.Checked;
+                IniConfig.System.AutoRun = autoRunCb.Checked;
+                IniConfig.System.OpenBlack = openBlackCb.Checked;
+                IniConfig.System.OpenWhite = openWhiteCb.Checked;
+                FormManager.Main.SaveIni();
+            }
         }
 
         /// <summary>
