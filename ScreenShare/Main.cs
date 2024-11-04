@@ -534,6 +534,40 @@ namespace ScreenShare
                     error += "视频质量 [Program] VideoQuality = " + videoQuality + " " + e.Message + "\r\n";
                 }
             }
+            /* 黑名单 */
+            KeyDataCollection blackList = iniData["BlackList"];
+            foreach (var black in blackList)
+            {
+                string item = black.Value;
+                if (item != null && item.Length != 0)
+                {
+                    if (ItemCorrectAndFormat(item) != null)
+                    {
+                        IniConfig.BlackList.Add(item);
+                    }
+                    else
+                    {
+                        error += "黑名单 [BlackList] 存在非法值 " + item + "\r\n";
+                    }
+                }
+            }
+            /* 白名单 */
+            KeyDataCollection writeList = iniData["WriteList"];
+            foreach (var write in writeList)
+            {
+                string item = write.Value;
+                if (item != null && item.Length != 0)
+                {
+                    if (ItemCorrectAndFormat(item) != null)
+                    {
+                        IniConfig.WriteList.Add(item);
+                    }
+                    else
+                    {
+                        error += "白名单 [WriteList] 存在非法值 " + item + "\r\n";
+                    }
+                }
+            }
             /* 注册表 */
             if (IniConfig.System.AutoLaunch)
             {
@@ -547,6 +581,97 @@ namespace ScreenShare
             {
                 throw new Exception(error);
             }
+        }
+
+        /// <summary>
+        /// 项正确并且格式化
+        /// </summary>
+        /// <param name="item">项</param>
+        /// <returns>
+        /// 错误返回null
+        /// 正确返回格式化后的字符串
+        /// </returns>
+        public string ItemCorrectAndFormat(string item)
+        {
+            if (item.IndexOf('-') == -1)
+            {
+                // 192.168.*.*
+                string[] split = item.Split('.');
+                if (split.Length != 4)
+                {
+                    return null;
+                }
+                bool isMask = false;
+                foreach (var s in split)
+                {
+                    if (s == "*")
+                    {
+                        isMask = true;
+                        continue;
+                    }
+                    else
+                    {
+                        if (isMask)
+                        {
+                            return null;
+                        }
+                        else
+                        {
+                            try
+                            {
+                                int n = int.Parse(s);
+                                if (n < 0 || n > 255)
+                                {
+                                    return null;
+                                }
+                            }
+                            catch
+                            {
+                                return null;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // 192.168.1.0 - 192.168.2.255
+                string[] split = item.Split('-');
+                if (split.Length != 2)
+                {
+                    return null;
+                }
+                else
+                {
+                    foreach (var s in split)
+                    {
+                        string[] ss = s.Split('.');
+                        if (ss.Length != 4)
+                        {
+                            return null;
+                        }
+                        else
+                        {
+                            foreach (var sss in ss)
+                            {
+                                try
+                                {
+                                    int n = int.Parse(sss);
+                                    if (n < 0 || n > 255)
+                                    {
+                                        return null;
+                                    }
+                                }
+                                catch
+                                {
+                                    return null;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return item;
         }
 
         /// <summary>
@@ -594,7 +719,15 @@ namespace ScreenShare
             program.Keys["VideoFrame"] = IniConfig.Program.VideoFrame.ToString();
             program.Keys["VideoQuality"] = IniConfig.Program.VideoQuality.ToString();
             SectionData blackList = new SectionData("BlackList");
+            for (int i = 0; i < IniConfig.BlackList.Count; i++)
+            {
+                blackList.Keys["Item" + i] = IniConfig.BlackList[i];
+            }
             SectionData writeList = new SectionData("WriteList");
+            for (int i = 0; i < IniConfig.WriteList.Count; i++)
+            {
+                writeList.Keys["Item" + i] = IniConfig.WriteList[i];
+            }
             SectionDataCollection sdc = new SectionDataCollection
             {
                 system,
