@@ -72,6 +72,7 @@ namespace ScreenShare
             this.autoLaunchCb.TabIndex = 0;
             this.autoLaunchCb.Text = "开机自启";
             this.autoLaunchCb.UseVisualStyleBackColor = true;
+            this.autoLaunchCb.CheckStateChanged += new System.EventHandler(this.AutoLaunchCb_CheckStateChanged);
             // 
             // autoRunCb
             // 
@@ -82,6 +83,7 @@ namespace ScreenShare
             this.autoRunCb.TabIndex = 1;
             this.autoRunCb.Text = "自动运行";
             this.autoRunCb.UseVisualStyleBackColor = true;
+            this.autoRunCb.CheckStateChanged += new System.EventHandler(this.AutoRunCb_CheckStateChanged);
             // 
             // openConfigBtn
             // 
@@ -180,6 +182,7 @@ namespace ScreenShare
             this.blackText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.blackText.Size = new System.Drawing.Size(230, 360);
             this.blackText.TabIndex = 1;
+            this.blackText.TextChanged += new System.EventHandler(this.BlackText_TextChanged);
             // 
             // whiteBox
             // 
@@ -211,6 +214,7 @@ namespace ScreenShare
             this.whiteText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.whiteText.Size = new System.Drawing.Size(230, 360);
             this.whiteText.TabIndex = 1;
+            this.whiteText.TextChanged += new System.EventHandler(this.WhiteText_TextChanged);
             // 
             // Config
             // 
@@ -230,6 +234,7 @@ namespace ScreenShare
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "系统配置";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Config_FormClosing);
             this.Load += new System.EventHandler(this.Config_Load);
             this.systemConfigBox.ResumeLayout(false);
             this.systemConfigBox.PerformLayout();

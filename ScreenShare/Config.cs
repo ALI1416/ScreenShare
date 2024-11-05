@@ -1,5 +1,7 @@
 using ScreenShare.Model;
+using ScreenShare.Util;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
 
@@ -11,6 +13,11 @@ namespace ScreenShare
     /// </summary>
     public partial class Config : Form
     {
+
+        /// <summary>
+        /// 配置已被修改
+        /// </summary>
+        private static bool isChanged = false;
 
         /// <summary>
         /// 构造函数
@@ -55,6 +62,19 @@ namespace ScreenShare
                 "\r\n显示光标 " + IniConfig.Program.IsDisplayCursor +
                 "\r\n每秒帧数 " + IniConfig.Program.VideoFrame +
                 "\r\n视频质量 " + IniConfig.Program.VideoQuality;
+            string black = "";
+            foreach (var item in IniConfig.BlackList)
+            {
+                black += item + "\r\n";
+            }
+            blackText.Text = black;
+            string write = "";
+            foreach (var item in IniConfig.WhiteList)
+            {
+                write += item + "\r\n";
+            }
+            whiteText.Text = write;
+            isChanged = false;
         }
 
         /// <summary>
@@ -77,17 +97,88 @@ namespace ScreenShare
             bool ok = true;
             if (!StatusManager.IniOk)
             {
-                ok = MessageBox.Show("确定覆盖配置文件？", "警告", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
+                ok = MessageBox.Show("配置文件在启动时加载错误，确定覆盖吗？", "警告", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
             }
             if (ok)
             {
-                StatusManager.IniOk = true;
-                IniConfig.System.AutoLaunch = autoLaunchCb.Checked;
-                IniConfig.System.AutoRun = autoRunCb.Checked;
-                IniConfig.System.OpenBlack = openBlackCb.Checked;
-                IniConfig.System.OpenWhite = openWhiteCb.Checked;
-                FormManager.Main.SaveIni();
+                if (SaveConfig())
+                {
+                    isChanged = false;
+                }
             }
+        }
+
+        /// <summary>
+        /// 保存配置
+        /// </summary>
+        /// <returns></returns>
+        private bool SaveConfig()
+        {
+            string[] blackSplit = blackText.Text.Split('\r', '\n');
+            List<string> blackList = new List<string>();
+            foreach (var split in blackSplit)
+            {
+                if (split.Trim().Length > 0)
+                {
+                    string format = Main.ItemCorrectAndFormat(split);
+                    if (format != null)
+                    {
+                        blackList.Add(format);
+                    }
+                    else
+                    {
+                        Utils.ShowError("黑名单存在非法值 " + split);
+                        return false;
+                    }
+                }
+            }
+            string[] whiteSplit = whiteText.Text.Split('\r', '\n');
+            List<string> whiteList = new List<string>();
+            foreach (var split in whiteSplit)
+            {
+                if (split.Trim().Length > 0)
+                {
+                    string format = Main.ItemCorrectAndFormat(split);
+                    if (format != null)
+                    {
+                        whiteList.Add(format);
+                    }
+                    else
+                    {
+                        Utils.ShowError("白名单存在非法值 " + split);
+                        return false;
+                    }
+                }
+            }
+            StatusManager.IniOk = true;
+            IniConfig.System.AutoLaunch = autoLaunchCb.Checked;
+            IniConfig.System.AutoRun = autoRunCb.Checked;
+            IniConfig.System.OpenBlack = openBlackCb.Checked;
+            IniConfig.System.OpenWhite = openWhiteCb.Checked;
+            IniConfig.BlackList = blackList;
+            IniConfig.WhiteList = whiteList;
+            FormManager.Main.SaveIni();
+            return true;
+        }
+
+        /// <summary>
+        /// 开机自启CheckBox状态改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AutoLaunchCb_CheckStateChanged(object sender, EventArgs e)
+        {
+            isChanged = true;
+        }
+
+        /// <summary>
+        /// 自动运行CheckBox状态改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AutoRunCb_CheckStateChanged(object sender, EventArgs e)
+        {
+            isChanged = true;
         }
 
         /// <summary>
@@ -97,6 +188,7 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void OpenBlackCb_CheckStateChanged(object sender, EventArgs e)
         {
+            isChanged = true;
             bool isChecked = ((CheckBox)sender).Checked;
             if (isChecked && openWhiteCb.Checked)
             {
@@ -111,10 +203,50 @@ namespace ScreenShare
         /// <param name="e"></param>
         private void OpenWhiteCb_CheckStateChanged(object sender, EventArgs e)
         {
+            isChanged = true;
             bool isChecked = ((CheckBox)sender).Checked;
             if (isChecked && openBlackCb.Checked)
             {
                 openBlackCb.Checked = false;
+            }
+        }
+
+        /// <summary>
+        /// 开启黑名单TextBox文本改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BlackText_TextChanged(object sender, EventArgs e)
+        {
+            isChanged = true;
+        }
+
+        /// <summary>
+        /// 开启白名单TextBox文本改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void WhiteText_TextChanged(object sender, EventArgs e)
+        {
+            isChanged = true;
+        }
+
+        /// <summary>
+        /// 点击关闭按钮前
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Config_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (isChanged)
+            {
+                if (MessageBox.Show("配置文件还未保存，是否保存？", "建议", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    if (!SaveConfig())
+                    {
+                        e.Cancel = true;
+                    }
+                }
             }
         }
 

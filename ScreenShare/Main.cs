@@ -14,7 +14,6 @@ using ScreenShare.Service;
 using IniParser;
 using IniParser.Model;
 using System.Drawing.Imaging;
-using System.Web;
 
 namespace ScreenShare
 {
@@ -539,11 +538,12 @@ namespace ScreenShare
             foreach (var black in blackList)
             {
                 string item = black.Value;
-                if (item != null && item.Length != 0)
+                if (item != null && item.Trim().Length != 0)
                 {
-                    if (ItemCorrectAndFormat(item) != null)
+                    string format = ItemCorrectAndFormat(item);
+                    if (format != null)
                     {
-                        IniConfig.BlackList.Add(item);
+                        IniConfig.BlackList.Add(format);
                     }
                     else
                     {
@@ -556,11 +556,12 @@ namespace ScreenShare
             foreach (var write in writeList)
             {
                 string item = write.Value;
-                if (item != null && item.Length != 0)
+                if (item != null && item.Trim().Length != 0)
                 {
-                    if (ItemCorrectAndFormat(item) != null)
+                    string format = ItemCorrectAndFormat(item);
+                    if (format != null)
                     {
-                        IniConfig.WriteList.Add(item);
+                        IniConfig.WhiteList.Add(format);
                     }
                     else
                     {
@@ -568,14 +569,21 @@ namespace ScreenShare
                     }
                 }
             }
-            /* 注册表 */
+            /* 注册表 开机自启 */
+            string autoLaunchPath = RegistryUtils.AutoLaunchGet();
             if (IniConfig.System.AutoLaunch)
             {
-                RegistryUtils.AutoLaunchOpen();
+                if (autoLaunchPath != Constant.APP_PATH)
+                {
+                    RegistryUtils.AutoLaunchOpen();
+                }
             }
             else
             {
-                RegistryUtils.AutoLaunchClose();
+                if (autoLaunchPath != null)
+                {
+                    RegistryUtils.AutoLaunchClose();
+                }
             }
             if (error.Length != 0)
             {
@@ -591,7 +599,7 @@ namespace ScreenShare
         /// 错误返回null
         /// 正确返回格式化后的字符串
         /// </returns>
-        public string ItemCorrectAndFormat(string item)
+        public static string ItemCorrectAndFormat(string item)
         {
             if (item.IndexOf('-') == -1)
             {
@@ -601,11 +609,13 @@ namespace ScreenShare
                 {
                     return null;
                 }
+                StringBuilder result = new StringBuilder();
                 bool isMask = false;
                 foreach (var s in split)
                 {
-                    if (s == "*")
+                    if (s.Trim() == "*")
                     {
+                        result.Append("*.");
                         isMask = true;
                         continue;
                     }
@@ -624,6 +634,8 @@ namespace ScreenShare
                                 {
                                     return null;
                                 }
+                                result.Append(n);
+                                result.Append(".");
                             }
                             catch
                             {
@@ -632,6 +644,8 @@ namespace ScreenShare
                         }
                     }
                 }
+                result.Remove(result.Length - 1, 1);
+                return result.ToString();
             }
             else
             {
@@ -643,8 +657,10 @@ namespace ScreenShare
                 }
                 else
                 {
-                    foreach (var s in split)
+                    StringBuilder[] result = { new StringBuilder(), new StringBuilder(), };
+                    for (int i = 0; i < 2; i++)
                     {
+                        string s = split[i];
                         string[] ss = s.Split('.');
                         if (ss.Length != 4)
                         {
@@ -661,6 +677,8 @@ namespace ScreenShare
                                     {
                                         return null;
                                     }
+                                    result[i].Append(n);
+                                    result[i].Append(".");
                                 }
                                 catch
                                 {
@@ -668,10 +686,11 @@ namespace ScreenShare
                                 }
                             }
                         }
+                        result[i].Remove(result[i].Length - 1, 1);
                     }
+                    return result[0].ToString() + " - " + result[1].ToString();
                 }
             }
-            return item;
         }
 
         /// <summary>
@@ -724,9 +743,9 @@ namespace ScreenShare
                 blackList.Keys["Item" + i] = IniConfig.BlackList[i];
             }
             SectionData writeList = new SectionData("WriteList");
-            for (int i = 0; i < IniConfig.WriteList.Count; i++)
+            for (int i = 0; i < IniConfig.WhiteList.Count; i++)
             {
-                writeList.Keys["Item" + i] = IniConfig.WriteList[i];
+                writeList.Keys["Item" + i] = IniConfig.WhiteList[i];
             }
             SectionDataCollection sdc = new SectionDataCollection
             {
@@ -1240,13 +1259,13 @@ namespace ScreenShare
                 {
                     InitialDirectory = Constant.PICTURE_DIRECTORY,
                     RestoreDirectory = true,
-                    FileName = "预览图.png",
-                    Filter = "PNG图片(*.png)|*.png"
+                    FileName = "预览图.jpg",
+                    Filter = "JPEG图片(*.jpg)|*.jpg"
                 };
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     string fileName = saveFileDialog.FileName;
-                    previewImg.Image.Save(fileName, ImageFormat.Png);
+                    previewImg.Image.Save(fileName, ImageFormat.Jpeg);
                 }
             }
         }

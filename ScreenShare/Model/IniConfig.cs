@@ -114,12 +114,12 @@ namespace ScreenShare.Model
         /// <summary>
         /// 黑名单
         /// </summary>
-        public static List<string> BlackList { get; } = new List<string>();
+        public static List<string> BlackList { get; set; } = new List<string>();
 
         /// <summary>
         /// 白名单
         /// </summary>
-        public static List<string> WriteList { get; } = new List<string>();
+        public static List<string> WhiteList { get; set; } = new List<string>();
 
     }
 }
