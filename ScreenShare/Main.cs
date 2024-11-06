@@ -14,6 +14,8 @@ using ScreenShare.Service;
 using IniParser;
 using IniParser.Model;
 using System.Drawing.Imaging;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace ScreenShare
 {
@@ -535,12 +537,13 @@ namespace ScreenShare
             }
             /* 黑名单 */
             KeyDataCollection blackList = iniData["BlackList"];
+            IniConfig.BlackList.Clear();
             foreach (var black in blackList)
             {
                 string item = black.Value;
                 if (item != null && item.Trim().Length != 0)
                 {
-                    string format = ItemCorrectAndFormat(item);
+                    string format = IpCorrectAndFormat(item);
                     if (format != null)
                     {
                         IniConfig.BlackList.Add(format);
@@ -553,12 +556,13 @@ namespace ScreenShare
             }
             /* 白名单 */
             KeyDataCollection writeList = iniData["WriteList"];
+            IniConfig.WhiteList.Clear();
             foreach (var write in writeList)
             {
                 string item = write.Value;
                 if (item != null && item.Trim().Length != 0)
                 {
-                    string format = ItemCorrectAndFormat(item);
+                    string format = IpCorrectAndFormat(item);
                     if (format != null)
                     {
                         IniConfig.WhiteList.Add(format);
@@ -568,6 +572,30 @@ namespace ScreenShare
                         error += "白名单 [WriteList] 存在非法值 " + item + "\r\n";
                     }
                 }
+            }
+            LoadConfig();
+            if (error.Length != 0)
+            {
+                throw new Exception(error);
+            }
+        }
+
+        /// <summary>
+        /// 加载配置
+        /// </summary>
+        public static void LoadConfig()
+        {
+            /* 黑名单 */
+            StatusManager.BlackList.Clear();
+            foreach (var item in IniConfig.BlackList)
+            {
+                StatusManager.BlackList.Add(Ip2Tuple(item));
+            }
+            /* 白名单 */
+            StatusManager.WhiteList.Clear();
+            foreach (var item in IniConfig.WhiteList)
+            {
+                StatusManager.WhiteList.Add(Ip2Tuple(item));
             }
             /* 注册表 开机自启 */
             string autoLaunchPath = RegistryUtils.AutoLaunchGet();
@@ -585,26 +613,22 @@ namespace ScreenShare
                     RegistryUtils.AutoLaunchClose();
                 }
             }
-            if (error.Length != 0)
-            {
-                throw new Exception(error);
-            }
         }
 
         /// <summary>
-        /// 项正确并且格式化
+        /// IP地址正确并且格式化
         /// </summary>
-        /// <param name="item">项</param>
+        /// <param name="ip">IP地址</param>
         /// <returns>
         /// 错误返回null
-        /// 正确返回格式化后的字符串
+        /// 正确返回格式化后的IP地址
         /// </returns>
-        public static string ItemCorrectAndFormat(string item)
+        public static string IpCorrectAndFormat(string ip)
         {
-            if (item.IndexOf('-') == -1)
+            if (ip.IndexOf('-') == -1)
             {
                 // 192.168.*.*
-                string[] split = item.Split('.');
+                string[] split = ip.Split('.');
                 if (split.Length != 4)
                 {
                     return null;
@@ -650,7 +674,7 @@ namespace ScreenShare
             else
             {
                 // 192.168.1.0 - 192.168.2.255
-                string[] split = item.Split('-');
+                string[] split = ip.Split('-');
                 if (split.Length != 2)
                 {
                     return null;
@@ -691,6 +715,75 @@ namespace ScreenShare
                     return result[0].ToString() + " - " + result[1].ToString();
                 }
             }
+        }
+
+        /// <summary>
+        /// IP地址转Tuple
+        /// </summary>
+        /// <param name="ip">IP地址</param>
+        /// <returns>Tuple</returns>
+        public static Tuple<long, long> Ip2Tuple(string ip)
+        {
+            if (ip.IndexOf('-') == -1)
+            {
+                if (ip.IndexOf('*') == -1)
+                {
+                    // 192.168.1.1
+                    long ipLong = Utils.Ip2Long(ip);
+                    return new Tuple<long, long>(ipLong, ipLong);
+                }
+                else
+                {
+                    // 192.168.*.*
+                    long ipLong1 = Utils.Ip2Long(ip.Replace('*', '0'));
+                    long ipLong2 = Utils.Ip2Long(ip.Replace("*", "255"));
+                    return new Tuple<long, long>(ipLong1, ipLong2);
+                }
+            }
+            else
+            {
+                // 192.168.1.0 - 192.168.2.255
+                string[] split = ip.Split('-');
+                long ipLong1 = Utils.Ip2Long(split[0]);
+                long ipLong2 = Utils.Ip2Long(split[1]);
+                return new Tuple<long, long>(ipLong1, ipLong2);
+            }
+        }
+
+        /// <summary>
+        /// IP通过
+        /// </summary>
+        /// <param name="ip">IP地址</param>
+        /// <returns>IP是否通过</returns>
+        public static bool IpPass(long ip)
+        {
+            if (IniConfig.System.OpenBlack)
+            {
+                return !IpMatch(ip, StatusManager.BlackList);
+            }
+            if (IniConfig.System.OpenWhite)
+            {
+                return IpMatch(ip, StatusManager.WhiteList);
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// IP匹配
+        /// </summary>
+        /// <param name="ip">IP地址</param>
+        /// <param name="list">IP列表</param>
+        /// <returns>IP是否匹配</returns>
+        public static bool IpMatch(long ip, List<Tuple<long, long>> list)
+        {
+            foreach (var item in list)
+            {
+                if (ip >= item.Item1 && ip <= item.Item2)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -873,11 +966,21 @@ namespace ScreenShare
         /// <summary>
         /// http响应回调函数
         /// </summary>
+        /// <param name="client">客户端</param>
         /// <param name="path">路径</param>
         /// <param name="param">参数</param>
         /// <returns>返回值</returns>
-        private byte[] HttpResponseCallback(string path, NameValueCollection param)
+        private byte[] HttpResponseCallback(HttpClient client, string path, NameValueCollection param)
         {
+            if (!IpPass(Utils.Ip2Long(client.Ip)))
+            {
+                Action<string> action = (d) =>
+                {
+                    Log(d);
+                };
+                Invoke(action, "客户端 " + client.Ip + " 被拦截。");
+                return HttpService.unauthorizedHeaderBytes;
+            }
             byte[] data;
             switch (path)
             {

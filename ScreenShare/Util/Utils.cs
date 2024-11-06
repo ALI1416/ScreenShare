@@ -80,6 +80,22 @@ namespace ScreenShare.Util
         }
 
         /// <summary>
+        /// IP地址转long
+        /// </summary>
+        /// <param name="ip">IP地址</param>
+        /// <returns>long型IP地址</returns>
+        public static long Ip2Long(string ip)
+        {
+            string[] split = ip.Split('.');
+            long address = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                address |= long.Parse(split[i]) << 8 * (3 - i);
+            }
+            return address;
+        }
+
+        /// <summary>
         /// 显示错误
         /// </summary>
         /// <param name="text"></param>

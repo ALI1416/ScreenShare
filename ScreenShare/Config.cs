@@ -120,7 +120,7 @@ namespace ScreenShare
             {
                 if (split.Trim().Length > 0)
                 {
-                    string format = Main.ItemCorrectAndFormat(split);
+                    string format = Main.IpCorrectAndFormat(split);
                     if (format != null)
                     {
                         blackList.Add(format);
@@ -138,7 +138,7 @@ namespace ScreenShare
             {
                 if (split.Trim().Length > 0)
                 {
-                    string format = Main.ItemCorrectAndFormat(split);
+                    string format = Main.IpCorrectAndFormat(split);
                     if (format != null)
                     {
                         whiteList.Add(format);
@@ -158,6 +158,7 @@ namespace ScreenShare
             IniConfig.BlackList = blackList;
             IniConfig.WhiteList = whiteList;
             FormManager.Main.SaveIni();
+            Main.LoadConfig();
             return true;
         }
 

@@ -21,9 +21,9 @@ namespace ScreenShare.Service
         /// </summary>
         private HttpServer server;
         /// <summary>
-        /// 响应回调函数 路径,参数,返回值
+        /// 响应回调函数 客户端,路径,参数,返回值
         /// </summary>
-        private Func<string, NameValueCollection, byte[]> responseCallback;
+        private Func<HttpClient, string, NameValueCollection, byte[]> responseCallback;
 
         /// <summary>
         /// html头
@@ -37,15 +37,19 @@ namespace ScreenShare.Service
         /// ico头byte[]
         /// </summary>
         public static readonly byte[] icoHeaderBytes = Encoding.UTF8.GetBytes("HTTP/1.0 200 OK\nContent-Type: image/x-icon\nConnection: close\n\n");
+        /// <summary>
+        /// 未授权头byte[]
+        /// </summary>
+        public static readonly byte[] unauthorizedHeaderBytes = Encoding.UTF8.GetBytes("HTTP/1.0 401 OK\nContent-Type: text/plain;charset=utf-8\nConnection: close\n\n");
 
         /// <summary>
         /// 启动
         /// </summary>
         /// <param name="ip">IP地址</param>
         /// <param name="port">端口号</param>
-        /// <param name="responseCallback">响应回调函数 路径,参数,返回值</param>
+        /// <param name="responseCallback">响应回调函数 客户端,路径,参数,返回值</param>
         /// <returns>是否启动成功</returns>
-        public bool Start(IPAddress ip, int port, Func<string, NameValueCollection, byte[]> responseCallback)
+        public bool Start(IPAddress ip, int port, Func<HttpClient, string, NameValueCollection, byte[]> responseCallback)
         {
             try
             {
@@ -199,7 +203,7 @@ namespace ScreenShare.Service
                 param = HttpUtility.ParseQueryString(pathAndQuery[1]);
             }
             // 响应回调函数
-            byte[] data = responseCallback(path, param);
+            byte[] data = responseCallback(client, path, param);
             Send(client, data);
         }
 

@@ -9,6 +9,8 @@
 
 [![Latest Download](https://img.shields.io/badge/Latest%20Version-Click%20Download-&color=success)](https://github.com/ALI1416/ScreenShare/releases/latest/download/ScreenShare.zip)
 
+注意：仅提供`x64`版本，如需其他版本，请自行编译
+
 ## 主要功能
 
 - [x] 密码验证
@@ -23,9 +25,9 @@
 - [x] 托盘运行
 - [x] 查看访问用户详细信息
 - [x] 网站二维码
-- [ ] 配置信息保存、导入与导出
-- [ ] 开机自启与自动运行
-- [ ] 黑白名单
+- [x] 开机自启与自动运行
+- [x] 系统配置
+- [x] 黑白名单
 
 ## 运行示例
 

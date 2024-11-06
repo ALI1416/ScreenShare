@@ -37,6 +37,14 @@ namespace ScreenShare.Model
         /// webSocket服务
         /// </summary>
         public static WebSocketService WebSocketService { get; set; }
+        /// <summary>
+        /// 黑名单列表
+        /// </summary>
+        public static List<Tuple<long, long>> BlackList { get; set; } = new List<Tuple<long, long>>();
+        /// <summary>
+        /// 白名单列表
+        /// </summary>
+        public static List<Tuple<long, long>> WhiteList { get; set; } = new List<Tuple<long, long>>();
 
     }
 }

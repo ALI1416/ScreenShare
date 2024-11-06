@@ -13,9 +13,9 @@ using System.Runtime.InteropServices;
 // 防火墙-发布者
 [assembly: AssemblyCompany("404z.cn")]
 // 文件版本&产品版本
-[assembly: AssemblyFileVersion("2.5.0.9")]
+[assembly: AssemblyFileVersion("2.6.0.10")]
 // 不显示
-[assembly: AssemblyVersion("2.5.0.9")]
+[assembly: AssemblyVersion("2.6.0.10")]
 [assembly: AssemblyDescription("局域网屏幕共享")]
 [assembly: AssemblyConfiguration("retail")]
 [assembly: AssemblyCulture("")]

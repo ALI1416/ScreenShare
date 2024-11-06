@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Sockets;
 
 namespace ScreenShare.Model
@@ -22,6 +23,9 @@ namespace ScreenShare.Model
         /// 接收数据缓冲区
         /// </summary>
         public byte[] Buffer { set; get; }
+        /// IP地址
+        /// </summary>
+        public string Ip { set; get; }
 
         /// <summary>
         /// 创建客户端
@@ -32,6 +36,7 @@ namespace ScreenShare.Model
         {
             Client = socket;
             Buffer = new byte[MAX_BUFFER_LENGTH];
+            Ip = ((IPEndPoint)socket.RemoteEndPoint).Address.ToString();
         }
 
         /// <summary>
